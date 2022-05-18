@@ -1,20 +1,15 @@
-from aiogram.dispatcher.filters import CommandStart
+import logging
+
+from aiogram.dispatcher.filters import Command
 from aiogram.types import Message
 
 from loader import dp
-from tgbot.keyboards.reply.state_keyboard import create_markup
-from tgbot.states.states import Example
-from tgbot.middlewares.throttling import rate_limit
-
-import logging
+from tgbot.keyboards.reply.location import create_markup
 
 
-@dp.message_handler(CommandStart(), state="*")
-@rate_limit(5, 'start')
-async def user_command(message: Message) -> Message:
+@dp.message_handler(Command('rs'))
+async def find_restaurants(message: Message) -> Message:
     logger = logging.getLogger(__name__)
     logger.info('Handler executed')
-
-    await Example.first()
     markup = create_markup()
-    await message.reply("Hello, user!", reply_markup=markup)
+    return await message.answer('Send location by button or just as input', reply_markup=markup)
