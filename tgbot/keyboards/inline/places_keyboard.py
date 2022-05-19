@@ -11,7 +11,7 @@ def create_markup() -> InlineKeyboardMarkup:
         free = random() > 0.5
         if free:
             place_button = InlineKeyboardButton(text=f"✅{place}",
-                                                callback_data=place_callback.new(place))
+                                                callback_data=f'place:{place}')
         else:
             place_button = InlineKeyboardButton(text=f"❌{place}",
                                                 callback_data='busy_place')
