@@ -2,8 +2,8 @@ from aiogram.dispatcher.filters import Command
 from aiogram.types import Message
 
 from loader import dp
-from tgbot.keyboards.reply.location import create_markup as location_markup
-from tgbot.keyboards.inline.places_keyboard import create_markup as places_markup
+from tgbot.keyboards.reply.location import location_markup
+from tgbot.keyboards.inline.places_keyboard import places_markup
 
 
 @dp.message_handler(Command('rs'))
