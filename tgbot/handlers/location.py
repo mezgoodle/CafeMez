@@ -24,4 +24,4 @@ async def nearest_restaurants(message: Message) -> Message:
                          disable_web_page_preview=True)
     for name, distance, url, location in closest_restaurants:
         await message.answer_location(location['lat'], location['lot'])
-    return await message.answer('Скористатйтеся посилання на Google карти або одразу натискайте на геопозиції.')
+    return await message.answer('Скористайтеся посиланнями на Google карти або одразу натискайте на геопозиції.')
