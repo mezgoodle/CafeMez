@@ -30,7 +30,7 @@ def choose_shortest(location: Location):
     for shop_name, shop_coords in restaurants.items():
         distances.append((shop_name,
                           calc_distance(location.latitude, location.longitude,
-                                        shop_coords['lat'], shop_coords['lng']),
+                                        shop_coords['lat'], shop_coords['lot']),
                           show(**shop_coords),
                           shop_coords
                           ))
