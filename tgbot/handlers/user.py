@@ -15,4 +15,5 @@ async def find_restaurants(message: Message) -> Message:
 @dp.message_handler(Command('places'))
 async def show_places(message: Message) -> Message:
     markup = places_markup()
-    return await message.answer('Оберіть вільне місце, яке хочете забронювати', reply_markup=markup)
+    await message.answer('Оберіть вільне місце, яке хочете забронювати', reply_markup=markup)
+    return await message.reply('Оренда буде дійсна дві години від початку оренди')
