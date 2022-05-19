@@ -10,12 +10,12 @@ from datetime import datetime
 
 @dp.callback_query_handler(text='busy_place')
 async def place_callback(call: CallbackQuery) -> Message:
-    return await call.answer('Це місце зайнято. Оберіть інше.', show_alert=True)
+    return await call.message.answer('Це місце зайнято. Оберіть інше.')
 
 
 @dp.callback_query_handler(place_data.filter(choice='yes'))
 async def accept_offer(call: CallbackQuery) -> Message:
-    return await call.answer('Непогано.', show_alert=True)
+    return await call.message.reply('Непогано.')
 
 
 @dp.callback_query_handler(place_data.filter(choice='no'))
@@ -28,7 +28,6 @@ async def deny_offer(call: CallbackQuery) -> Message:
 
 @dp.callback_query_handler(text_contains='place')
 async def place_callback(call: CallbackQuery) -> Message:
-    await call.answer()
     place = call.data.split(":")[-1]
     markup = place_markup(place)
     date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
