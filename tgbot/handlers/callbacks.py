@@ -1,9 +1,8 @@
 from aiogram.types import CallbackQuery, Message
 from aiogram.utils.markdown import hbold
 
-from tgbot.keyboards.inline.places_keyboard import place_markup
+from tgbot.keyboards.inline.places_keyboard import place_markup, places_markup
 from tgbot.keyboards.inline.callback_data import place_callback as place_data
-from tgbot.handlers.user import show_places
 from loader import dp
 
 from datetime import datetime
@@ -21,8 +20,10 @@ async def accept_offer(call: CallbackQuery) -> Message:
 
 @dp.callback_query_handler(place_data.filter(choice='no'))
 async def deny_offer(call: CallbackQuery) -> Message:
-    await call.answer()
-    return await show_places(call.message)
+    markup = places_markup()
+    message = call.message
+    await message.answer('Оберіть вільне місце, яке хочете забронювати', reply_markup=markup)
+    return await message.reply('Оренда буде дійсна дві години від початку оренди')
 
 
 @dp.callback_query_handler(text_contains='place')
