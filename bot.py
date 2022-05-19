@@ -8,6 +8,7 @@ from aiogram.utils.executor import start_polling, start_webhook
 from tgbot.config import load_config
 from tgbot.filters.admin import IsAdminFilter
 from tgbot.middlewares.throttling import ThrottlingMiddleware
+from tgbot.middlewares.callbacks import CallbackMiddleware
 from tgbot.services.setting_commands import set_default_commands
 from tgbot.services.admins_notify import on_startup_notify
 from loader import dp
@@ -18,6 +19,7 @@ logger = logging.getLogger(__name__)
 def register_all_middlewares(dispatcher: Dispatcher) -> None:
     logger.info('Registering middlewares')
     dispatcher.setup_middleware(ThrottlingMiddleware())
+    dispatcher.setup_middleware(CallbackMiddleware())
 
 
 def register_all_filters(dispatcher: Dispatcher) -> None:
