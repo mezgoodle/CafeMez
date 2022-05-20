@@ -70,3 +70,23 @@ class Item(TimeStampedModel):
 
     def __str__(self):
         return f'#{self.id} - {self.name}'
+
+
+class Purchase(TimeStampedModel):
+    id = models.AutoField(primary_key=True)
+    buyer = models.ForeignKey(User, on_delete=models.SET(0), verbose_name='Користувач')
+    item_id = models.ForeignKey(Item, on_delete=models.CASCADE, verbose_name='Продукт')
+    amount = models.DecimalField(max_digits=8, decimal_places=2, verbose_name='Вартість')
+    quantity = models.IntegerField(verbose_name='Кількість')
+    purchase_time = models.DateTimeField(verbose_name='Час покупки', auto_now_add=True)
+    shipping_address = models.CharField(max_length=200, verbose_name='Адреса доставки', null=True)
+    email = models.EmailField(max_length=100, verbose_name='Електронна пошта')
+    reciever = models.CharField(max_length=100, verbose_name='Ім\'я отримувача')
+    successfull = models.BooleanField(default=False, verbose_name='Успішна оплата')
+
+    class Meta:
+        verbose_name = 'Покупка'
+        verbose_name_plural = 'Покупки'
+
+    def __str__(self):
+        return f'#{self.id} - {self.item_id} ({self.quantity})'
