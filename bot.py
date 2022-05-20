@@ -6,7 +6,7 @@ from aiogram import Dispatcher
 from aiogram.utils.executor import start_polling, start_webhook
 
 from tgbot.config import load_config
-from tgbot.filters.admin import IsAdminFilter
+from tgbot.filters.admin import IsGeneralAdminFilter, IsAdminFilter
 from tgbot.middlewares.throttling import ThrottlingMiddleware
 from tgbot.middlewares.callbacks import CallbackMiddleware
 from tgbot.services.setting_commands import set_default_commands
@@ -24,6 +24,7 @@ def register_all_middlewares(dispatcher: Dispatcher) -> None:
 
 def register_all_filters(dispatcher: Dispatcher) -> None:
     logger.info('Registering filters')
+    dispatcher.filters_factory.bind(IsGeneralAdminFilter)
     dispatcher.filters_factory.bind(IsAdminFilter)
 
 
