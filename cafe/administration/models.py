@@ -50,3 +50,18 @@ class Referral(TimeStampedModel):
 
     def __str__(self):
         return f'#{self.id} від {self.referrer_id}'
+
+
+class Item(TimeStampedModel):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, verbose_name='Назва')
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Ціна')
+    description = models.TextField(verbose_name='Опис')
+    image = models.ImageField(upload_to='items', verbose_name='Зображення')
+
+    class Meta:
+        verbose_name = 'Продукт'
+        verbose_name_plural = 'Продукти'
+
+    def __str__(self):
+        return f'#{self.id} ({self.name})'
