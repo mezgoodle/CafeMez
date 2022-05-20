@@ -38,3 +38,15 @@ class User(TimeStampedModel):
 
     def __str__(self):
         return f'#{self.id} ({self.user_id} {self.name})'
+
+
+class Referral(TimeStampedModel):
+    id = models.ForeignKey(User, unique=True, primary_key=True, on_delete=models.CASCADE, verbose_name='Користувач')
+    referrer_id = models.BigIntegerField()
+
+    class Meta:
+        verbose_name = 'Реферал'
+        verbose_name_plural = 'Реферали'
+
+    def __str__(self):
+        return f'#{self.id} від {self.referrer_id}'
