@@ -26,7 +26,7 @@ def load_config(path: str = None) -> Config:
     # load_dotenv(path)
     return Config(
         tg_bot=TgBot(
-            token=os.getenv('BOT_TOKEN', 'token'),
+            token=os.getenv('BOT_TOKEN', '5135575762:AAEDgcUR-r4TYnC1IV-DAMt7L8hiZXdOjEY'),
             admins=[
                 '353057906',
             ],
