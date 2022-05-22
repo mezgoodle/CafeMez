@@ -11,6 +11,7 @@ from tgbot.middlewares.throttling import ThrottlingMiddleware
 from tgbot.middlewares.callbacks import CallbackMiddleware
 from tgbot.services.setting_commands import set_default_commands
 from tgbot.services.admins_notify import on_startup_notify
+from tgbot.misc.api import API
 from loader import dp
 
 logger = logging.getLogger(__name__)
@@ -43,6 +44,10 @@ async def on_startup(dispatcher: Dispatcher, webhook_url: str = None) -> None:
     register_all_filters(dispatcher)
     register_all_handlers(dispatcher)
     await register_all_commands(dispatcher)
+
+    dispatcher.bot['api'] = API()
+    logger.info('Add server API to bot')
+
     # Get current webhook status
     webhook = await dispatcher.bot.get_webhook_info()
 
@@ -59,6 +64,10 @@ async def on_startup(dispatcher: Dispatcher, webhook_url: str = None) -> None:
 
 
 async def on_shutdown(dispatcher: Dispatcher) -> None:
+    server_api = dispatcher.bot.get('api')
+    await server_api.close()
+    logger.info('Server API was closed')
+
     await dispatcher.storage.close()
     await dispatcher.storage.wait_closed()
     logger.info('Bot shutdown')
