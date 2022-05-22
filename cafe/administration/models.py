@@ -22,7 +22,7 @@ class Place(TimeStampedModel):
         verbose_name_plural = 'Місця'
 
     def __str__(self):
-        return f'Місце {self.id} - {self.free}'
+        return f'Місце {self.id} - {"Вільне" if self.free else "Зайняте"}'
 
 
 class User(TimeStampedModel):
