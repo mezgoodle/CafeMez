@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from aiogram.dispatcher.filters import Command
 from aiogram.types import Message
 
@@ -14,6 +16,6 @@ async def find_restaurants(message: Message) -> Message:
 
 @dp.message_handler(Command('places'))
 async def show_places(message: Message) -> Message:
-    markup = places_markup()
+    markup = await places_markup(message)
     await message.answer('Оберіть вільне місце, яке хочете забронювати', reply_markup=markup)
     return await message.reply('Оренда буде дійсна дві години від початку оренди')

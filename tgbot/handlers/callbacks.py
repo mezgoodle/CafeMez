@@ -20,7 +20,7 @@ async def accept_offer(call: CallbackQuery) -> Message:
 
 @dp.callback_query_handler(place_data.filter(choice='no'))
 async def deny_offer(call: CallbackQuery) -> Message:
-    markup = places_markup()
+    markup = await places_markup(call.message)
     message = call.message
     await message.answer('Оберіть вільне місце, яке хочете забронювати', reply_markup=markup)
     return await message.reply('Оренда буде дійсна дві години від початку оренди')

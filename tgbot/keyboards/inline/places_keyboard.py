@@ -1,19 +1,18 @@
-from random import random
-
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 
 from tgbot.keyboards.inline.callback_data import place_callback
 
 
-def places_markup() -> InlineKeyboardMarkup:
+async def places_markup(message: Message) -> InlineKeyboardMarkup:
+    api = message.bot.get('api')
+    places = await api.get('places')
     markup = InlineKeyboardMarkup(row_width=5)
-    for place in range(1, 24):
-        free = random() > 0.5
-        if free:
-            place_button = InlineKeyboardButton(text=f"✅{place}",
-                                                callback_data=f'place:{place}')
+    for place in places:
+        if place['free']:
+            place_button = InlineKeyboardButton(text=f"✅{place['id']}",
+                                                callback_data=f"place:{place['id']}")
         else:
-            place_button = InlineKeyboardButton(text=f"❌{place}",
+            place_button = InlineKeyboardButton(text=f"❌{place['id']}",
                                                 callback_data='busy_place')
         markup.insert(place_button)
     return markup
