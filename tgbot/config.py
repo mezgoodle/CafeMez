@@ -14,6 +14,7 @@ class DbConfig:
 class TgBot:
     token: str
     admins: list
+    payment_token: str
 
 
 @dataclass
@@ -30,6 +31,7 @@ def load_config(path: str = None) -> Config:
             admins=[
                 '353057906',
             ],
+            payment_token=os.getenv('PAYMENT_TOKEN', '54321'),
         ),
         db=DbConfig(
             host=os.getenv('DB_HOST', 'localhost'),
