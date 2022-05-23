@@ -12,8 +12,17 @@ async def show_stats(message: Message) -> Message:
 
 
 @dp.message_handler(Command(['add_admin']), is_general_admin=True)
-async def show_stats(message: Message, command: Command.CommandObj) -> Message:
+async def add_admin(message: Message, command: Command.CommandObj) -> Message:
     success, text = check_nickname(command)
+    if success:
+        # TODO: send request to server
+        return await message.reply(text)
+    return await message.reply(text)
+
+
+@dp.message_handler(Command(['remove_admin']), is_general_admin=True)
+async def add_admin(message: Message, command: Command.CommandObj) -> Message:
+    success, text = check_nickname(command, False)
     if success:
         # TODO: send request to server
         return await message.reply(text)
