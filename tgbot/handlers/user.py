@@ -1,5 +1,3 @@
-from pprint import pprint
-
 from aiogram.dispatcher.filters import Command
 from aiogram.types import Message
 

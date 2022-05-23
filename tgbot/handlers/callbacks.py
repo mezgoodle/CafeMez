@@ -20,17 +20,16 @@ async def accept_offer(call: CallbackQuery, callback_data: dict) -> Message:
     number = callback_data['number']
     place_invoice = Item(
         title=f'Місце з номером {number}',
-        description=f'Оренда місця з номером {call.data.split(":")[-1]} на дату {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}',
-        currency='UAH',
+        description=f'Оренда місця з номером {number} на дату {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}',
         prices=[
             LabeledPrice(
                 label='Оренда столика',
-                amount=10
+                amount=100_00
             )],
         start_parameter=f'create_invoice_rent_place_{number}',
+        payload=f'place:{number}'
     )
-    await bot.send_invoice(call.from_user.id, **place_invoice.generate_invoice(), payload=f'place:{number}')
-    return await call.message.reply('Непогано.')
+    return await bot.send_invoice(call.from_user.id, **place_invoice.generate_invoice())
 
 
 @dp.callback_query_handler(place_data.filter(choice='no'))
