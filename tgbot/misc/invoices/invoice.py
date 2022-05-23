@@ -12,9 +12,9 @@ class Item:
     description: str
     payload: str
     start_parameter: str
-    currency: str
     prices: List[LabeledPrice]
     provider_token: str = load_config().tg_bot.payment_token
+    currency: str = 'UAH'
     provider_data: dict = None
     photo_url: str = None
     photo_size: int = None
