@@ -11,10 +11,5 @@ async def show_stats(message: Message) -> Message:
 
 @dp.message_handler(content_types=ContentType.LOCATION, is_general_admin=True)
 async def add_cafe_coords(message: Message) -> Message:
-    return await message.reply(f'{message.location.longitude}, {message.location.latitude}')
-
-
-@dp.message_handler(content_types=ContentType.LOCATION, is_general_admin=True)
-async def add_cafe_coords(message: Message) -> Message:
     # TODO: send request to server
     return await message.reply(f'{message.location.longitude}, {message.location.latitude}')
