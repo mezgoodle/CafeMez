@@ -1,17 +1,26 @@
-from django.http import Http404
-from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework import mixins, generics
 
 from .models import Place
 from .serializers import PlaceSerializer
 
 
-class PlaceList(generics.ListCreateAPIView):
-    queryset = Place.objects.all()
-    serializer_class = PlaceSerializer
+class ListView(generics.ListCreateAPIView):
+    pass
 
 
-class PlaceDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Place.objects.all()
-    serializer_class = PlaceSerializer
+class DetailView(generics.RetrieveUpdateDestroyAPIView):
+    pass
+
+
+class PlaceList(ListView):
+    def __init__(self):
+        super().__init__()
+        self.queryset = Place.objects.all()
+        self.serializer_class = PlaceSerializer
+
+
+class PlaceDetail(DetailView):
+    def __init__(self):
+        super().__init__()
+        self.queryset = Place.objects.all()
+        self.serializer_class = PlaceSerializer
