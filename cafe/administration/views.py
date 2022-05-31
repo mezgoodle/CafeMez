@@ -1,28 +1,46 @@
-from django.shortcuts import render
+from django.http import Http404
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 
 from .models import Place
 from .serializers import PlaceSerializer
 
 
-@api_view(['GET'])
-def places_lists(request):
-    places = PlaceSerializer(Place.objects.all(), many=True)
-    return Response(places.data)
+class PlaceList(APIView):
+    def get(self, request):
+        places = Place.objects.all()
+        serializer = PlaceSerializer(places, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = PlaceSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
 
 
-@api_view(['GET'])
-def places_detail(request, pk):
-    place = Place.objects.get(pk=pk)
-    place = PlaceSerializer(place, many=False)
-    return Response(place.data)
+class PlaceDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return Place.objects.get(pk=pk)
+        except Place.DoesNotExist:
+            return Http404
 
+    def get(self, request, pk):
+        place = self.get_object(pk)
+        serializer = PlaceSerializer(place)
+        return Response(serializer.data)
 
-@api_view(['POST'])
-def places_add(request):
-    place = PlaceSerializer(data=request.data)
-    if place.is_valid():
-        place.save()
-        return Response(place.data)
-    return Response(place.errors)
+    def put(self, request, pk):
+        place = self.get_object(pk)
+        serializer = PlaceSerializer(place, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk):
+        place = self.get_object(pk)
+        place.delete()
+        return Response(status=204)
