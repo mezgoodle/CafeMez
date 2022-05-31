@@ -1,46 +1,33 @@
 from django.http import Http404
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import mixins, generics
 
 from .models import Place
 from .serializers import PlaceSerializer
 
 
-class PlaceList(APIView):
-    def get(self, request):
-        places = Place.objects.all()
-        serializer = PlaceSerializer(places, many=True)
-        return Response(serializer.data)
+class PlaceList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
+    queryset = Place.objects.all()
+    serializer_class = PlaceSerializer
 
-    def post(self, request):
-        serializer = PlaceSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
 
 
-class PlaceDetail(APIView):
-    def get_object(self, pk):
-        try:
-            return Place.objects.get(pk=pk)
-        except Place.DoesNotExist:
-            return Http404
+class PlaceDetail(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin,
+                  generics.GenericAPIView):
+    queryset = Place.objects.all()
+    serializer_class = PlaceSerializer
 
-    def get(self, request, pk):
-        place = self.get_object(pk)
-        serializer = PlaceSerializer(place)
-        return Response(serializer.data)
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
 
-    def put(self, request, pk):
-        place = self.get_object(pk)
-        serializer = PlaceSerializer(place, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
 
-    def delete(self, request, pk):
-        place = self.get_object(pk)
-        place.delete()
-        return Response(status=204)
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
