@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Item, User, Place, Purchase, Referral
+from .models import Item, User, Place, Purchase, Referral, Restaurant
 
 
 @admin.register(User)
@@ -26,3 +26,8 @@ class PurchaseAdmin(admin.ModelAdmin):
 @admin.register(Place)
 class PlaceAdmin(admin.ModelAdmin):
     list_display = ('id', 'free')
+
+
+@admin.register(Restaurant)
+class RestaurantAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
