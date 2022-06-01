@@ -1,7 +1,7 @@
 from rest_framework import generics
 
-from .models import Place
-from .serializers import PlaceSerializer
+from .models import Place, Restaurant
+from .serializers import PlaceSerializer, RestaurantSerializer
 
 
 class ListView(generics.ListCreateAPIView):
@@ -24,3 +24,17 @@ class PlaceDetail(DetailView):
         super().__init__()
         self.queryset = Place.objects.all()
         self.serializer_class = PlaceSerializer
+
+
+class RestaurantList(ListView):
+    def __init__(self):
+        super().__init__()
+        self.queryset = Restaurant.objects.all()
+        self.serializer_class = RestaurantSerializer
+
+
+class RestaurantDetail(DetailView):
+    def __init__(self):
+        super().__init__()
+        self.queryset = Restaurant.objects.all()
+        self.serializer_class = RestaurantSerializer
