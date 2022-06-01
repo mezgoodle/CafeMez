@@ -25,6 +25,20 @@ class Place(TimeStampedModel):
         return f'Місце {self.id} - {"Вільне" if self.free else "Зайняте"}'
 
 
+class Restaurant(TimeStampedModel):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, verbose_name='Назва ресторану')
+    longitude = models.FloatField(verbose_name='Довгота')
+    latitude = models.FloatField(verbose_name='Широта')
+
+    class Meta:
+        verbose_name = 'Ресторан'
+        verbose_name_plural = 'Ресторани'
+
+    def __str__(self):
+        return f'Ресторан {self.id} - {self.name} з координатами {self.longitude}, {self.latitude}'
+
+
 class User(TimeStampedModel):
     id = models.AutoField(primary_key=True)
     user_id = models.BigIntegerField(unique=True, default=1, verbose_name='Ідентифікатор користувача у телеграмі')
