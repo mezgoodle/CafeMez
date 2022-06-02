@@ -1,3 +1,4 @@
+from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, ContentType
 from aiogram.dispatcher.filters import Command
 from aiogram.utils.markdown import hitalic, hbold
@@ -30,6 +31,19 @@ async def add_admin(message: Message, command: Command.CommandObj) -> Message:
 
 
 @dp.message_handler(content_types=ContentType.LOCATION, is_general_admin=True)
-async def add_cafe_coords(message: Message) -> Message:
+async def add_cafe_coords(message: Message, state: FSMContext) -> Message:
     # TODO: send request to server
-    return await message.reply(f'{message.location.longitude}, {message.location.latitude}')
+    await state.set_state('cafe_name')
+    await state.update_data(longitude=message.location.longitude, latitude=message.location.latitude)
+    return await message.reply('Назва кав\'ярні:')
+
+
+@dp.message_handler(state='cafe_name', is_general_admin=True)
+async def answer_cafe_name(message: Message, state: FSMContext) -> Message:
+    data = await state.get_data()
+    await state.finish()
+    api = message.bot.get('api')
+    resp = await api.post('restaurants',
+                          {'name': message.text, 'latitude': data['latitude'], 'longitude': data['longitude']})
+    print(resp)
+    return await message.reply('Haha')
