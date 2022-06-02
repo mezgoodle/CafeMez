@@ -1,1 +1,1 @@
-from . import callbacks, admin, user, help, location, payments, echo, errors
+from . import callbacks, help, user, admin, location, payments, echo, errors
