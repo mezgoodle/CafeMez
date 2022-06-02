@@ -14,7 +14,7 @@ class API:
     async def post(self, request_url, data=None):
         url = self.base_url % request_url
         async with self.session.post(url, data=data) as response:
-            return await response.json()
+            return response.status
 
     async def put(self, url, data=None):
         async with self.session.put(url, data=data) as response:
