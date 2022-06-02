@@ -10,7 +10,7 @@ async def nearest_restaurants(message: Message) -> Message:
     location = message.location
     latitude = location.latitude
     longitude = location.longitude
-    closest_restaurants = choose_shortest(location)
+    closest_restaurants = await choose_shortest(location, message.bot)
     text_format = "Назва: {name}. {url}\nВідстань до нього: {distance:.1f} км."
     text = '\n\n'.join(
         [

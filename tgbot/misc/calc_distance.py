@@ -1,8 +1,9 @@
 import math
+from typing import Dict
 
+from aiogram import Bot
 from aiogram.types import Location
 
-from tgbot.misc.coords import restaurants
 from tgbot.misc.map import show
 
 
@@ -25,13 +26,16 @@ def calc_distance(lat1, lon1, lat2, lon2):
     return distance
 
 
-def choose_shortest(location: Location):
+async def choose_shortest(location: Location, bot: Bot):
     distances = list()
-    for shop_name, shop_coords in restaurants.items():
-        distances.append((shop_name,
+    api = bot.get('api')
+    restaurants = await api.get('restaurants')
+    for restaurant in restaurants:
+        coord_dict: Dict[str, float] = {'lat': restaurant['latitude'], 'lot': restaurant['longitude']}
+        distances.append((restaurant['name'],
                           calc_distance(location.latitude, location.longitude,
-                                        shop_coords['lat'], shop_coords['lot']),
-                          show(**shop_coords),
-                          shop_coords
+                                        restaurant['latitude'], restaurant['longitude']),
+                          show(**coord_dict),
+                          coord_dict
                           ))
     return sorted(distances, key=lambda x: x[1])[:2]
