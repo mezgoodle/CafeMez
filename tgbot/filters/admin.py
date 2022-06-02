@@ -20,8 +20,8 @@ class IsAdminFilter(BoundFilter):
 
     def __init__(self, is_admin):
         self.is_admin = is_admin
+
     # TODO: get admins from api
     async def check(self, message: Message):
         config: Config = load_config()
         return str(message.from_user.id) in config.tg_bot.admins
-
