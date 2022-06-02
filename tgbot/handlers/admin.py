@@ -7,6 +7,7 @@ from loader import dp
 from tgbot.misc.admin_utils import check_nickname
 
 
+# TODO: make rights for admin and general admin
 @dp.message_handler(Command(['stats']), is_general_admin=True)
 async def show_stats(message: Message) -> Message:
     return await message.reply(f'Hello, {message.from_user.username}!')
@@ -35,7 +36,7 @@ async def add_cafe_coords(message: Message, state: FSMContext) -> Message:
     # TODO: send request to server
     await state.set_state('cafe_name')
     await state.update_data(longitude=message.location.longitude, latitude=message.location.latitude)
-    return await message.reply('Назва кав\'ярні:')
+    return await message.reply('Напишіть назву ресторану')
 
 
 @dp.message_handler(state='cafe_name', is_general_admin=True)
@@ -43,7 +44,8 @@ async def answer_cafe_name(message: Message, state: FSMContext) -> Message:
     data = await state.get_data()
     await state.finish()
     api = message.bot.get('api')
-    resp = await api.post('restaurants',
+    response_code = await api.post('restaurants',
                           {'name': message.text, 'latitude': data['latitude'], 'longitude': data['longitude']})
-    print(resp)
-    return await message.reply('Haha')
+    if response_code == 201:
+        return await message.answer(f'Дякую! Ресторан {hbold(message.text)} доданий до бази даних.')
+    return await message.reply('Щось пішло не так. Зверніться до головного адміністратора.')
