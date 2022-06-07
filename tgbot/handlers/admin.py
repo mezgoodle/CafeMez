@@ -5,12 +5,21 @@ from aiogram.utils.markdown import hitalic, hbold
 
 from loader import dp
 from tgbot.misc.admin_utils import check_nickname
+from tgbot.keyboards.inline.restaurants_keyboard import restaurants_markup
 
 
 # TODO: make rights for admin and general admin
 @dp.message_handler(Command(['stats']), is_general_admin=True)
 async def show_stats(message: Message) -> Message:
     return await message.reply(f'Hello, {message.from_user.username}!')
+
+
+@dp.message_handler(Command(['rs']), is_general_admin=True)
+async def show_stats(message: Message) -> Message:
+    keyboard = await restaurants_markup(message)
+    return await message.reply(
+        f'Список ресторанів у базі даних. Щоб видалити, {hbold("натисніть хрестик")} навпроти імені ресторану',
+        reply_markup=keyboard)
 
 
 @dp.message_handler(Command(['add_admin']), is_general_admin=True)
@@ -45,7 +54,7 @@ async def answer_cafe_name(message: Message, state: FSMContext) -> Message:
     await state.finish()
     api = message.bot.get('api')
     response_code = await api.post('restaurants',
-                          {'name': message.text, 'latitude': data['latitude'], 'longitude': data['longitude']})
+                                   {'name': message.text, 'latitude': data['latitude'], 'longitude': data['longitude']})
     if response_code == 201:
         return await message.answer(f'Дякую! Ресторан {hbold(message.text)} доданий до бази даних.')
     return await message.reply('Щось пішло не так. Зверніться до головного адміністратора.')
