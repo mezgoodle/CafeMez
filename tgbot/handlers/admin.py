@@ -16,10 +16,14 @@ async def show_stats(message: Message) -> Message:
 
 @dp.message_handler(Command(['rs']), is_general_admin=True)
 async def show_stats(message: Message) -> Message:
-    keyboard = await restaurants_markup(message)
-    return await message.reply(
-        f'Список ресторанів у базі даних. Щоб видалити, {hbold("натисніть хрестик")} навпроти імені ресторану',
-        reply_markup=keyboard)
+    api = message.bot.get('api')
+    restaurants = await api.get('restaurants')
+    keyboard = await restaurants_markup(restaurants)
+    text = f'Список ресторанів у базі даних. Щоб видалити, {hbold("натисніть хрестик")} навпроти імені номеру' \
+           f' ресторану:\n'
+    for restaurant in restaurants:
+        text += f'{hitalic(restaurant["id"])}. {restaurant["name"]}\n'
+    return await message.reply(text, reply_markup=keyboard)
 
 
 @dp.message_handler(Command(['add_admin']), is_general_admin=True)
