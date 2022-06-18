@@ -17,6 +17,7 @@ from loader import dp
 logger = logging.getLogger(__name__)
 
 # TODO: зробити команду старт, і старт бота з інвойсом
+# TODO: make functions to do requests to server
 
 
 def register_all_middlewares(dispatcher: Dispatcher) -> None:
