@@ -1,7 +1,8 @@
 from aiogram.types import CallbackQuery, Message, LabeledPrice
-from aiogram.utils.markdown import hbold
+from aiogram.utils.markdown import hbold, hitalic
 
 from tgbot.keyboards.inline.places_keyboard import place_markup, places_markup
+from tgbot.keyboards.inline.restaurants_keyboard import restaurants_markup
 from tgbot.keyboards.inline.callback_data import place_callback as place_data
 from loader import dp, bot
 
@@ -13,6 +14,22 @@ from tgbot.misc.invoices.invoice import Item
 @dp.callback_query_handler(text='busy_place')
 async def place_callback(call: CallbackQuery) -> Message:
     return await call.message.answer('Це місце зайнято. Оберіть інше.')
+
+
+@dp.callback_query_handler(text_contains='rs:')
+async def place_callback(call: CallbackQuery) -> Message:
+    # TODO: at first, delete restaurant from db
+    restaurant_id = call.data.split(':')[1]
+    # TODO: at second, show new text and keyboard
+    api = call.bot.get('api')
+    restaurants = await api.get('restaurants')
+    keyboard = await restaurants_markup(restaurants)
+    text = f'Список ресторанів у базі даних. Щоб видалити, {hbold("натисніть хрестик")} навпроти імені номеру' \
+           f' ресторану:\n'
+    for restaurant in restaurants:
+        text += f'{hitalic(restaurant["id"])}. {restaurant["name"]}\n'
+    await call.message.edit_text("hello", reply_markup=None)
+    return await call.message.answer(restaurant_id)
 
 
 @dp.callback_query_handler(place_data.filter(choice='yes'))
