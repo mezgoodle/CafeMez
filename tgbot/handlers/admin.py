@@ -21,8 +21,8 @@ async def show_stats(message: Message) -> Message:
     keyboard = await restaurants_markup(restaurants)
     text = f'Список ресторанів у базі даних. Щоб видалити, {hbold("натисніть хрестик")} навпроти імені номеру' \
            f' ресторану:\n'
-    for restaurant in restaurants:
-        text += f'{hitalic(restaurant["id"])}. {restaurant["name"]}\n'
+    for index, restaurant in enumerate(restaurants, start=1):
+        text += f'{hitalic(index)}. {restaurant["name"]}\n'
     return await message.reply(text, reply_markup=keyboard)
 
 
