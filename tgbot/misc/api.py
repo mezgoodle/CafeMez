@@ -20,5 +20,9 @@ class API:
         async with self.session.put(url, data=data) as response:
             return await response.json()
 
+    async def delete(self, url):
+        async with self.session.delete(url) as response:
+            return response.status
+
     async def close(self):
         await self.session.close()
