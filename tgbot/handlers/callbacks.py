@@ -18,10 +18,11 @@ async def place_callback(call: CallbackQuery) -> Message:
 
 @dp.callback_query_handler(text_contains='rs:')
 async def place_callback(call: CallbackQuery) -> Message:
-    # TODO: at first, delete restaurant from db
     restaurant_id = call.data.split(':')[1]
-    # TODO: at second, show new text and keyboard
     api = call.bot.get('api')
+    status = api.delete(f'restaurants/{restaurant_id}')
+    # TODO: at second, show new text and keyboard
+
     restaurants = await api.get('restaurants')
     keyboard = await restaurants_markup(restaurants)
     text = f'Список ресторанів у базі даних. Щоб видалити, {hbold("натисніть хрестик")} навпроти імені номеру' \
