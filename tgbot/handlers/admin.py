@@ -16,8 +16,8 @@ async def show_stats(message: Message) -> Message:
 
 @dp.message_handler(Command(['rs']), is_general_admin=True)
 async def show_stats(message: Message) -> Message:
-    api = message.bot.get('api')
-    restaurants = await api.get('restaurants')
+    api = message.bot.get('restaurants_api')
+    restaurants = await api.get_all_restaurants()
     keyboard = await restaurants_markup(restaurants)
     text = f'Список ресторанів у базі даних. Щоб видалити, {hbold("натисніть хрестик")} навпроти імені номеру' \
            f' ресторану:\n'
@@ -56,9 +56,8 @@ async def add_cafe_coords(message: Message, state: FSMContext) -> Message:
 async def answer_cafe_name(message: Message, state: FSMContext) -> Message:
     data = await state.get_data()
     await state.finish()
-    api = message.bot.get('api')
-    response_code = await api.post('restaurants',
-                                   {'name': message.text, 'latitude': data['latitude'], 'longitude': data['longitude']})
+    api = message.bot.get('restaurants_api')
+    response_code = await api.create_restaurant(message.text, data['latitude'], data['longitude'])
     if response_code == 201:
         return await message.answer(f'Дякую! Ресторан {hbold(message.text)} доданий до бази даних.')
     return await message.reply('Щось пішло не так. Зверніться до головного адміністратора.')

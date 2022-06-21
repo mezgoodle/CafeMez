@@ -28,8 +28,8 @@ def calc_distance(lat1, lon1, lat2, lon2):
 
 async def choose_shortest(location: Location, bot: Bot):
     distances = list()
-    api = bot.get('api')
-    restaurants = await api.get('restaurants')
+    api = bot.get('restaurants_api')
+    restaurants = await api.get_all_restaurants()
     for restaurant in restaurants:
         coord_dict: Dict[str, float] = {'lat': restaurant['latitude'], 'lot': restaurant['longitude']}
         distances.append((restaurant['name'],

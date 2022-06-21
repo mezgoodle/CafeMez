@@ -4,8 +4,8 @@ from tgbot.keyboards.inline.callback_data import place_callback
 
 
 async def places_markup(message: Message) -> InlineKeyboardMarkup:
-    api = message.bot.get('api')
-    places = await api.get('places')
+    api = message.bot.get('places_api')
+    places = await api.get_all_places()
     markup = InlineKeyboardMarkup(row_width=5)
     for place in places:
         if place['free']:
