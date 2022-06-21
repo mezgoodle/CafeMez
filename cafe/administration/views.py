@@ -1,10 +1,12 @@
 from rest_framework import generics
+from rest_framework.permissions import IsAdminUser
 
 from .models import Place, Restaurant
 from .serializers import PlaceSerializer, RestaurantSerializer
 
 
 class ListView(generics.ListCreateAPIView):
+    permission_classes = [IsAdminUser]
     pass
 
 
