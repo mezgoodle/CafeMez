@@ -1,17 +1,16 @@
 from rest_framework import generics
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from .models import Place, Restaurant
 from .serializers import PlaceSerializer, RestaurantSerializer
 
 
 class ListView(generics.ListCreateAPIView):
-    permission_classes = [IsAdminUser]
-    pass
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class DetailView(generics.RetrieveUpdateDestroyAPIView):
-    pass
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class PlaceList(ListView):
