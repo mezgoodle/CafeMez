@@ -57,7 +57,7 @@ async def answer_cafe_name(message: Message, state: FSMContext) -> Message:
     data = await state.get_data()
     await state.finish()
     api = message.bot.get('restaurants_api')
-    response_code = await api.create_restaurant(message.text, data['latitude'], data['longitude'])
-    if response_code == 201:
+    response = await api.create_restaurant(message.text, data['latitude'], data['longitude'])
+    if response:
         return await message.answer(f'Дякую! Ресторан {hbold(message.text)} доданий до бази даних.')
     return await message.reply('Щось пішло не так. Зверніться до головного адміністратора.')
