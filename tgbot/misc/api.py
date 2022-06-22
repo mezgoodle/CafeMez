@@ -11,19 +11,19 @@ class API:
         async with self.session.get(url) as response:
             return await response.json()
 
-    async def post(self, request_url, data=None):
+    async def post(self, request_url, data: dict = None, headers: dict = None):
         url = self.base_url % request_url
-        async with self.session.post(url, data=data) as response:
-            return response.status
+        async with self.session.post(url, data=data, headers=headers) as response:
+            return await response.json()
 
     async def put(self, request_url, data=None):
         url = self.base_url % request_url
         async with self.session.put(url, data=data) as response:
             return await response.json()
 
-    async def delete(self, request_url):
+    async def delete(self, request_url: str, headers: dict = None):
         url = self.base_url % request_url
-        async with self.session.delete(url) as response:
+        async with self.session.delete(url, headers=headers) as response:
             return response.status
 
     async def close(self):
