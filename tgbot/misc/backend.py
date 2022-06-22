@@ -1,7 +1,11 @@
 from tgbot.misc.api import API
+from tgbot.config import load_config, Config
 
 
 class Backend:
+    token: str = None
+    auth_str = 'Token %s'
+
     def __init__(self, api):
         self.api: API = api
 
@@ -14,15 +18,30 @@ class Backend:
         return item
 
     async def update_item(self, collection: str, item_id, name, price, category_id, subcategory_id):
+        await self.get_token()
         pass
 
     async def delete_item(self, collection: str, item_id):
-        status = await self.api.delete(f'{collection}/{item_id}')
+        await self.get_token()
+        headers = {'Authorization': self.auth_str % self.token}
+        status = await self.api.delete(f'{collection}/{item_id}', headers=headers)
         return status
 
     async def create_item(self, collection: str, data: dict):
-        status = await self.api.post(collection, data)
+        await self.get_token()
+        headers = {'Authorization': self.auth_str % self.token}
+        status = await self.api.post(collection, data, headers=headers)
         return status
+
+    async def get_token(self):
+        if not self.token:
+            config: Config = load_config()
+            token = await self.api.post('token',
+                                        data={
+                                            'username': config.admin.username,
+                                            'password': config.admin.password
+                                        })
+            self.token = token['token']
 
 
 class Restaurant(Backend):
