@@ -6,6 +6,7 @@ from aiogram.utils.markdown import hitalic, hbold
 from loader import dp
 from tgbot.misc.admin_utils import check_nickname
 from tgbot.keyboards.inline.restaurants_keyboard import restaurants_markup
+from tgbot.keyboards.reply.location import location_markup
 
 
 # TODO: make rights for admin and general admin
@@ -44,9 +45,15 @@ async def add_admin(message: Message, command: Command.CommandObj) -> Message:
     return await message.reply(text)
 
 
-@dp.message_handler(content_types=ContentType.LOCATION, is_general_admin=True)
+@dp.message_handler(Command(['add_rs']), is_general_admin=True)
+async def add_restaurant(message: Message, state: FSMContext) -> Message:
+    await state.set_state('cafe_coords')
+    markup = location_markup()
+    return await message.reply('Надішліть локацію через кнопку або просто як вкладення', reply_markup=markup)
+
+
+@dp.message_handler(state='cafe_coords', content_types=ContentType.LOCATION, is_general_admin=True)
 async def add_cafe_coords(message: Message, state: FSMContext) -> Message:
-    # TODO: send request to server
     await state.set_state('cafe_name')
     await state.update_data(longitude=message.location.longitude, latitude=message.location.latitude)
     return await message.reply('Напишіть назву ресторану')
