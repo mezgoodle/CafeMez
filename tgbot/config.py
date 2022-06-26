@@ -11,6 +11,12 @@ class DbConfig:
 
 
 @dataclass
+class AdminCredentials:
+    username: str
+    password: str
+
+
+@dataclass
 class TgBot:
     token: str
     admins: list
@@ -21,6 +27,7 @@ class TgBot:
 class Config:
     tg_bot: TgBot
     db: DbConfig
+    admin: AdminCredentials
 
 
 def load_config(path: str = None) -> Config:
@@ -39,4 +46,8 @@ def load_config(path: str = None) -> Config:
             user=os.getenv('DB_USER', 'user'),
             database=os.getenv('DB_NAME', 'database'),
         ),
+        admin=AdminCredentials(
+            username=os.getenv('USERNAME', 'username'),
+            password=os.getenv('PASSWORD', 'password'),
+        )
     )
