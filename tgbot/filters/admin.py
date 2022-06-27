@@ -10,6 +10,7 @@ class IsGeneralAdminFilter(BoundFilter):
     def __init__(self, is_general_admin):
         self.is_general_admin = is_general_admin
 
+    # TODO: get admin from api
     async def check(self, message: Message):
         config: Config = load_config()
         return str(message.from_user.id) in config.tg_bot.admins
