@@ -44,8 +44,9 @@ class Restaurant(TimeStampedModel):
 
 
 class User(TimeStampedModel, AbstractUser):
+    id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=100, verbose_name='Ім\'я користувача в телеграмі')
-    email = models.EmailField(max_length=100, verbose_name='Електронна пошта')
+    email = models.EmailField(max_length=100, verbose_name='Електронна пошта', unique=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
