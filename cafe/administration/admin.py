@@ -5,7 +5,10 @@ from .models import Item, User, Place, Purchase, Referral, Restaurant
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user_id', 'name', 'username', 'created')
+    list_display = ('email', 'is_staff', 'is_active',)
+    list_filter = ('email', 'is_staff', 'is_active',)
+    search_fields = ('email',)
+    ordering = ('email',)
 
 
 @admin.register(Item)
