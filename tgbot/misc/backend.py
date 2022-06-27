@@ -38,7 +38,7 @@ class Backend:
             config: Config = load_config()
             token = await self.api.post('token',
                                         data={
-                                            'username': config.admin.username,
+                                            'username': config.admin.email,
                                             'password': config.admin.password
                                         })
             self.token = token['token']
