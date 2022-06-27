@@ -12,7 +12,7 @@ class DbConfig:
 
 @dataclass
 class AdminCredentials:
-    username: str
+    email: str
     password: str
 
 
@@ -47,7 +47,7 @@ def load_config(path: str = None) -> Config:
             database=os.getenv('DB_NAME', 'database'),
         ),
         admin=AdminCredentials(
-            username=os.getenv('USERNAME', 'username'),
             password=os.getenv('PASSWORD', 'password'),
+            email=os.getenv('EMAIL', 'email'),
         )
     )
