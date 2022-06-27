@@ -1,4 +1,8 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+from .managers import CustomUserManager
 
 
 class TimeStampedModel(models.Model):
@@ -39,19 +43,21 @@ class Restaurant(TimeStampedModel):
         return f'Ресторан {self.id} - {self.name} з координатами {self.longitude}, {self.latitude}'
 
 
-class User(TimeStampedModel):
-    id = models.AutoField(primary_key=True)
-    user_id = models.BigIntegerField(unique=True, default=1, verbose_name='Ідентифікатор користувача у телеграмі')
-    name = models.CharField(max_length=100, verbose_name='Ім\'я користувача')
+class User(TimeStampedModel, AbstractUser):
     username = models.CharField(max_length=100, verbose_name='Ім\'я користувача в телеграмі')
     email = models.EmailField(max_length=100, verbose_name='Електронна пошта')
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
+
+    objects = CustomUserManager()
 
     class Meta:
         verbose_name = 'Користувач'
         verbose_name_plural = 'Користувачі'
 
     def __str__(self):
-        return f'#{self.id} ({self.user_id} {self.name})'
+        return f'#{self.id} @{self.username}'
 
 
 class Referral(TimeStampedModel):
