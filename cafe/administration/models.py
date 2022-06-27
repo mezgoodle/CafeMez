@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from uuid import uuid1
 
 from .managers import CustomUserManager
 
@@ -45,7 +46,7 @@ class Restaurant(TimeStampedModel):
 
 class User(TimeStampedModel, AbstractUser):
     id = models.AutoField(primary_key=True)
-    username = models.CharField(max_length=100, verbose_name='Ім\'я користувача в телеграмі')
+    username = models.CharField(max_length=100, verbose_name='Ім\'я користувача в телеграмі', unique=True)
     email = models.EmailField(max_length=100, verbose_name='Електронна пошта', unique=True)
 
     USERNAME_FIELD = 'email'
