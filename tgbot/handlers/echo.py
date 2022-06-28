@@ -5,4 +5,4 @@ from loader import dp
 
 @dp.message_handler()
 async def echo(message: Message) -> Message:
-    await message.answer(message.text)
+    return await message.answer(message.text)
