@@ -18,21 +18,9 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 
-class Place(TimeStampedModel):
-    id = models.AutoField(primary_key=True)
-    free = models.BooleanField(default=True, verbose_name='Вільне місце')
-
-    class Meta:
-        verbose_name = 'Місце'
-        verbose_name_plural = 'Місця'
-
-    def __str__(self):
-        return f'Місце {self.id} - {"Вільне" if self.free else "Зайняте"}'
-
-
 class Restaurant(TimeStampedModel):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100, verbose_name='Назва ресторану')
+    name = models.CharField(max_length=100, verbose_name='Назва ресторану', unique=True)
     longitude = models.FloatField(verbose_name='Довгота')
     latitude = models.FloatField(verbose_name='Широта')
 
@@ -42,6 +30,20 @@ class Restaurant(TimeStampedModel):
 
     def __str__(self):
         return f'Ресторан {self.id} - {self.name} з координатами {self.longitude}, {self.latitude}'
+
+
+class Place(TimeStampedModel):
+    id = models.AutoField(primary_key=True)
+    free = models.BooleanField(default=True, verbose_name='Вільне місце')
+    restaurant = models.ForeignKey(Restaurant, to_field='name', on_delete=models.CASCADE, verbose_name='Ресторан',
+                                   default='МакДональдз. Метро Вокзальна')
+
+    class Meta:
+        verbose_name = 'Місце'
+        verbose_name_plural = 'Місця'
+
+    def __str__(self):
+        return f'Місце {self.id} у ресторані {self.restaurant} - {"Вільне" if self.free else "Зайняте"}'
 
 
 class User(TimeStampedModel, AbstractUser):
