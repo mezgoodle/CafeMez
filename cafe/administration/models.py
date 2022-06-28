@@ -29,7 +29,7 @@ class Restaurant(TimeStampedModel):
         verbose_name_plural = 'Ресторани'
 
     def __str__(self):
-        return f'Ресторан {self.id} - {self.name} з координатами {self.longitude}, {self.latitude}'
+        return f'Ресторан {self.id} - {self.name}'
 
 
 class Place(TimeStampedModel):

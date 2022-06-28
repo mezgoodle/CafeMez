@@ -28,7 +28,7 @@ class PurchaseAdmin(admin.ModelAdmin):
 
 @admin.register(Place)
 class PlaceAdmin(admin.ModelAdmin):
-    list_display = ('id', 'free')
+    list_display = ('id', 'free', 'restaurant')
 
 
 @admin.register(Restaurant)
