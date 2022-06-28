@@ -1,4 +1,5 @@
 from rest_framework import generics, views, response, status
+from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django.http import Http404
 
@@ -28,6 +29,18 @@ class PlaceDetail(DetailView):
         self.serializer_class = PlaceSerializer
 
 
+@api_view(['GET'])
+def places_by_restaurant(request, restaurant_name):
+    try:
+        restaurant = Restaurant.objects.get(name=restaurant_name)
+    except Restaurant.DoesNotExist:
+        raise Http404
+
+    places = Place.objects.filter(restaurant=restaurant)
+    serializer = PlaceSerializer(places, many=True)
+    return response.Response(serializer.data)
+
+
 class RestaurantList(ListView):
     def __init__(self):
         super().__init__()
@@ -44,8 +57,9 @@ class RestaurantDetail(DetailView):
 
 class UserList(views.APIView):
     """
-    List all snippets, or create a new user.
+    List all users, or create a new user.
     """
+
     def get(self, request):
         snippets = User.objects.all()
         serializer = UserSerializer(snippets, many=True)
@@ -63,6 +77,7 @@ class UserDetail(views.APIView):
     """
     Retrieve, update or delete a user instance.
     """
+
     @staticmethod
     def get_object(username):
         try:
