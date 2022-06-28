@@ -87,5 +87,3 @@ class UserDetail(views.APIView):
         user = self.get_object(username)
         user.delete()
         return response.Response(status=status.HTTP_204_NO_CONTENT)
-
-

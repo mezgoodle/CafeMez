@@ -1,7 +1,7 @@
 from aiogram.types import Message
 from aiogram.dispatcher.filters import BoundFilter
 
-from tgbot.config import Config, load_config
+from tgbot.misc.backend import User
 
 
 class IsGeneralAdminFilter(BoundFilter):
@@ -10,10 +10,10 @@ class IsGeneralAdminFilter(BoundFilter):
     def __init__(self, is_general_admin):
         self.is_general_admin = is_general_admin
 
-    # TODO: get admin from api
     async def check(self, message: Message):
-        config: Config = load_config()
-        return str(message.from_user.id) in config.tg_bot.admins
+        api: User = message.bot['users_api']
+        username = message.from_user.username
+        return await api.is_superuser(username)
 
 
 class IsAdminFilter(BoundFilter):
@@ -22,7 +22,7 @@ class IsAdminFilter(BoundFilter):
     def __init__(self, is_admin):
         self.is_admin = is_admin
 
-    # TODO: get admins from api
     async def check(self, message: Message):
-        config: Config = load_config()
-        return str(message.from_user.id) in config.tg_bot.admins
+        api: User = message.bot['users_api']
+        username = message.from_user.username
+        return await api.is_staff(username)

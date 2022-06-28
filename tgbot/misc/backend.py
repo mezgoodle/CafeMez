@@ -87,6 +87,40 @@ class Place(Backend):
         return status
 
 
+class User(Backend):
+    def __init__(self, api):
+        super().__init__(api)
+
+    async def get_all_users(self):
+        users = await self.get_all_items('users')
+        return users
+
+    async def get_user(self, username: str):
+        user = await self.get_item('users', username)
+        return user
+
+    async def delete_user(self, username: str):
+        status = self.delete_item('users', username)
+        return status
+
+    async def create_user(self, username: str, email: str, is_staff: bool):
+        data = {
+            'username': username,
+            'is_staff': is_staff,
+            'email': email,
+        }
+        status = await self.create_item('users', data)
+        return status
+
+    async def is_staff(self, username: str):
+        user = await self.get_user(username)
+        return user['is_staff']
+
+    async def is_superuser(self, username: str):
+        user = await self.get_user(username)
+        return user['is_superuser']
+
+
 class Product(Backend):
     def __init__(self, api):
         super().__init__(api)
