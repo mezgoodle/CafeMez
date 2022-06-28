@@ -3,11 +3,12 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 from tgbot.keyboards.inline.callback_data import place_callback
 
 
-async def places_markup(message: Message) -> InlineKeyboardMarkup:
+async def places_markup(message: Message, restaurant_name: str) -> InlineKeyboardMarkup:
     api = message.bot.get('places_api')
     places = await api.get_all_places()
+    filtered_places = list(filter(lambda place: place['restaurant'] == restaurant_name, places))
     markup = InlineKeyboardMarkup(row_width=5)
-    for place in places:
+    for place in filtered_places:
         if place['free']:
             place_button = InlineKeyboardButton(text=f"✅{place['id']}",
                                                 callback_data=f"place:{place['id']}")
