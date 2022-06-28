@@ -75,8 +75,12 @@ class Place(Backend):
         super().__init__(api)
 
     async def get_all_places(self):
-        restaurants = await self.get_all_items('places')
-        return restaurants
+        places = await self.get_all_items('places')
+        return places
+
+    async def get_places_by_restaurant(self, restaurant_name: str):
+        places = await self.get_all_items(f'places/restaurant/{restaurant_name}')
+        return places
 
     async def get_place(self, place_id):
         place = await self.get_item('places', place_id)
