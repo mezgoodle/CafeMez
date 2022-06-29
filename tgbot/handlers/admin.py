@@ -4,9 +4,11 @@ from aiogram.dispatcher.filters import Command
 from aiogram.utils.markdown import hitalic, hbold
 
 from loader import dp
-from tgbot.misc.admin_utils import check_nickname
+from tgbot.misc.admin_utils import check_username
 from tgbot.keyboards.inline.restaurants_keyboard import restaurants_markup
 from tgbot.keyboards.reply.location import location_markup
+from tgbot.misc.backend import User
+from tgbot.states.states import Admin
 
 
 # TODO: make rights for admin and general admin
@@ -28,17 +30,40 @@ async def show_stats(message: Message) -> Message:
 
 
 @dp.message_handler(Command(['add_admin']), is_general_admin=True)
-async def add_admin(message: Message, command: Command.CommandObj) -> Message:
-    success, text = check_nickname(command)
+async def add_admin(message: Message, command: Command.CommandObj, state: FSMContext) -> Message:
+    success, nickname = check_username(command)
     if success:
-        # TODO: send request to server
-        return await message.reply(text)
-    return await message.reply(text)
+        await Admin.first()
+        await state.update_data(username=nickname)
+        await Admin.next()
+        return await message.answer(f'Введіть пароль для користувача {nickname}')
+    return await message.reply(nickname)
+
+
+@dp.message_handler(state=Admin.password)
+async def answer_password(message: Message, state: FSMContext) -> Message:
+    await Admin.next()
+    await state.update_data(password=message.text)
+    return await message.answer('Введіть поштовий адрес')
+
+
+@dp.message_handler(state=Admin.email)
+async def answer_email(message: Message, state: FSMContext) -> Message:
+    await state.update_data(email=message.text)
+    data = await state.get_data()
+    await state.finish()
+    api: User = message.bot.get('users_api')
+    status = await api.create_user(**data, is_staff=True)
+    if status:
+        await message.answer('Адміністратора успішно створено')
+        return await message.answer(
+            f'Username: {hbold(data["username"])}\nPassword: {hbold(data["password"])}\nEmail: {hbold(data["email"])}')
+    return await message.reply('Виникла проблема. Зверніться до головного адміністратора')
 
 
 @dp.message_handler(Command(['remove_admin']), is_general_admin=True)
 async def add_admin(message: Message, command: Command.CommandObj) -> Message:
-    success, text = check_nickname(command, False)
+    success, text = check_username(command, False)
     if success:
         # TODO: send request to server
         return await message.reply(text)
