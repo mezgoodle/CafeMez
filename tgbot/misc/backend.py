@@ -107,9 +107,10 @@ class User(Backend):
         status = self.delete_item('users', username)
         return status
 
-    async def create_user(self, username: str, email: str, is_staff: bool):
+    async def create_user(self, username: str, email: str, is_staff: bool = False, password: str = None):
         data = {
             'username': username,
+            'password': password,
             'is_staff': is_staff,
             'email': email,
         }
