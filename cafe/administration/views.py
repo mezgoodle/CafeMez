@@ -5,6 +5,7 @@ from django.http import Http404
 
 from .models import Place, Restaurant, User
 from .serializers import PlaceSerializer, RestaurantSerializer, UserSerializer
+from .utils import set_permissions
 
 
 class ListView(generics.ListCreateAPIView):
@@ -70,6 +71,7 @@ class UserList(views.APIView):
         if serializer.is_valid():
             user = serializer.save()
             user.set_password(request.data['password'])
+            set_permissions(user)
             user.save()
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
