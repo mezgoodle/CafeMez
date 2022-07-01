@@ -54,7 +54,7 @@ class User(TimeStampedModel, AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
-    objects = CustomUserManager()
+    # objects = CustomUserManager()
 
     class Meta:
         verbose_name = 'Користувач'
