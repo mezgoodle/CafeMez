@@ -17,4 +17,5 @@ class PlaceSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'is_staff', 'is_superuser']
+        fields = ['id', 'username', 'email', 'is_staff', 'is_superuser', 'password']
+        extra_kwargs = {'password': {'write_only': True}}
