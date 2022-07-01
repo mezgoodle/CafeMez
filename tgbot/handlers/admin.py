@@ -53,8 +53,8 @@ async def answer_email(message: Message, state: FSMContext) -> Message:
     data = await state.get_data()
     await state.finish()
     api: User = message.bot.get('users_api')
-    status = await api.create_user(**data, is_staff=True)
-    if status:
+    _, status = await api.create_user(**data, is_staff=True)
+    if status == 201:
         await message.answer('Адміністратора успішно створено')
         return await message.answer(
             f'Username: {hbold(data["username"])}\nPassword: {hbold(data["password"])}\nEmail: {hbold(data["email"])}')
@@ -63,7 +63,7 @@ async def answer_email(message: Message, state: FSMContext) -> Message:
 
 @dp.message_handler(Command(['remove_admin']), is_general_admin=True)
 async def add_admin(message: Message, command: Command.CommandObj) -> Message:
-    success, text = check_username(command, False)
+    success, text = check_username(command)
     if success:
         # TODO: send request to server
         return await message.reply(text)
