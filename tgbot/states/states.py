@@ -5,4 +5,5 @@ class Admin(StatesGroup):
     username = State()
     password = State()
     email = State()
+    telegram_id = State()
     is_staff = State()

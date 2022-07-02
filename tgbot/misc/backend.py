@@ -115,11 +115,13 @@ class User(Backend):
     async def create_user(self,
                           username: str,
                           email: str,
+                          user_id: int,
                           is_staff: bool = False,
                           password: str = None) -> Tuple[dict, int]:
         data = {
             'username': username,
             'password': password,
+            'telegram_id': user_id,
             'is_staff': is_staff,
             'email': email,
         }

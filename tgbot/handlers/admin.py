@@ -47,9 +47,23 @@ async def answer_password(message: Message, state: FSMContext) -> Message:
     return await message.answer('Введіть поштовий адрес')
 
 
+@dp.message_handler(state=Admin.password)
+async def answer_password(message: Message, state: FSMContext) -> Message:
+    await Admin.next()
+    await state.update_data(password=message.text)
+    return await message.answer('Введіть поштовий адрес')
+
+
 @dp.message_handler(state=Admin.email)
 async def answer_email(message: Message, state: FSMContext) -> Message:
+    await Admin.next()
     await state.update_data(email=message.text)
+    return await message.answer('Введіть ідентифікатор користувача у Telegram')
+
+
+@dp.message_handler(state=Admin.telegram_id)
+async def answer_id(message: Message, state: FSMContext) -> Message:
+    await state.update_data(telegram_id=message.text)
     data = await state.get_data()
     await state.finish()
     api: User = message.bot.get('users_api')
