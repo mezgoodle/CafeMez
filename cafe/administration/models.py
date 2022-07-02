@@ -72,7 +72,7 @@ class Referral(TimeStampedModel):
         verbose_name_plural = 'Реферали'
 
     def __str__(self):
-        return f'{self.user_id.username} від {self.referrer_id.username}'
+        return f'{self.user_id} прийшов від {self.referrer_id.username}'
 
 
 class Item(TimeStampedModel):

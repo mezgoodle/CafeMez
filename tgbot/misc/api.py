@@ -34,6 +34,5 @@ class API:
         async with self.session.delete(url, headers=headers) as response:
             return response.status
 
-    @api_decorator
     async def close(self):
         await self.session.close()

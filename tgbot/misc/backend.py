@@ -92,7 +92,7 @@ class Place(Backend):
         return place
 
     async def delete_place(self, place_id) -> int:
-        status = self.delete_item('places', place_id)
+        status = await self.delete_item('places', place_id)
         return status
 
 
@@ -140,3 +140,16 @@ class User(Backend):
 class Product(Backend):
     def __init__(self, api):
         super().__init__(api)
+
+
+class Referral(Backend):
+    def __init__(self, api):
+        super().__init__(api)
+
+    async def apply_referral(self, from_user_id: int, to_user_id: int) -> Tuple[dict, int]:
+        data = {
+            'referrer_id': from_user_id,
+            'user_id': to_user_id
+        }
+        data, status = await self.create_item('referrals', data)
+        return data, status

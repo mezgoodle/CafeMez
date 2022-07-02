@@ -12,7 +12,7 @@ from tgbot.middlewares.callbacks import CallbackMiddleware
 from tgbot.services.setting_commands import set_default_commands
 from tgbot.services.admins_notify import on_startup_notify
 from tgbot.misc.api import API
-from tgbot.misc.backend import Place, Product, Restaurant, User
+from tgbot.misc.backend import Place, Product, Restaurant, User, Referral
 from loader import dp
 
 logger = logging.getLogger(__name__)
@@ -53,6 +53,7 @@ async def on_startup(dispatcher: Dispatcher, webhook_url: str = None) -> None:
     dispatcher.bot['restaurants_api'] = Restaurant(API())
     dispatcher.bot['products_api'] = Product(API())
     dispatcher.bot['users_api'] = User(API())
+    dispatcher.bot['referrals_api'] = Referral(API())
 
     logger.info('Add server API to bot')
 
