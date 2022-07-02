@@ -1,6 +1,7 @@
 from aiogram.dispatcher.filters import Command
 from aiogram.types import Message
 from aiogram.dispatcher import FSMContext
+from aiogram.utils.deep_linking import get_start_link
 
 from loader import dp
 from tgbot.keyboards.reply.location import location_markup
@@ -28,3 +29,9 @@ async def show_places(message: Message, state: FSMContext) -> Message:
     markup = await places_markup(message, restaurant_name)
     await message.answer('Оберіть вільне місце, яке хочете забронювати', reply_markup=markup)
     return await message.reply('Оренда буде дійсна дві години від початку оренди')
+
+
+@dp.message_handler(Command(['my_ref']))
+async def show_my_ref(message: Message) -> Message:
+    link = await get_start_link(payload=message.from_user.username)
+    return await message.answer(f'Вашe посилання: {link}')
