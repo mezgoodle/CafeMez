@@ -20,11 +20,9 @@ class CustomUserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         # TODO: dont get password from user, if it is not staff
-        # print(password)
         user.set_password(password)
         # TODO: fix this
         if extra_fields.get('is_staff'):
-            # print('Hello')
             needed_models = [Place, Restaurant, Referral, Purchase, Item]
             for model in needed_models:
                 content_type = ContentType.objects.get_for_model(model)
