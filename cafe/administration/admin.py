@@ -5,9 +5,9 @@ from .models import Item, User, Place, Purchase, Referral, Restaurant
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('email', 'is_staff', 'is_active',)
+    list_display = ('email', 'is_staff', 'is_active', 'telegram_id')
     list_filter = ('email', 'is_staff', 'is_active',)
-    search_fields = ('email',)
+    search_fields = ('email', 'telegram_id', 'username')
     ordering = ('email',)
 
 
@@ -18,7 +18,7 @@ class ItemAdmin(admin.ModelAdmin):
 
 @admin.register(Referral)
 class ReferralAdmin(admin.ModelAdmin):
-    list_display = ('id', 'referrer_id')
+    list_display = ('user_id', 'referrer_id')
 
 
 @admin.register(Purchase)

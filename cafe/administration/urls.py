@@ -11,5 +11,7 @@ urlpatterns = [
     path('restaurants/<int:pk>', views.RestaurantDetail.as_view(), name='restaurant_detail'),
     path('users', views.UserList.as_view(), name='all_users'),
     path('users/<str:username>', views.UserDetail.as_view(), name='user_detail'),
+    path('referrals', views.ReferralList.as_view(), name='all_referrals'),
+    path('referrals/<int:pk>', views.ReferralDetail.as_view(), name='referral_detail'),
     path('token', obtain_auth_token, name='token'),
 ]
