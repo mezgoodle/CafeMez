@@ -65,8 +65,13 @@ async def answer_email(message: Message, state: FSMContext) -> Message:
 async def add_admin(message: Message, command: Command.CommandObj) -> Message:
     success, text = check_username(command)
     if success:
-        # TODO: send request to server
-        return await message.reply(text)
+        api: User = message.bot.get('users_api')
+        status = await api.delete_user(text)
+        if status == 204:
+            return await message.reply(f'Користувача {hbold(text)} успішно видалено')
+        elif status == 404:
+            return await message.reply(f'Користувача {hbold(text)} не знайдено')
+        return await message.reply('Виникла проблема. Зверніться до головного адміністратора')
     return await message.reply(text)
 
 
