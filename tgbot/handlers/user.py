@@ -7,6 +7,7 @@ from loader import dp
 from tgbot.keyboards.reply.location import location_markup
 from tgbot.keyboards.reply.restaurants import restaurants_markup
 from tgbot.keyboards.inline.places_keyboard import places_markup
+from tgbot.misc.backend import User
 
 
 @dp.message_handler(Command(['rs', 'admin_rs']))
@@ -33,5 +34,9 @@ async def show_places(message: Message, state: FSMContext) -> Message:
 
 @dp.message_handler(Command(['my_ref']))
 async def show_my_ref(message: Message) -> Message:
-    link = await get_start_link(payload=message.from_user.id)
-    return await message.answer(f'Вашe посилання: {link}')
+    api: User = message.bot.get('users_api')
+    user = await api.get_user(message.from_user.username)
+    if user:
+        link = await get_start_link(payload=message.from_user.id)
+        return await message.answer(f'Вашe посилання: {link}')
+    return await message.answer('Ви не зареєстровані в системі. Для цього введіть команду /register')
