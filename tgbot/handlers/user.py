@@ -33,5 +33,5 @@ async def show_places(message: Message, state: FSMContext) -> Message:
 
 @dp.message_handler(Command(['my_ref']))
 async def show_my_ref(message: Message) -> Message:
-    link = await get_start_link(payload=message.from_user.username)
+    link = await get_start_link(payload=message.from_user.id)
     return await message.answer(f'Вашe посилання: {link}')
