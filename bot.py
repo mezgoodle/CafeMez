@@ -1,9 +1,9 @@
 import functools
-import logging
 import os
 
 from aiogram import Dispatcher
 from aiogram.utils.executor import start_polling, start_webhook
+from loguru import logger
 
 from tgbot.config import load_config
 from tgbot.filters.admin import IsGeneralAdminFilter, IsAdminFilter
@@ -14,8 +14,6 @@ from tgbot.services.admins_notify import on_startup_notify
 from tgbot.misc.api import API
 from tgbot.misc.backend import Place, Product, Restaurant, User, Referral
 from loader import dp
-
-logger = logging.getLogger(__name__)
 
 
 def register_all_middlewares(dispatcher: Dispatcher) -> None:
@@ -81,11 +79,11 @@ async def on_shutdown(dispatcher: Dispatcher) -> None:
 
 
 if __name__ == '__main__':
-    logging.basicConfig(
-        level=logging.INFO,
-        format=u'%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s',
-    )
+    logger.add('tgbot.log', format='{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}', rotation='10 KB',
+               compression='zip')
     config = load_config()
+
+    logger.info('Initializing bot')
 
     # Webhook settings
     HEROKU_APP_NAME = os.getenv('HEROKU_APP_NAME')

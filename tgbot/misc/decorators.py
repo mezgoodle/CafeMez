@@ -1,15 +1,13 @@
 from aiohttp import ClientConnectorError
 from aiogram import Bot
 from aiogram.types import User
-from aiogram.utils.markdown import hbold
+from loguru import logger
 
-import logging
 from functools import wraps
 
 
 def api_decorator(method):
-    logger = logging.getLogger(__name__)
-    method_name = hbold(method.__name__)
+    method_name = method.__name__
 
     @wraps(method)
     async def wrapper(*args, **kwargs):
