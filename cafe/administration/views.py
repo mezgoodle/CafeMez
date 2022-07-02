@@ -3,8 +3,8 @@ from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django.http import Http404
 
-from .models import Place, Restaurant, User
-from .serializers import PlaceSerializer, RestaurantSerializer, UserSerializer
+from .models import Place, Restaurant, User, Referral
+from .serializers import PlaceSerializer, RestaurantSerializer, UserSerializer, ReferralSerializer
 from .utils import set_permissions
 
 
@@ -54,6 +54,20 @@ class RestaurantDetail(DetailView):
         super().__init__()
         self.queryset = Restaurant.objects.all()
         self.serializer_class = RestaurantSerializer
+
+
+class ReferralList(ListView):
+    def __init__(self):
+        super().__init__()
+        self.queryset = Referral.objects.all()
+        self.serializer_class = ReferralSerializer
+
+
+class ReferralDetail(DetailView):
+    def __init__(self):
+        super().__init__()
+        self.queryset = Referral.objects.all()
+        self.serializer_class = ReferralSerializer
 
 
 class UserList(views.APIView):
