@@ -46,6 +46,8 @@ class User(TimeStampedModel, AbstractUser):
     id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=100, verbose_name='Ім\'я користувача в телеграмі', unique=True)
     email = models.EmailField(max_length=100, verbose_name='Електронна пошта', unique=True)
+    telegram_id = models.IntegerField(verbose_name='Ідентифікатор користувача у телеграмі',
+                                      default=353057906, unique=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -59,15 +61,18 @@ class User(TimeStampedModel, AbstractUser):
 
 
 class Referral(TimeStampedModel):
-    id = models.OneToOneField(User, unique=True, primary_key=True, on_delete=models.CASCADE, verbose_name='Користувач')
-    referrer_id = models.BigIntegerField()
+    id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField(verbose_name='Ідентифікатор користувача у телеграмі',
+                                  default=353057906, unique=True)
+    referrer_id = models.ForeignKey(User, to_field='telegram_id', on_delete=models.CASCADE,
+                                    verbose_name='Користувач')
 
     class Meta:
         verbose_name = 'Реферал'
         verbose_name_plural = 'Реферали'
 
     def __str__(self):
-        return f'#{self.id} від {self.referrer_id}'
+        return f'{self.user_id.username} від {self.referrer_id.username}'
 
 
 class Item(TimeStampedModel):
