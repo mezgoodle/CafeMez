@@ -79,8 +79,8 @@ async def on_shutdown(dispatcher: Dispatcher) -> None:
 
 
 if __name__ == '__main__':
-    logger.add('tgbot.log', format='{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}', rotation='10 KB',
-               compression='zip')
+    logger.add('tgbot.log', format='{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}', rotation='5 KB',
+               compression='zip', enqueue=True)
     config = load_config()
 
     logger.info('Initializing bot')
