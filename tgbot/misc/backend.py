@@ -108,6 +108,11 @@ class User(Backend):
         user = await self.get_item('users', username)
         return user
 
+    async def get_staff(self) -> list:
+        users = await self.get_all_users()
+        staff = list(filter(lambda user: user['is_staff'], users))
+        return staff
+
     async def delete_user(self, username: str) -> int:
         status = await self.delete_item('users', username)
         return status

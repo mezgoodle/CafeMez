@@ -2,7 +2,7 @@ import aiohttp
 
 from tgbot.misc.decorators import api_decorator
 
-from typing import Tuple
+from typing import Tuple, Union
 
 
 class API:
@@ -11,7 +11,7 @@ class API:
         self.base_url = 'http://127.0.0.1:8000/api/%s'
 
     @api_decorator
-    async def get(self, request_url: str) -> dict:
+    async def get(self, request_url: str) -> Union[dict, list]:
         url = self.base_url % request_url
         async with self.session.get(url) as response:
             return await response.json()
