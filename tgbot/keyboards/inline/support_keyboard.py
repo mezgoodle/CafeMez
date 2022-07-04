@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from tgbot.misc.support import get_support_manager
 from tgbot.config import load_config, Config
-from tgbot.keyboards.inline.callback_data import support_callback, cancel_support
+from tgbot.keyboards.inline.callback_data import support_callback, cancel_support_callback
 
 from random import choice
 
@@ -39,3 +39,11 @@ async def create_keyboard(messages, user_id=None):
                                           )
                      )
     return keyboard
+
+
+async def cancel_support(user_id):
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text='Закінчити сеанс', callback_data=cancel_support_callback.new(user_id=user_id))]
+        ]
+    )
