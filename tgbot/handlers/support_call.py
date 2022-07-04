@@ -54,8 +54,10 @@ async def answer_support_call(call: CallbackQuery, state: FSMContext, callback_d
     keyboard = await cancel_support(second_id)
     keyboard_second_user = await cancel_support(call.from_user.id)
 
-    await call.message.edit_text('Ви на зв\'язку з користувачем!\n Щоб завершити спілкування, натисніть кнопку нижче!',
-                                 reply_markup=keyboard)
+    new_message = await call.message.edit_text(
+        'Ви на зв\'язку з користувачем!\n Щоб завершити спілкування, натисніть кнопку нижче!',
+        reply_markup=keyboard)
+    await bot.pin_chat_message(new_message.chat.id, new_message.message_id)
     return await bot.send_message(second_id,
                                   'Техпідтримка на зв\'язку з вами! Можете писати сюди ваші повідомлення. \n'
                                   'Щоб закінчити спілкування, натисніть кнопку нижче',
@@ -70,7 +72,6 @@ async def not_supported(message: Message, state: FSMContext) -> Message:
     return await message.answer('Дочекайтесь відповіді оператора або відміність сеанс!', reply_markup=keyboard)
 
 
-
 @dp.callback_query_handler(cancel_support_callback.filter(), state=['in_support', 'wait_in_support', None])
 async def exit_support(call: CallbackQuery, state: FSMContext, callback_data: dict) -> Message:
     bot: Bot = call.bot
@@ -79,9 +80,9 @@ async def exit_support(call: CallbackQuery, state: FSMContext, callback_data: di
 
     if await second_state.get_state() is not None:
         data_second = await second_state.get_data()
-        second_id = data_second.get('user_id')
+        second_id = data_second.get('second_id')
         if int(second_id) == call.from_user.id:
             await second_state.reset_state()
             await bot.send_message(user_id, 'Користувач завершив сеанс техпідтримки!')
-    await call.message.edit_text('Ви завершили спілкування!')
     await state.reset_state()
+    return await call.message.edit_text('Ви завершили спілкування!')

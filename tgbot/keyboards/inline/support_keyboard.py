@@ -34,7 +34,7 @@ async def create_keyboard(messages, user_id=None):
                  )
     if messages == 'many':
         keyboard.add(InlineKeyboardButton(text='Закінчити сеанс',
-                                          callback_data=cancel_support.new(
+                                          callback_data=cancel_support_callback.new(
                                               user_id=contact_id)
                                           )
                      )
