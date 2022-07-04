@@ -10,6 +10,7 @@ from tgbot.filters.admin import IsGeneralAdminFilter, IsAdminFilter
 from tgbot.middlewares.throttling import ThrottlingMiddleware
 from tgbot.middlewares.callbacks import CallbackMiddleware
 # from tgbot.middlewares.language import ACLMiddleware
+from tgbot.middlewares.support_middleware import SupportMiddleware
 from tgbot.services.setting_commands import set_default_commands
 from tgbot.services.admins_notify import on_startup_notify
 from tgbot.misc.api import API
@@ -22,6 +23,7 @@ def register_all_middlewares(dispatcher: Dispatcher) -> None:
     # config = dispatcher.bot.get('config')
     dispatcher.setup_middleware(ThrottlingMiddleware())
     dispatcher.setup_middleware(CallbackMiddleware())
+    dispatcher.setup_middleware(SupportMiddleware())
     # i18n = ACLMiddleware(config.i18n.domain, config.i18n.locales_dir)
     # dispatcher.setup_middleware(i18n)
     # logger.info('Add i18n middleware to the bot')
