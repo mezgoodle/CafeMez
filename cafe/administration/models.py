@@ -77,15 +77,15 @@ class Referral(TimeStampedModel):
 
 class Item(TimeStampedModel):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100, verbose_name='Назва')
+    name = models.CharField(max_length=50, verbose_name='Назва')
     price = models.DecimalField(max_digits=8, decimal_places=2, verbose_name='Ціна')
     description = models.TextField(verbose_name='Опис', null=True, max_length=200)
-    photo = models.CharField(max_length=200, verbose_name='Фото file_id')
-
+    photo = models.CharField(max_length=250, verbose_name='Фото file_id')
+    # TODO: maybe do categories and subcategories as foreign keys
     category_code = models.CharField(max_length=20, verbose_name='Код категорії')
-    category_name = models.CharField(max_length=20, verbose_name='Назва категорії')
+    category_name = models.CharField(max_length=50, verbose_name='Назва категорії')
     subcategory_code = models.CharField(max_length=20, verbose_name='Код підкатегорії')
-    subcategory_name = models.CharField(max_length=20, verbose_name='Назва підкатегорії')
+    subcategory_name = models.CharField(max_length=50, verbose_name='Назва підкатегорії')
 
     class Meta:
         verbose_name = 'Продукт'
