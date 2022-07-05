@@ -11,25 +11,25 @@ class Backend:
     def __init__(self, api):
         self.api: API = api
 
-    async def get_all_items(self, collection: str) -> list:
+    async def get_all_objects(self, collection: str) -> list:
         items = await self.api.get(collection)
         return items
 
-    async def get_item(self, collection: str, item_id) -> dict:
+    async def get_object(self, collection: str, item_id) -> dict:
         item = await self.api.get(f'{collection}/{item_id}')
         return item
 
-    async def update_item(self, collection: str, item_id, name, price, category_id, subcategory_id):
+    async def update_object(self, collection: str, item_id, name, price, category_id, subcategory_id):
         await self.get_token()
         pass
 
-    async def delete_item(self, collection: str, item_id) -> int:
+    async def delete_object(self, collection: str, item_id) -> int:
         await self.get_token()
         headers = {'Authorization': self.auth_str % self.token}
         status = await self.api.delete(f'{collection}/{item_id}', headers=headers)
         return status
 
-    async def create_item(self, collection: str, data: dict) -> Tuple[dict, int]:
+    async def create_object(self, collection: str, data: dict) -> Tuple[dict, int]:
         await self.get_token()
         headers = {'Authorization': self.auth_str % self.token}
         data, status = await self.api.post(collection, data, headers=headers)
@@ -54,11 +54,11 @@ class Restaurant(Backend):
         super().__init__(api)
 
     async def get_all_restaurants(self) -> list:
-        restaurants = await self.get_all_items('restaurants')
+        restaurants = await self.get_all_objects('restaurants')
         return restaurants
 
     async def get_restaurant(self, restaurant_id) -> dict:
-        restaurant = await self.get_item('restaurants', restaurant_id)
+        restaurant = await self.get_object('restaurants', restaurant_id)
         return restaurant
 
     async def create_restaurant(self, name, latitude, longitude) -> Tuple[dict, int]:
@@ -67,11 +67,11 @@ class Restaurant(Backend):
             'latitude': latitude,
             'longitude': longitude
         }
-        data, status = await self.create_item('restaurants', data)
+        data, status = await self.create_object('restaurants', data)
         return data, status
 
     async def delete_restaurant(self, restaurant_id) -> int:
-        status = await self.delete_item('restaurants', restaurant_id)
+        status = await self.delete_object('restaurants', restaurant_id)
         return status
 
 
@@ -80,19 +80,19 @@ class Place(Backend):
         super().__init__(api)
 
     async def get_all_places(self) -> list:
-        places = await self.get_all_items('places')
+        places = await self.get_all_objects('places')
         return places
 
     async def get_places_by_restaurant(self, restaurant_name: str) -> list:
-        places = await self.get_all_items(f'places/restaurant/{restaurant_name}')
+        places = await self.get_all_objects(f'places/restaurant/{restaurant_name}')
         return places
 
     async def get_place(self, place_id) -> dict:
-        place = await self.get_item('places', place_id)
+        place = await self.get_object('places', place_id)
         return place
 
     async def delete_place(self, place_id) -> int:
-        status = await self.delete_item('places', place_id)
+        status = await self.delete_object('places', place_id)
         return status
 
 
@@ -101,11 +101,11 @@ class User(Backend):
         super().__init__(api)
 
     async def get_all_users(self) -> list:
-        users = await self.get_all_items('users')
+        users = await self.get_all_objects('users')
         return users
 
     async def get_user(self, username: str) -> dict:
-        user = await self.get_item('users', username)
+        user = await self.get_object('users', username)
         return user
 
     async def get_staff(self) -> list:
@@ -114,7 +114,7 @@ class User(Backend):
         return staff
 
     async def delete_user(self, username: str) -> int:
-        status = await self.delete_item('users', username)
+        status = await self.delete_object('users', username)
         return status
 
     async def create_user(self,
@@ -130,7 +130,7 @@ class User(Backend):
             'is_staff': is_staff,
             'email': email,
         }
-        data, status = await self.create_item('users', data)
+        data, status = await self.create_object('users', data)
         return data, status
 
     async def is_staff(self, username: str) -> bool:
@@ -142,9 +142,30 @@ class User(Backend):
         return user['is_superuser']
 
 
-class Product(Backend):
+class Item(Backend):
     def __init__(self, api):
         super().__init__(api)
+
+    async def create_item(self, **kwargs) -> Tuple[dict, int]:
+        data = locals()
+        print(data)
+        # data, status = await self.create_object('items', data)
+        # return data, status
+
+    async def get_categories(self, **kwargs) -> list[dict]:
+        pass
+
+    async def get_subcategories(self, category: str) -> list[dict]:
+        pass
+
+    async def count_items(self, category: str, subcategory: str = None) -> int:
+        pass
+
+    async def get_items(self, category: str, subcategory: str) -> list[dict]:
+        pass
+
+    async def get_item(self, item_id) -> dict:
+        pass
 
 
 class Referral(Backend):
@@ -156,5 +177,5 @@ class Referral(Backend):
             'referrer_id': from_user_id,
             'user_id': to_user_id
         }
-        data, status = await self.create_item('referrals', data)
+        data, status = await self.create_object('referrals', data)
         return data, status

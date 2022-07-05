@@ -14,7 +14,7 @@ from tgbot.middlewares.support_middleware import SupportMiddleware
 from tgbot.services.setting_commands import set_default_commands
 from tgbot.services.admins_notify import on_startup_notify
 from tgbot.misc.api import API
-from tgbot.misc.backend import Place, Product, Restaurant, User, Referral
+from tgbot.misc.backend import Place, Item, Restaurant, User, Referral
 from loader import dp
 
 
@@ -55,7 +55,7 @@ async def on_startup(dispatcher: Dispatcher, webhook_url: str = None) -> None:
     dispatcher.bot['api'] = API()
     dispatcher.bot['places_api'] = Place(API())
     dispatcher.bot['restaurants_api'] = Restaurant(API())
-    dispatcher.bot['products_api'] = Product(API())
+    dispatcher.bot['items_api'] = Item(API())
     dispatcher.bot['users_api'] = User(API())
     dispatcher.bot['referrals_api'] = Referral(API())
 
