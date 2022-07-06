@@ -1,7 +1,7 @@
 from tgbot.misc.api import API
 from tgbot.config import load_config, Config
 
-from typing import Tuple
+from typing import Tuple, List, Union
 
 
 class Backend:
@@ -11,7 +11,7 @@ class Backend:
     def __init__(self, api):
         self.api: API = api
 
-    async def get_all_objects(self, collection: str) -> list:
+    async def get_all_objects(self, collection: str) -> Union[list, int]:
         items = await self.api.get(collection)
         return items
 
@@ -152,20 +152,25 @@ class Item(Backend):
         # data, status = await self.create_object('items', data)
         # return data, status
 
-    async def get_categories(self, **kwargs) -> list[dict]:
-        pass
+    async def get_categories(self, **kwargs) -> List[dict]:
+        categories = await self.get_all_objects('categories')
+        return categories
 
-    async def get_subcategories(self, category: str) -> list[dict]:
-        pass
+    async def get_subcategories(self, category: str) -> List[dict]:
+        subcategories = await self.get_all_objects(f'subcategories/{category}')
+        return subcategories
 
-    async def count_items(self, category: str, subcategory: str = None) -> int:
-        pass
+    async def count_items(self, category: str, subcategory: str = '') -> int:
+        amount = await self.get_all_objects(f'count_items/{category}/{subcategory}')
+        return amount
 
-    async def get_items(self, category: str, subcategory: str) -> list[dict]:
-        pass
+    async def get_items(self, category: str, subcategory: str) -> List[dict]:
+        items = await self.get_all_objects(f'items/by/{category}/{subcategory}')
+        return items
 
     async def get_item(self, item_id) -> dict:
-        pass
+        item = await self.get_object('items', item_id)
+        return item
 
 
 class Referral(Backend):
