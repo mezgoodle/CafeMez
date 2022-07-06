@@ -161,7 +161,7 @@ class Item(Backend):
         return subcategories
 
     async def count_items(self, category: str, subcategory: str = '') -> int:
-        amount = await self.get_all_objects(f'count_items/{category}/{subcategory}')
+        amount = await self.get_all_objects(f'count_items/{category}{"/" + subcategory if subcategory else ""}')
         return amount
 
     async def get_items(self, category: str, subcategory: str) -> List[dict]:
