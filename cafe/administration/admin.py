@@ -14,6 +14,7 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'price', 'category_name', 'subcategory_name')
+    prepopulated_fields = {'description': ('name',)}
 
 
 @admin.register(Referral)
