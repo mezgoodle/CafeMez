@@ -4,8 +4,8 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django.http import Http404
 from loguru import logger
 
-from .models import Place, Restaurant, User, Referral
-from .serializers import PlaceSerializer, RestaurantSerializer, UserSerializer, ReferralSerializer
+from .models import Place, Restaurant, User, Referral, Item
+from .serializers import PlaceSerializer, RestaurantSerializer, UserSerializer, ReferralSerializer, ItemSerializer
 from .utils import set_permissions
 
 
@@ -53,6 +53,23 @@ class PlaceDetail(DetailView):
         super().__init__()
         self.queryset = Place.objects.all()
         self.serializer_class = PlaceSerializer
+
+
+class ItemList(ListView):
+    def __init__(self):
+        super().__init__()
+        self.queryset = Item.objects.all()
+        self.serializer_class = ItemSerializer
+
+    # def get_queryset(self):
+    #     return Item.objects.filter(category_name=self.kwargs.get('category_name'))
+
+
+class ItemDetail(DetailView):
+    def __init__(self):
+        super().__init__()
+        self.queryset = Item.objects.all()
+        self.serializer_class = ItemSerializer
 
 
 @api_view(['GET'])

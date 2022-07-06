@@ -13,5 +13,7 @@ urlpatterns = [
     path('users/<str:username>', views.UserDetail.as_view(), name='user_detail'),
     path('referrals', views.ReferralList.as_view(), name='all_referrals'),
     path('referrals/<int:pk>', views.ReferralDetail.as_view(), name='referral_detail'),
+    path('items', views.ItemList.as_view(), name='all_items'),
+    path('items/<int:pk>', views.ItemDetail.as_view(), name='item_detail'),
     path('token', obtain_auth_token, name='token'),
 ]
