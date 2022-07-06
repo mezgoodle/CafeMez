@@ -64,7 +64,7 @@ def places_by_restaurant(request, restaurant_name):
         raise Http404
 
     logger.info(f'Get places by restaurant; {request=}; {restaurant_name=}')
-    places = Place.objects.filter(restaurant=restaurant)
+    places = restaurant.place_set.all()
     serializer = PlaceSerializer(places, many=True)
     return response.Response(serializer.data)
 
