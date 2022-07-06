@@ -77,33 +77,33 @@ class ItemDetail(DetailView):
 def get_categories(request):
     """List of categories"""
     logger.info(f'Get categories; {request=}')
-    categories = Item.objects.values_list('category_name', flat=True).distinct()
+    categories = Item.objects.values('category_name', 'category_code').distinct()
     return response.Response(categories)
 
 
 @api_view(['GET'])
-def get_subcategories(request, category_name):
+def get_subcategories(request, category_code):
     """List of subcategories"""
-    logger.info(f'Get subcategories; {request=}; {category_name=}')
-    subcategories = Item.objects.filter(category_name=category_name).values_list('subcategory_name',
-                                                                                 flat=True).distinct()
+    logger.info(f'Get subcategories; {request=}; {category_code=}')
+    subcategories = Item.objects.filter(category_code=category_code).values('subcategory_name',
+                                                                            'subcategory_code').distinct()
     return response.Response(subcategories)
 
 
 @api_view(['GET'])
-def count_items(request, category_name, subcategory_name=None):
+def count_items(request, category_code, subcategory_code=None):
     """Count of items"""
-    logger.info(f'Count items; {request=}; {category_name=}; {subcategory_name=}')
-    conditions = [Q(category_name=category_name)]
-    if subcategory_name:
-        conditions.append(Q(subcategory_name=subcategory_name))
+    logger.info(f'Count items; {request=}; {category_code=}; {subcategory_code=}')
+    conditions = [Q(category_code=category_code)]
+    if subcategory_code:
+        conditions.append(Q(subcategory_code=subcategory_code))
     count = Item.objects.filter(*conditions).count()
     return response.Response(count)
 
 
 @api_view(['GET'])
-def get_items(request, category_name, subcategory_name):
-    items = Item.objects.filter(category_name=category_name, subcategory_name=subcategory_name)
+def get_items(request, category_code, subcategory_code):
+    items = Item.objects.filter(category_code=category_code, subcategory_code=subcategory_code)
     serializer = ItemSerializer(items, many=True)
     return response.Response(serializer.data)
 
