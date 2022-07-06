@@ -42,9 +42,9 @@ async def items_keyboard(api: Item, category: str, subcategory: str) -> InlineKe
 
     items = await api.get_items(category, subcategory)
     for item in items:
-        button_text = f'{item["item_name"]} ({item["item_price"]} гривень.)'
+        button_text = f'{item["name"]} ({item["price"]} гривень.)'
         callback_data = make_callback_data(level=CURRENT_LEVEL + 1, category=category,
-                                           subcategory=subcategory, item_id=item['item_id'])
+                                           subcategory=subcategory, item_id=item['id'])
         markup.insert(InlineKeyboardButton(button_text, callback_data=callback_data))
     markup.row(
         InlineKeyboardButton('Назад', callback_data=make_callback_data(level=CURRENT_LEVEL - 1, category=category)))
@@ -56,9 +56,9 @@ async def item_keyboard(api: Item, category: str, subcategory: str, item_id: str
     markup = InlineKeyboardMarkup()
 
     item = await api.get_item(item_id)
-    button_text = f'Купити {item["item_name"]} ({item["item_price"]} гривень.)'
+    button_text = f'Купити {item["name"]} ({item["price"]} гривень.)'
     callback_data = make_callback_data(level=CURRENT_LEVEL + 1, category=item['category_code'],
-                                       subcategory=item['subcategory_code'], item_id=item['item_id'])
+                                       subcategory=item['subcategory_code'], item_id=item['id'])
     markup.insert(InlineKeyboardButton(button_text, callback_data=callback_data))
     markup.row(InlineKeyboardButton('Назад',
                                     callback_data=make_callback_data(level=CURRENT_LEVEL - 1, category=category,
