@@ -2,6 +2,7 @@ from rest_framework import generics, views, response, status
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django.http import Http404
+from django.db.models import Q
 from loguru import logger
 
 from .models import Place, Restaurant, User, Referral, Item
@@ -70,6 +71,41 @@ class ItemDetail(DetailView):
         super().__init__()
         self.queryset = Item.objects.all()
         self.serializer_class = ItemSerializer
+
+
+@api_view(['GET'])
+def get_categories(request):
+    """List of categories"""
+    logger.info(f'Get categories; {request=}')
+    categories = Item.objects.values_list('category_name', flat=True).distinct()
+    return response.Response(categories)
+
+
+@api_view(['GET'])
+def get_subcategories(request, category_name):
+    """List of subcategories"""
+    logger.info(f'Get subcategories; {request=}; {category_name=}')
+    subcategories = Item.objects.filter(category_name=category_name).values_list('subcategory_name',
+                                                                                 flat=True).distinct()
+    return response.Response(subcategories)
+
+
+@api_view(['GET'])
+def count_items(request, category_name, subcategory_name=None):
+    """Count of items"""
+    logger.info(f'Count items; {request=}; {category_name=}; {subcategory_name=}')
+    conditions = [Q(category_name=category_name)]
+    if subcategory_name:
+        conditions.append(Q(subcategory_name=subcategory_name))
+    count = Item.objects.filter(*conditions).count()
+    return response.Response(count)
+
+
+@api_view(['GET'])
+def get_items(request, category_name, subcategory_name):
+    items = Item.objects.filter(category_name=category_name, subcategory_name=subcategory_name)
+    serializer = ItemSerializer(items, many=True)
+    return response.Response(serializer.data)
 
 
 @api_view(['GET'])

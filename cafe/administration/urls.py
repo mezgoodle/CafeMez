@@ -15,5 +15,11 @@ urlpatterns = [
     path('referrals/<int:pk>', views.ReferralDetail.as_view(), name='referral_detail'),
     path('items', views.ItemList.as_view(), name='all_items'),
     path('items/<int:pk>', views.ItemDetail.as_view(), name='item_detail'),
+    path('items/by/<str:category_name>/<str:subcategory_name>', views.get_items, name='items_specific'),
+    path('count_items/<str:category_name>', views.count_items, name='count_items'),
+    path('count_items/<str:category_name>/<str:subcategory_name>', views.count_items,
+         name='count_items_with_subcategory'),
+    path('categories', views.get_categories, name='get_categories'),
+    path('subcategories/<str:category_name>', views.get_subcategories, name='get_subcategories'),
     path('token', obtain_auth_token, name='token'),
 ]
