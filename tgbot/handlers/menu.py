@@ -24,7 +24,7 @@ async def list_categories(message: Union[Message, CallbackQuery], **kwargs):
         await message.answer("Дивись, що у нас є", reply_markup=markup)
     elif isinstance(message, CallbackQuery):
         call = message
-        await call.message.edit_reply_markup(markup)
+        await call.message.edit_text("Дивись, що у нас є", reply_markup=markup)
 
 
 async def list_subcategories(callback: CallbackQuery, category: str, **kwargs):
@@ -45,6 +45,11 @@ async def show_item(callback: CallbackQuery, category: str, subcategory: str, it
     await callback.message.edit_text(text=text, reply_markup=markup)
 
 
+async def buy_item(callback: CallbackQuery, category: str, subcategory: str, item_id: str):
+    await callback.message.answer('Ви успішно додали товар до корзини!')
+    return await list_categories(callback, category=category, subcategory=subcategory, item_id=item_id)
+
+
 @dp.callback_query_handler(menu_callback.filter())
 async def menu_navigate(call: CallbackQuery, callback_data: dict):
     current_level = callback_data.get('level')
@@ -56,7 +61,8 @@ async def menu_navigate(call: CallbackQuery, callback_data: dict):
         '0': list_categories,
         '1': list_subcategories,
         '2': list_items,
-        '3': show_item
+        '3': show_item,
+        '4': buy_item
     }
     current_level_function = levels.get(current_level)
 

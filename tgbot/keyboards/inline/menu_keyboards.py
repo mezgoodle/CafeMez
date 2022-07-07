@@ -56,7 +56,7 @@ async def item_keyboard(api: Item, category: str, subcategory: str, item_id: str
     markup = InlineKeyboardMarkup()
 
     item = await api.get_item(item_id)
-    button_text = f'Купити {item["name"]} ({item["price"]} гривень.)'
+    button_text = f'Додати {item["name"]} ({item["price"]} гривень) до корзини'
     callback_data = make_callback_data(level=CURRENT_LEVEL + 1, category=item['subcategory']['category']['code'],
                                        subcategory=item['subcategory']['code'], item_id=item['id'])
     markup.insert(InlineKeyboardButton(button_text, callback_data=callback_data))
