@@ -75,17 +75,41 @@ class Referral(TimeStampedModel):
         return f'{self.user_id} прийшов від {self.referrer_id.username}'
 
 
+class Category(TimeStampedModel):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=50, verbose_name='Назва', unique=True)
+    code = models.CharField(max_length=20, verbose_name='Код')
+
+    class Meta:
+        verbose_name = 'Категорія'
+        verbose_name_plural = 'Категорії'
+
+    def __str__(self):
+        return f'{self.name}'
+
+
+class SubCategory(TimeStampedModel):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=50, verbose_name='Назва', unique=True)
+    code = models.CharField(max_length=20, verbose_name='Код')
+    category = models.ForeignKey(Category, to_field='name', on_delete=models.CASCADE, verbose_name='Категорія')
+
+    class Meta:
+        verbose_name = 'Підкатегорія'
+        verbose_name_plural = 'Підкатегорії'
+
+    def __str__(self):
+        return f'{self.name}'
+
+
 class Item(TimeStampedModel):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, verbose_name='Назва')
     price = models.DecimalField(max_digits=8, decimal_places=2, verbose_name='Ціна')
     description = models.TextField(verbose_name='Опис', null=True, max_length=200)
     photo = models.CharField(max_length=250, verbose_name='Фото file_id')
-    # TODO: maybe do categories and subcategories as foreign keys
-    category_code = models.CharField(max_length=20, verbose_name='Код категорії')
-    category_name = models.CharField(max_length=50, verbose_name='Назва категорії')
-    subcategory_code = models.CharField(max_length=20, verbose_name='Код підкатегорії')
-    subcategory_name = models.CharField(max_length=50, verbose_name='Назва підкатегорії')
+    subcategory = models.ForeignKey(SubCategory, to_field='name', on_delete=models.CASCADE, verbose_name='Підкатегорія',
+                                    default='Перші страви')
 
     class Meta:
         verbose_name = 'Продукт'

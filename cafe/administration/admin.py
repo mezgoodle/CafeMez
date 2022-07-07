@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Item, User, Place, Purchase, Referral, Restaurant
+from .models import Item, User, Place, Purchase, Referral, Restaurant, Category, SubCategory
 
 
 @admin.register(User)
@@ -13,8 +13,20 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'price', 'category_name', 'subcategory_name')
+    list_display = ('id', 'name', 'price', 'subcategory')
     prepopulated_fields = {'description': ('name',)}
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'code')
+    search_fields = ('name', 'code')
+
+
+@admin.register(SubCategory)
+class SubCategoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'code', 'category')
+    search_fields = ('name', 'code', 'category__name')
 
 
 @admin.register(Referral)
