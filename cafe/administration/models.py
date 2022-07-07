@@ -77,8 +77,8 @@ class Referral(TimeStampedModel):
 
 class Category(TimeStampedModel):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50, verbose_name='Назва', unique=True)
-    code = models.CharField(max_length=20, verbose_name='Код')
+    name = models.CharField(max_length=50, verbose_name='Назва')
+    code = models.CharField(max_length=20, verbose_name='Код', unique=True)
 
     class Meta:
         verbose_name = 'Категорія'
@@ -90,9 +90,9 @@ class Category(TimeStampedModel):
 
 class SubCategory(TimeStampedModel):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50, verbose_name='Назва', unique=True)
-    code = models.CharField(max_length=20, verbose_name='Код')
-    category = models.ForeignKey(Category, to_field='name', on_delete=models.CASCADE, verbose_name='Категорія')
+    name = models.CharField(max_length=50, verbose_name='Назва')
+    code = models.CharField(max_length=20, verbose_name='Код', unique=True)
+    category = models.ForeignKey(Category, to_field='code', on_delete=models.CASCADE, verbose_name='Категорія')
 
     class Meta:
         verbose_name = 'Підкатегорія'
@@ -108,7 +108,7 @@ class Item(TimeStampedModel):
     price = models.DecimalField(max_digits=8, decimal_places=2, verbose_name='Ціна')
     description = models.TextField(verbose_name='Опис', null=True, max_length=200)
     photo = models.CharField(max_length=250, verbose_name='Фото file_id')
-    subcategory = models.ForeignKey(SubCategory, to_field='name', on_delete=models.CASCADE, verbose_name='Підкатегорія',
+    subcategory = models.ForeignKey(SubCategory, to_field='code', on_delete=models.CASCADE, verbose_name='Підкатегорія',
                                     default='Перші страви')
 
     class Meta:
