@@ -5,8 +5,14 @@ from django.http import Http404
 from django.db.models import Q
 from loguru import logger
 
-from .models import Place, Restaurant, User, Referral, Item
-from .serializers import PlaceSerializer, RestaurantSerializer, UserSerializer, ReferralSerializer, ItemSerializer
+from .models import Place, Restaurant, User, Referral, Item, Category, SubCategory
+from .serializers import (PlaceSerializer,
+                          RestaurantSerializer,
+                          UserSerializer,
+                          ReferralSerializer,
+                          ItemSerializer,
+                          CategorySerializer,
+                          SubCategorySerializer)
 from .utils import set_permissions
 
 
@@ -56,14 +62,44 @@ class PlaceDetail(DetailView):
         self.serializer_class = PlaceSerializer
 
 
+class CategoryList(ListView):
+    def __init__(self):
+        super().__init__()
+        self.queryset = Category.objects.all()
+        self.serializer_class = CategorySerializer
+
+
+class CategoryDetail(DetailView):
+    def __init__(self):
+        super().__init__()
+        self.queryset = Category.objects.all()
+        self.serializer_class = CategorySerializer
+
+
+class SubCategoryList(ListView):
+    def __init__(self):
+        super().__init__()
+        # self.queryset = SubCategory.objects.all()
+        self.serializer_class = SubCategorySerializer
+
+    def get_queryset(self):
+        category_code = self.kwargs.get('category_code', None)
+        queryset = SubCategory.objects.filter(category=category_code)
+        return queryset
+
+
+class SubCategoryDetail(DetailView):
+    def __init__(self):
+        super().__init__()
+        self.queryset = SubCategory.objects.all()
+        self.serializer_class = SubCategorySerializer
+
+
 class ItemList(ListView):
     def __init__(self):
         super().__init__()
         self.queryset = Item.objects.all()
         self.serializer_class = ItemSerializer
-
-    # def get_queryset(self):
-    #     return Item.objects.filter(category_name=self.kwargs.get('category_name'))
 
 
 class ItemDetail(DetailView):
@@ -74,36 +110,21 @@ class ItemDetail(DetailView):
 
 
 @api_view(['GET'])
-def get_categories(request):
-    """List of categories"""
-    logger.info(f'Get categories; {request=}')
-    categories = Item.objects.values('category_name', 'category_code').distinct()
-    return response.Response(categories)
-
-
-@api_view(['GET'])
-def get_subcategories(request, category_code):
-    """List of subcategories"""
-    logger.info(f'Get subcategories; {request=}; {category_code=}')
-    subcategories = Item.objects.filter(category_code=category_code).values('subcategory_name',
-                                                                            'subcategory_code').distinct()
-    return response.Response(subcategories)
-
-
-@api_view(['GET'])
 def count_items(request, category_code, subcategory_code=None):
     """Count of items"""
     logger.info(f'Count items; {request=}; {category_code=}; {subcategory_code=}')
-    conditions = [Q(category_code=category_code)]
-    if subcategory_code:
-        conditions.append(Q(subcategory_code=subcategory_code))
-    count = Item.objects.filter(*conditions).count()
+    count = 0
+    category = Category.objects.get(code=category_code)
+    subcategories = [category.subcategory_set.get(code=subcategory_code)] \
+        if subcategory_code else category.subcategory_set.all()
+    for subcategory in subcategories:
+        count += subcategory.item_set.count()
     return response.Response(count)
 
 
 @api_view(['GET'])
-def get_items(request, category_code, subcategory_code):
-    items = Item.objects.filter(category_code=category_code, subcategory_code=subcategory_code)
+def get_items(request, subcategory_code):
+    items = Item.objects.filter(subcategory=subcategory_code)
     serializer = ItemSerializer(items, many=True)
     return response.Response(serializer.data)
 

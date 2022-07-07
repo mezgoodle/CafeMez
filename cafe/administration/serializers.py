@@ -8,12 +8,6 @@ class RestaurantSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Item
-        fields = '__all__'
-
-
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -21,8 +15,18 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class SubCategorySerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True, many=False)
+
     class Meta:
         model = SubCategory
+        fields = '__all__'
+
+
+class ItemSerializer(serializers.ModelSerializer):
+    subcategory = SubCategorySerializer(many=False, read_only=True)
+
+    class Meta:
+        model = Item
         fields = '__all__'
 
 
