@@ -7,3 +7,11 @@ class Admin(StatesGroup):
     email = State()
     telegram_id = State()
     is_staff = State()
+
+
+class Item(StatesGroup):
+    name = State()
+    price = State()
+    description = State()
+    photo = State()
+    subcategory = State()
