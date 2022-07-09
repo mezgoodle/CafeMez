@@ -146,11 +146,9 @@ class Item(Backend):
     def __init__(self, api):
         super().__init__(api)
 
-    async def create_item(self, **kwargs) -> Tuple[dict, int]:
-        data = locals()
-        print(data)
-        # data, status = await self.create_object('items', data)
-        # return data, status
+    async def create_item(self, data: dict) -> Tuple[dict, int]:
+        data, status = await self.create_object('items', data)
+        return data, status
 
     async def get_categories(self, **kwargs) -> List[dict]:
         categories = await self.get_all_objects('categories')

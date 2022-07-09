@@ -1,3 +1,5 @@
+import pprint
+
 from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, ContentType
@@ -6,6 +8,7 @@ from aiogram.utils.markdown import hbold
 from loader import dp
 from tgbot.states.states import Item
 from tgbot.keyboards.reply.subcategories import subcategories_markup
+from tgbot.misc.backend import Item as ItemBackend
 
 
 @dp.message_handler(Command("add_item"), is_admin=True)
@@ -53,8 +56,13 @@ async def answer_subcategory(message: Message, state: FSMContext, subcategories:
     subcategory = message.text
     if not subcategory in subcategories:
         return await message.reply("Оберіть категорію товару із клавіатури")
+    api: ItemBackend = message.bot.get('items_api')
     await state.update_data(subcategory=subcategory)
     data = await state.get_data()
     await state.finish()
-    print(data)
+    pprint.pprint(data)
+    _, status = await api.create_item(data)
+    if status:
+        print(status)
+        return await message.reply(f'Товар "{data["name"]}" був створений')
     return await message.reply('f')
