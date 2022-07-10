@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.relations import HyperlinkedRelatedField
+
 from .models import Place, Restaurant, User, Referral, Item, Category, SubCategory
 
 
@@ -12,10 +14,11 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
+        lookup_field = 'code'
 
 
 class SubCategorySerializer(serializers.ModelSerializer):
-    category = CategorySerializer(read_only=True, many=False)
+    category = CategorySerializer(many=False, read_only=True)
 
     class Meta:
         model = SubCategory
@@ -47,3 +50,4 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email', 'is_staff', 'is_superuser', 'password', 'telegram_id']
         extra_kwargs = {'password': {'write_only': True}}
+        lookup_field = 'username'
