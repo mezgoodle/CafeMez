@@ -1,8 +1,8 @@
-from rest_framework import generics, views, response, status
+from rest_framework import response, status
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.viewsets import ModelViewSet
 from django.http import Http404
-from django.db.models import Q
 from loguru import logger
 
 from .models import Place, Restaurant, User, Referral, Item, Category, SubCategory
@@ -16,97 +16,60 @@ from .serializers import (PlaceSerializer,
 from .utils import set_permissions
 
 
-class ListView(generics.ListCreateAPIView):
+class BaseViewSet(ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def get(self, request, *args, **kwargs):
-        logger.info(f'Get list of objects; {request=}; {args=}; {kwargs=}')
-        return self.list(request, *args, **kwargs)
+    def list(self, request, *args, **kwargs):
+        # logger.info(f'Get list of objects; {request=}; {args=}; {kwargs=}')
+        return super().list(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        logger.info(f'Create object; {request=}; {args=}; {kwargs=}')
-        return self.create(request, *args, **kwargs)
+    def create(self, request, *args, **kwargs):
+        # logger.info(f'Create object; {request=}; {args=}; {kwargs=}')
+        return super().create(request, *args, **kwargs)
 
+    def retrieve(self, request, *args, **kwargs):
+        # logger.info(f'Get object; {request=}; {args=}; {kwargs=}')
+        return super().retrieve(request, *args, **kwargs)
 
-class DetailView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    def update(self, request, *args, **kwargs):
+        # logger.info(f'Update object; {request=}; {args=}; {kwargs=}')
+        return super().update(request, *args, **kwargs)
 
-    def get(self, request, *args, **kwargs):
-        logger.info(f'Get object; {request=}; {args=}; {kwargs=}')
-        return self.retrieve(request, *args, **kwargs)
+    def partial_update(self, request, *args, **kwargs):
+        # logger.info(f'Update object partial; {request=}; {args=}; {kwargs=}')
+        return super().partial_update(request, *args, **kwargs)
 
-    def put(self, request, *args, **kwargs):
-        logger.info(f'Update object; {request=}; {args=}; {kwargs=}')
-        return self.update(request, *args, **kwargs)
-
-    def patch(self, request, *args, **kwargs):
-        logger.info(f'Update object; {request=}; {args=}; {kwargs=}')
-        return self.partial_update(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        logger.info(f'Delete object; {request=}; {args=}; {kwargs=}')
-        return self.destroy(request, *args, **kwargs)
+    def destroy(self, request, *args, **kwargs):
+        # logger.info(f'Delete object; {request=}; {args=}; {kwargs=}')
+        return super().destroy(request, *args, **kwargs)
 
 
-class PlaceList(ListView):
-    def __init__(self):
-        super().__init__()
-        self.queryset = Place.objects.all()
-        self.serializer_class = PlaceSerializer
+class PlaceViewSet(BaseViewSet):
+    queryset = Place.objects.all()
+    serializer_class = PlaceSerializer
 
 
-class PlaceDetail(DetailView):
-    def __init__(self):
-        super().__init__()
-        self.queryset = Place.objects.all()
-        self.serializer_class = PlaceSerializer
+class CategoryViewSet(BaseViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    lookup_field = 'code'
 
 
-class CategoryList(ListView):
-    def __init__(self):
-        super().__init__()
-        self.queryset = Category.objects.all()
-        self.serializer_class = CategorySerializer
+class SubCategoryViewSet(BaseViewSet):
+    queryset = SubCategory.objects.all()
+    serializer_class = SubCategorySerializer
 
 
-class CategoryDetail(DetailView):
-    def __init__(self):
-        super().__init__()
-        self.queryset = Category.objects.all()
-        self.serializer_class = CategorySerializer
+class ItemViewSet(BaseViewSet):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
 
-
-class SubCategoryList(ListView):
-    def __init__(self):
-        super().__init__()
-        # self.queryset = SubCategory.objects.all()
-        self.serializer_class = SubCategorySerializer
-
-    def get_queryset(self):
-        category_code = self.kwargs.get('category_code', None)
-        queryset = SubCategory.objects.filter(category=category_code)
-        return queryset
-
-
-class SubCategoryDetail(DetailView):
-    def __init__(self):
-        super().__init__()
-        self.queryset = SubCategory.objects.all()
-        self.serializer_class = SubCategorySerializer
-
-
-class ItemList(ListView):
-    def __init__(self):
-        super().__init__()
-        self.queryset = Item.objects.all()
-        self.serializer_class = ItemSerializer
-
-
-class ItemDetail(DetailView):
-    def __init__(self):
-        super().__init__()
-        self.queryset = Item.objects.all()
-        self.serializer_class = ItemSerializer
+    def create(self, request, *args, **kwargs):
+        item = Item(name=request.data['name'], price=request.data['price'], description=request.data['description'],
+                    photo=request.data['photo'], subcategory=SubCategory.objects.get(code=request.data['subcategory']))
+        item.save()
+        serializer = ItemSerializer(item)
+        return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 @api_view(['GET'])
@@ -143,46 +106,36 @@ def places_by_restaurant(request, restaurant_name):
     return response.Response(serializer.data)
 
 
-class RestaurantList(ListView):
-    def __init__(self):
-        super().__init__()
-        self.queryset = Restaurant.objects.all()
-        self.serializer_class = RestaurantSerializer
+@api_view(['GET'])
+def subcategories_by_category(request, category_code: str):
+    try:
+        category = Category.objects.get(code=category_code)
+    except Category.DoesNotExist:
+        logger.error(f'Category {category_code} does not exist')
+        raise Http404
+
+    logger.info(f'Get subcategories by category; {request=}; {category_code=}')
+    subcategories = category.subcategory_set.all()
+    serializer = SubCategorySerializer(subcategories, many=True)
+    return response.Response(serializer.data)
 
 
-class RestaurantDetail(DetailView):
-    def __init__(self):
-        super().__init__()
-        self.queryset = Restaurant.objects.all()
-        self.serializer_class = RestaurantSerializer
+class RestaurantViewSet(BaseViewSet):
+    queryset = Restaurant.objects.all()
+    serializer_class = RestaurantSerializer
 
 
-class ReferralList(ListView):
-    def __init__(self):
-        super().__init__()
-        self.queryset = Referral.objects.all()
-        self.serializer_class = ReferralSerializer
+class ReferralViewSet(BaseViewSet):
+    queryset = Referral.objects.all()
+    serializer_class = ReferralSerializer
 
 
-class ReferralDetail(DetailView):
-    def __init__(self):
-        super().__init__()
-        self.queryset = Referral.objects.all()
-        self.serializer_class = ReferralSerializer
+class UserViewSet(BaseViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'username'
 
-
-class UserList(views.APIView):
-    """
-    List all users, or create a new user.
-    """
-
-    def get(self, request):
-        logger.info(f'Get list of users; {request=}')
-        snippets = User.objects.all()
-        serializer = UserSerializer(snippets, many=True)
-        return response.Response(serializer.data)
-
-    def post(self, request):
+    def create(self, request, *args, **kwargs):
         logger.info(f'Create user; {request=}; {request.data=}')
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -192,38 +145,3 @@ class UserList(views.APIView):
             user.save()
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class UserDetail(views.APIView):
-    """
-    Retrieve, update or delete a user instance.
-    """
-
-    @staticmethod
-    def get_object(username):
-        try:
-            return User.objects.get(username=username)
-        except User.DoesNotExist:
-            logger.error(f'User {username} does not exist')
-            raise Http404
-
-    def get(self, request, username):
-        logger.info(f'Get user; {request=}; {username=}')
-        user = self.get_object(username)
-        serializer = UserSerializer(user)
-        return response.Response(serializer.data)
-
-    def put(self, request, username):
-        logger.info(f'Update user; {request=}; {username=}; {request.data=}')
-        user = self.get_object(username)
-        serializer = UserSerializer(user, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return response.Response(serializer.data)
-        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, username):
-        logger.info(f'Delete user; {request=}; {username=}')
-        user = self.get_object(username)
-        user.delete()
-        return response.Response(status=status.HTTP_204_NO_CONTENT)
