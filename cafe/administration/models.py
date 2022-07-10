@@ -77,8 +77,8 @@ class Referral(TimeStampedModel):
 
 class Category(TimeStampedModel):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50, verbose_name='Назва')
-    code = models.CharField(max_length=20, verbose_name='Код', unique=True)
+    name = models.CharField(max_length=50, verbose_name='Назва категорії')
+    code = models.CharField(max_length=20, verbose_name='Код категорії', unique=True)
 
     class Meta:
         verbose_name = 'Категорія'
@@ -90,8 +90,8 @@ class Category(TimeStampedModel):
 
 class SubCategory(TimeStampedModel):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50, verbose_name='Назва')
-    code = models.CharField(max_length=20, verbose_name='Код', unique=True)
+    name = models.CharField(max_length=50, verbose_name='Назва підкатегорії')
+    code = models.CharField(max_length=20, verbose_name='Код підкатегорії', unique=True)
     category = models.ForeignKey(Category, to_field='code', on_delete=models.CASCADE, verbose_name='Категорія')
 
     class Meta:
