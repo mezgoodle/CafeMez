@@ -1,5 +1,3 @@
-import pprint
-
 from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, ContentType
@@ -60,7 +58,6 @@ async def answer_subcategory(message: Message, state: FSMContext, subcategories:
     await state.update_data(subcategory=subcategory)
     data = await state.get_data()
     await state.finish()
-    pprint.pprint(data)
     _, status = await api.create_item(data)
     if status:
         print(status)
