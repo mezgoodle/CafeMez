@@ -120,13 +120,13 @@ class User(Backend):
     async def create_user(self,
                           username: str,
                           email: str,
-                          user_id: int,
+                          telegram_id: int,
                           is_staff: bool = False,
                           password: str = None) -> Tuple[dict, int]:
         data = {
             'username': username,
             'password': password,
-            'telegram_id': user_id,
+            'telegram_id': telegram_id,
             'is_staff': is_staff,
             'email': email,
         }
@@ -155,7 +155,7 @@ class Item(Backend):
         return categories
 
     async def get_subcategories(self, category: str) -> List[dict]:
-        subcategories = await self.get_all_objects(f'subcategories/{category}')
+        subcategories = await self.get_all_objects(f'subcategories/by/{category}')
         return subcategories
 
     async def count_items(self, category: str, subcategory: str = '') -> int:
