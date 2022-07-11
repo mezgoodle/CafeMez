@@ -7,6 +7,7 @@ from django.http import Http404
 from loguru import logger
 
 from .models import Place, Restaurant, User, Referral, Item, Category, SubCategory
+from .paginator import Paginator
 from .serializers import (PlaceSerializer,
                           RestaurantSerializer,
                           UserSerializer,
@@ -19,6 +20,7 @@ from .utils import set_permissions
 
 class BaseViewSet(ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = Paginator
 
     def list(self, request, *args, **kwargs):
         # logger.info(f'Get list of objects; {request=}; {args=}; {kwargs=}')
