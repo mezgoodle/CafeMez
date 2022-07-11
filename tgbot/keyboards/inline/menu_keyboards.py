@@ -27,8 +27,7 @@ async def subcategories_keyboard(api: Item, category: str) -> InlineKeyboardMark
 
     subcategories = await api.get_subcategories(category)
     for subcategory in subcategories:
-        number_of_items = await api.count_items(category, subcategory['code'])
-        button_text = f'{subcategory["name"]} ({number_of_items} шт.)'
+        button_text = f'{subcategory["name"]} ({subcategory["items_amount"]} шт.)'
         callback_data = make_callback_data(level=CURRENT_LEVEL + 1, category=category,
                                            subcategory=subcategory['code'])
         markup.insert(InlineKeyboardButton(button_text, callback_data=callback_data))
