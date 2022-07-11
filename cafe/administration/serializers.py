@@ -24,6 +24,11 @@ class SubCategorySerializer(serializers.ModelSerializer):
         model = SubCategory
         fields = '__all__'
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['items_amount'] = instance.count_items()
+        return data
+
 
 class ItemSerializer(serializers.ModelSerializer):
     subcategory = SubCategorySerializer(many=False, read_only=True)

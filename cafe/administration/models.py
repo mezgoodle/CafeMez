@@ -101,6 +101,9 @@ class SubCategory(TimeStampedModel):
     def __str__(self):
         return f'{self.name}'
 
+    def count_items(self):
+        return self.item_set.count()
+
 
 class Item(TimeStampedModel):
     id = models.AutoField(primary_key=True)
