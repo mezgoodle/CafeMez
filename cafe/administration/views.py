@@ -73,19 +73,6 @@ class ItemViewSet(BaseViewSet):
 
 
 @api_view(['GET'])
-def count_items(request, category_code, subcategory_code=None):
-    """Count of items"""
-    logger.info(f'Count items; {request=}; {category_code=}; {subcategory_code=}')
-    count = 0
-    category = Category.objects.get(code=category_code)
-    subcategories = [category.subcategory_set.get(code=subcategory_code)] \
-        if subcategory_code else category.subcategory_set.all()
-    for subcategory in subcategories:
-        count += subcategory.item_set.count()
-    return response.Response(count)
-
-
-@api_view(['GET'])
 def get_items(request, subcategory_code):
     items = Item.objects.filter(subcategory=subcategory_code)
     serializer = ItemSerializer(items, many=True)

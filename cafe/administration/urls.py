@@ -18,8 +18,5 @@ urlpatterns = [
     path('places/restaurant/<str:restaurant_name>', views.places_by_restaurant, name='places_by_restaurant'),
     path('items/by/<str:subcategory_code>', views.get_items, name='items_specific'),
     path('subcategories/by/<str:category_code>', views.subcategories_by_category, name='get_subcategories'),
-    path('count_items/<str:category_code>', views.count_items, name='count_items'),
-    path('count_items/<str:category_code>/<str:subcategory_code>', views.count_items,
-         name='count_items_with_subcategory'),
     path('token', obtain_auth_token, name='token'),
 ]

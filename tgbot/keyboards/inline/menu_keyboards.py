@@ -14,8 +14,7 @@ async def categories_keyboard(api: Item) -> InlineKeyboardMarkup:
 
     categories = await api.get_categories()
     for category in categories:
-        number_of_items = await api.count_items(category['code'])
-        button_text = f'{category["name"]} ({number_of_items} шт.)'
+        button_text = f'{category["name"]} ({category["items_amount"]} шт.)'
         callback_data = make_callback_data(level=CURRENT_LEVEL + 1, category=category['code'])
         markup.insert(InlineKeyboardButton(button_text, callback_data=callback_data))
     return markup
