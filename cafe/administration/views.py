@@ -20,7 +20,8 @@ from .utils import set_permissions
 
 class BaseViewSet(ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
-    pagination_class = Paginator
+    # TODO: fix this problem
+    # pagination_class = Paginator
 
     def list(self, request, *args, **kwargs):
         # logger.info(f'Get list of objects; {request=}; {args=}; {kwargs=}')
