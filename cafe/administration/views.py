@@ -1,6 +1,7 @@
 from rest_framework import response, status
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.viewsets import ModelViewSet
 from django.http import Http404
 from loguru import logger
@@ -63,6 +64,8 @@ class SubCategoryViewSet(BaseViewSet):
 class ItemViewSet(BaseViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ['name', 'description']
 
     def create(self, request, *args, **kwargs):
         item = Item(name=request.data['name'], price=request.data['price'], description=request.data['description'],
