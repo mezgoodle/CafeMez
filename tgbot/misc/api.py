@@ -23,10 +23,10 @@ class API:
             return await response.json(), response.status
 
     @api_decorator
-    async def put(self, request_url, data=None, headers: dict = None) -> dict:
+    async def put(self, request_url, data=None, headers: dict = None) -> int:
         url = self.base_url % request_url
         async with self.session.put(url, data=data, headers=headers) as response:
-            return await response.json()
+            return response.status
 
     @api_decorator
     async def delete(self, request_url: str, headers: dict = None) -> int:
