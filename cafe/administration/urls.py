@@ -4,7 +4,7 @@ from rest_framework.routers import SimpleRouter
 
 from . import views
 
-router = SimpleRouter(trailing_slash=True) # trailing slash is False for production
+router = SimpleRouter(trailing_slash=False)  # trailing slash is False for production
 router.register(r'places', views.PlaceViewSet)
 router.register(r'categories', views.CategoryViewSet)
 router.register(r'items', views.ItemViewSet)
