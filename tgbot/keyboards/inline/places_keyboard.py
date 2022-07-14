@@ -22,7 +22,7 @@ async def admin_places_markup(message: Message, restaurant_name: str) -> InlineK
     api = message.bot.get('places_api')
     places = await api.get_places_by_restaurant(restaurant_name)
     markup = InlineKeyboardMarkup(row_width=3)
-    for index, place in enumerate(places):
+    for index, place in enumerate(places, start=1):
         number_button = InlineKeyboardButton(text=f"Місце #{index}", callback_data='nothing')
         place_button = InlineKeyboardButton(
             text=f"Змінити на {'зайняте' if place['free'] else 'вільне'}",
