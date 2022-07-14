@@ -19,9 +19,11 @@ class Backend:
         item = await self.api.get(f'{collection}/{item_id}')
         return item
 
-    async def update_object(self, collection: str, item_id, name, price, category_id, subcategory_id):
+    async def update_object(self, collection: str, item_id, data: dict) -> dict:
         await self.get_token()
-        pass
+        headers = {'Authorization': self.auth_str % self.token}
+        data = await self.api.put(f'{collection}/{item_id}', data, headers=headers)
+        return data
 
     async def delete_object(self, collection: str, item_id) -> int:
         await self.get_token()
@@ -94,6 +96,10 @@ class Place(Backend):
     async def delete_place(self, place_id) -> int:
         status = await self.delete_object('places', place_id)
         return status
+
+    async def update_place(self, place_id, data: dict) -> dict:
+        data = await self.update_object('places', place_id, data)
+        return data
 
 
 class User(Backend):

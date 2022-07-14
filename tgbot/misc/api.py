@@ -23,9 +23,9 @@ class API:
             return await response.json(), response.status
 
     @api_decorator
-    async def put(self, request_url, data=None) -> dict:
+    async def put(self, request_url, data=None, headers: dict = None) -> dict:
         url = self.base_url % request_url
-        async with self.session.put(url, data=data) as response:
+        async with self.session.put(url, data=data, headers=headers) as response:
             return await response.json()
 
     @api_decorator
