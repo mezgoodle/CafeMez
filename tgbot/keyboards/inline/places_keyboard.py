@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 
-from tgbot.keyboards.inline.callback_data import place_callback
+from tgbot.keyboards.inline.callback_data import place_callback, admin_place_callback
 
 
 async def places_markup(message: Message, restaurant_name: str) -> InlineKeyboardMarkup:
@@ -22,15 +22,15 @@ async def admin_places_markup(message: Message, restaurant_name: str) -> InlineK
     api = message.bot.get('places_api')
     places = await api.get_places_by_restaurant(restaurant_name)
     markup = InlineKeyboardMarkup(row_width=3)
-    for place in places:
-        number_button = InlineKeyboardButton(text=f"Місце #{place['id']}", callback_data='nothing')
+    for index, place in enumerate(places):
+        number_button = InlineKeyboardButton(text=f"Місце #{index}", callback_data='nothing')
         place_button = InlineKeyboardButton(
-            text=f"Змінити на Вільне",
-            callback_data=f"edit_place:{place['id']}"
+            text=f"Змінити на {'зайняте' if place['free'] else 'вільне'}",
+            callback_data=admin_place_callback.new('update', place['id'], not place['free'])
         )
         remove_button = InlineKeyboardButton(
             text='Видалити',
-            callback_data=f"remove_place:{place['id']}"
+            callback_data=admin_place_callback.new('remove', place['id'], '')
         )
         markup.row(number_button, place_button, remove_button)
     return markup
