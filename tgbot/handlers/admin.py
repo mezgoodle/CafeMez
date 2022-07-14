@@ -6,18 +6,19 @@ from aiogram.utils.markdown import hitalic, hbold
 from loader import dp
 from tgbot.misc.admin_utils import check_username
 from tgbot.keyboards.inline.restaurants_keyboard import restaurants_markup
+from tgbot.keyboards.inline.places_keyboard import admin_places_markup
+from tgbot.keyboards.reply.restaurants import restaurants_markup as reply_restaurants_markup
 from tgbot.keyboards.reply.location import location_markup
 from tgbot.misc.backend import User
 from tgbot.states.states import Admin
 
 
-# TODO: make rights for admin and general admin
-@dp.message_handler(Command(['stats']), is_general_admin=True)
+@dp.message_handler(Command(['stats']), is_admin=True)
 async def show_stats(message: Message) -> Message:
     return await message.reply(f'Hello, {message.from_user.username}!')
 
 
-@dp.message_handler(Command(['rs']), is_general_admin=True)
+@dp.message_handler(Command(['rs']), is_admin=True)
 async def show_stats(message: Message) -> Message:
     api = message.bot.get('restaurants_api')
     restaurants = await api.get_all_restaurants()
@@ -89,21 +90,21 @@ async def add_admin(message: Message, command: Command.CommandObj) -> Message:
     return await message.reply(text)
 
 
-@dp.message_handler(Command(['add_rs']), is_general_admin=True)
+@dp.message_handler(Command(['add_rs']), is_admin=True)
 async def add_restaurant(message: Message, state: FSMContext) -> Message:
     await state.set_state('cafe_coords')
     markup = location_markup()
     return await message.reply('Надішліть локацію через кнопку або просто як вкладення', reply_markup=markup)
 
 
-@dp.message_handler(state='cafe_coords', content_types=ContentType.LOCATION, is_general_admin=True)
+@dp.message_handler(state='cafe_coords', content_types=ContentType.LOCATION, is_admin=True)
 async def add_cafe_coords(message: Message, state: FSMContext) -> Message:
     await state.set_state('cafe_name')
     await state.update_data(longitude=message.location.longitude, latitude=message.location.latitude)
     return await message.reply('Напишіть назву ресторану')
 
 
-@dp.message_handler(state='cafe_name', is_general_admin=True)
+@dp.message_handler(state='cafe_name', is_admin=True)
 async def answer_cafe_name(message: Message, state: FSMContext) -> Message:
     data = await state.get_data()
     await state.finish()
@@ -112,3 +113,18 @@ async def answer_cafe_name(message: Message, state: FSMContext) -> Message:
     if response:
         return await message.answer(f'Дякую! Ресторан {hbold(message.text)} доданий до бази даних.')
     return await message.reply('Щось пішло не так. Зверніться до головного адміністратора.')
+
+
+@dp.message_handler(Command(['places']), is_admin=True)
+async def edit_places(message: Message, state: FSMContext) -> Message:
+    markup = await reply_restaurants_markup(message)
+    await state.set_state('restaurant_name')
+    return await message.answer('Оберіть ресторан, у якому хочете редагувати місце', reply_markup=markup)
+
+
+@dp.message_handler(state='restaurant_name', is_admin=True)
+async def edit_places_in_restaurant(message: Message, state: FSMContext) -> Message:
+    restaurant_name = message.text
+    keyboard = await admin_places_markup(message, restaurant_name)
+    await state.finish()
+    return await message.answer('Будь ласка, редагуйте місця за допомогою кнопок', reply_markup=keyboard)
