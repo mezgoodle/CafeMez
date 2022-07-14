@@ -10,7 +10,7 @@ from tgbot.keyboards.inline.places_keyboard import admin_places_markup
 from tgbot.keyboards.inline.callback_data import admin_place_callback
 from tgbot.keyboards.reply.restaurants import restaurants_markup as reply_restaurants_markup
 from tgbot.keyboards.reply.location import location_markup
-from tgbot.misc.backend import User
+from tgbot.misc.backend import User, Place
 from tgbot.states.states import Admin
 
 
@@ -133,7 +133,9 @@ async def edit_places_in_restaurant(message: Message, state: FSMContext) -> Mess
 
 @dp.callback_query_handler(admin_place_callback.filter(method='update'), is_admin=True)
 async def update_places_in_restaurant(call: CallbackQuery, callback_data: dict) -> Message:
-    print(callback_data)
+    api: Place = call.bot.get('places_api')
+    response = await api.update_place(callback_data['place_id'], {'free': callback_data['value']})
+    print(response)
     return await call.message.answer('update')
 
 
