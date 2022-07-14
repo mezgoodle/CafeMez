@@ -18,6 +18,6 @@ def api_decorator(method):
         except ClientConnectorError:
             logger.error(f'Error in function "{method_name}": Connection error')
             await bot.send_message(user_id, 'Помилка при з\'єднанні з сервером. Перевірте лог-файли.')
-        except Exception:
-            logger.error(f'Error in function {method_name}')
+        except Exception as e:
+            logger.error(f'Error in function {method_name}. Error: {e}')
     return wrapper
