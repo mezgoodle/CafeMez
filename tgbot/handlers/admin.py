@@ -1,5 +1,5 @@
 from aiogram.dispatcher import FSMContext
-from aiogram.types import Message, ContentType
+from aiogram.types import Message, ContentType, CallbackQuery
 from aiogram.dispatcher.filters import Command
 from aiogram.utils.markdown import hitalic, hbold
 
@@ -7,6 +7,7 @@ from loader import dp
 from tgbot.misc.admin_utils import check_username
 from tgbot.keyboards.inline.restaurants_keyboard import restaurants_markup
 from tgbot.keyboards.inline.places_keyboard import admin_places_markup
+from tgbot.keyboards.inline.callback_data import admin_place_callback
 from tgbot.keyboards.reply.restaurants import restaurants_markup as reply_restaurants_markup
 from tgbot.keyboards.reply.location import location_markup
 from tgbot.misc.backend import User
@@ -118,13 +119,24 @@ async def answer_cafe_name(message: Message, state: FSMContext) -> Message:
 @dp.message_handler(Command(['places']), is_admin=True)
 async def edit_places(message: Message, state: FSMContext) -> Message:
     markup = await reply_restaurants_markup(message)
-    await state.set_state('restaurant_name')
+    await state.set_state('admin_restaurant_name')
     return await message.answer('Оберіть ресторан, у якому хочете редагувати місце', reply_markup=markup)
 
 
-@dp.message_handler(state='restaurant_name', is_admin=True)
+@dp.message_handler(state='admin_restaurant_name', is_admin=True)
 async def edit_places_in_restaurant(message: Message, state: FSMContext) -> Message:
     restaurant_name = message.text
     keyboard = await admin_places_markup(message, restaurant_name)
     await state.finish()
     return await message.answer('Будь ласка, редагуйте місця за допомогою кнопок', reply_markup=keyboard)
+
+
+@dp.callback_query_handler(admin_place_callback.filter(method='update'), is_admin=True)
+async def update_places_in_restaurant(call: CallbackQuery, callback_data: dict) -> Message:
+    print(callback_data)
+    return await call.message.answer('update')
+
+
+@dp.callback_query_handler(admin_place_callback.filter(method='remove'), is_admin=True)
+async def delete_places_in_restaurant(call: CallbackQuery, callback_data: dict) -> Message:
+    return await call.message.answer('remove')

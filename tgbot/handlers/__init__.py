@@ -1,1 +1,2 @@
-from . import callbacks, help, start, support, support_call, menu, item, admin, user, location, payments, echo, errors
+# TODO: testing all situations
+from . import admin, callbacks, help, start, support, support_call, menu, item, user, location, payments, echo, errors
