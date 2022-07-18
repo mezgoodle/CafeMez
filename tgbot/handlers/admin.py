@@ -2,6 +2,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, ContentType, CallbackQuery
 from aiogram.dispatcher.filters import Command
 from aiogram.utils.markdown import hitalic, hbold
+from asyncio import sleep
 
 from loader import dp
 from tgbot.misc.admin_utils import check_username
@@ -11,7 +12,7 @@ from tgbot.keyboards.inline.callback_data import admin_place_callback
 from tgbot.keyboards.reply.restaurants import restaurants_markup as reply_restaurants_markup
 from tgbot.keyboards.reply.location import location_markup
 from tgbot.misc.backend import User, Place
-from tgbot.states.states import Admin
+from tgbot.states.states import Admin, Mailing
 
 
 @dp.message_handler(Command(['stats']), is_admin=True)
@@ -147,3 +148,26 @@ async def delete_places_in_restaurant(call: CallbackQuery, callback_data: dict) 
     if status == 204:
         return await call.message.edit_text('Місце успішно видалено')
     return await call.message.edit_text('Виникла помилка. Зверніться до головного адміністратора')
+
+
+@dp.message_handler(Command(['tell_everyone']), is_admin=True)
+async def mailing(message: Message):
+    await Mailing.first()
+    return await message.answer('Надішліть текст повідомлення!')
+
+
+@dp.message_handler(state=Mailing.text, is_admin=True)
+async def enter_text(message: Message, state: FSMContext):
+    text = message.text
+    await state.update_data(text=text)
+    await state.reset_state()
+    api: User = message.bot.get('users_api')
+    bot = message.bot
+    users = await api.get_all_users()
+    for user in users:
+        try:
+            await bot.send_message(user['telegram_id'], text)
+            await sleep(0.3)
+        except Exception as e:
+            pass
+    return await message.answer('Повідомлення надіслано!')

@@ -9,6 +9,7 @@ from tgbot.keyboards.reply.subcategories import subcategories_markup
 from tgbot.misc.backend import Item as ItemBackend
 
 
+# TODO: add approval as final state step
 @dp.message_handler(Command("add_item"), is_admin=True)
 async def add_item(message: Message):
     await Item.first()
