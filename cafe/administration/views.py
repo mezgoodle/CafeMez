@@ -20,6 +20,7 @@ from .utils import set_permissions
 
 class BaseViewSet(ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
+
     # TODO: fix this problem
     # pagination_class = Paginator
 
@@ -71,11 +72,15 @@ class ItemViewSet(BaseViewSet):
     search_fields = ['name', 'description']
 
     def create(self, request, *args, **kwargs):
-        item = Item(name=request.data['name'], price=request.data['price'], description=request.data['description'],
-                    photo=request.data['photo'], subcategory=SubCategory.objects.get(code=request.data['subcategory']))
-        item.save()
-        serializer = ItemSerializer(item)
-        return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer = ItemSerializer(data=request.data)
+        if serializer.is_valid():
+            item = Item(name=request.data['name'], price=request.data['price'], description=request.data['description'],
+                        photo=request.data['photo'],
+                        subcategory=SubCategory.objects.get(code=request.data['subcategory']))
+            item.save()
+            serializer = ItemSerializer(item)
+            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
