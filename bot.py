@@ -26,10 +26,11 @@ def register_all_middlewares(dispatcher: Dispatcher) -> None:
     dispatcher.setup_middleware(CallbackMiddleware())
     dispatcher.setup_middleware(SupportMiddleware())
     dispatcher.setup_middleware(SubCategoriesMiddleware())
-    i18n = ACLMiddleware(config.i18n.domain, config.i18n.locales_dir)
-    dispatcher.setup_middleware(i18n)
+    # TODO: maybe adding i18n middleware
+    # i18n = ACLMiddleware(config.i18n.domain, config.i18n.locales_dir)
+    # dispatcher.setup_middleware(i18n)
     logger.info('Add i18n middleware to the bot')
-    dispatcher.bot['i18n'] = i18n.gettext
+    # dispatcher.bot['i18n'] = i18n.gettext
 
 
 def register_all_filters(dispatcher: Dispatcher) -> None:
