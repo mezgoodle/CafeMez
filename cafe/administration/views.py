@@ -1,6 +1,5 @@
 from rest_framework import response, status
 from rest_framework.decorators import api_view
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.viewsets import ModelViewSet
 from django.http import Http404
@@ -16,10 +15,11 @@ from .serializers import (PlaceSerializer,
                           CategorySerializer,
                           SubCategorySerializer)
 from .utils import set_permissions
+from .permissions import IsAdminOrReadOnly
 
 
 class BaseViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
 
     # TODO: fix this problem
     # pagination_class = Paginator
