@@ -20,24 +20,24 @@ class Backend:
         return item
 
     async def update_object(self, collection: str, item_id, data: dict) -> int:
-        await self.get_token()
+        await self.__get_token()
         headers = {'Authorization': self.auth_str % self.token}
         status = await self.api.put(f'{collection}/{item_id}', data, headers=headers)
         return status
 
     async def delete_object(self, collection: str, item_id) -> int:
-        await self.get_token()
+        await self.__get_token()
         headers = {'Authorization': self.auth_str % self.token}
         status = await self.api.delete(f'{collection}/{item_id}', headers=headers)
         return status
 
     async def create_object(self, collection: str, data: dict) -> Tuple[dict, int]:
-        await self.get_token()
+        await self.__get_token()
         headers = {'Authorization': self.auth_str % self.token}
         data, status = await self.api.post(collection, data, headers=headers)
         return data, status
 
-    async def get_token(self):
+    async def __get_token(self):
         if not self.token:
             config: Config = load_config()
             token, status = await self.api.post('token',
