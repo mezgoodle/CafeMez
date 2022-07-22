@@ -8,6 +8,11 @@ from loader import dp
 from tgbot.misc.storage import Storage
 
 
+@dp.message_handler(lambda message: not message.text.isdigit(), state='item_amount')
+async def item_amount_handler(message: Message):
+    return await message.reply(f'Введіть кількість товару у {hbold("цифрах")}')
+
+
 @dp.message_handler(state='item_amount')
 async def item_amount(message: Message, state: FSMContext):
     data = await state.get_data()
@@ -18,3 +23,15 @@ async def item_amount(message: Message, state: FSMContext):
     await state.reset_state()
     await message.answer('Ви успішно додали товар до корзини!')
     return await list_categories(message)
+
+
+@dp.message_handler(Command("cart"))
+async def show_cart(message: Message):
+    storage: Storage = message.bot.get('storage')
+    cart = storage.get_cart(message.from_user.id)
+    if not cart:
+        return await message.answer('Корзина порожня!')
+    text = 'Ваша корзина:\n'
+    for item in cart:
+        text += f'{item}\n'
+    await message.answer(text)
