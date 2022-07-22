@@ -23,18 +23,25 @@ class Storage:
 
     def get_cart(self, identifier: str) -> list:
         data = self.read_file()
-        try:
-            return data[identifier]
-        except KeyError:
-            return []
+        return self.getting_data(data, str(identifier))
 
     def add_to_cart(self, identifier: str, item: str, quantity: int = 1) -> None:
         data = self.read_file()
-        try:
-            cart = data[identifier]
-        except KeyError:
-            cart = []
+        cart = self.getting_data(data, identifier)
         cart.extend([item] * quantity)
         data[identifier] = cart
         with open(self.filename, 'w') as f:
             json.dump(data, f)
+
+    def clean_cart(self, identifier: str) -> None:
+        data = self.read_file()
+        data[identifier] = []
+        with open(self.filename, 'w') as f:
+            json.dump(data, f)
+
+    @staticmethod
+    def getting_data(data: dict, key: str) -> list:
+        try:
+            return data[key]
+        except KeyError:
+            return []
