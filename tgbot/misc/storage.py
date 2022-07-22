@@ -3,7 +3,7 @@ import os
 
 
 class Storage:
-    def __init__(self, filename: str = 'storage.json'):
+    def __init__(self, filename: str = 'tgbot/misc/storage/storage.json'):
         self.filename = filename
         self.create_file()
 
