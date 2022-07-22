@@ -1,5 +1,6 @@
 from typing import Union
 
+from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command
 from aiogram.types import Message, CallbackQuery
 
@@ -37,7 +38,7 @@ async def list_items(callback: CallbackQuery, category: str, subcategory: str, *
     await callback.message.edit_text(text="Дивись, що у нас є", reply_markup=markup)
 
 
-async def show_item(callback: CallbackQuery, category: str, subcategory: str, item_id: str):
+async def show_item(callback: CallbackQuery, category: str, subcategory: str, item_id: str, **kwargs):
     api = callback.bot.get('items_api')
     markup = await item_keyboard(api, category, subcategory, item_id)
     item = await api.get_item(item_id)
@@ -45,13 +46,14 @@ async def show_item(callback: CallbackQuery, category: str, subcategory: str, it
     await callback.message.edit_text(text=text, reply_markup=markup)
 
 
-async def buy_item(callback: CallbackQuery, category: str, subcategory: str, item_id: str):
-    await callback.message.answer('Ви успішно додали товар до корзини!')
-    return await list_categories(callback, category=category, subcategory=subcategory, item_id=item_id)
+async def buy_item(callback: CallbackQuery, item_id: str, state: FSMContext, **kwargs):
+    await state.update_data(item_id=item_id)
+    await state.set_state('item_amount')
+    return await callback.message.answer('Введіть кількість товару(у цифрах):')
 
 
 @dp.callback_query_handler(menu_callback.filter())
-async def menu_navigate(call: CallbackQuery, callback_data: dict):
+async def menu_navigate(call: CallbackQuery, callback_data: dict, state: FSMContext):
     current_level = callback_data.get('level')
     category = callback_data.get('category')
     subcategory = callback_data.get('subcategory')
@@ -66,4 +68,4 @@ async def menu_navigate(call: CallbackQuery, callback_data: dict):
     }
     current_level_function = levels.get(current_level)
 
-    await current_level_function(call, category=category, subcategory=subcategory, item_id=item_id)
+    await current_level_function(call, category=category, subcategory=subcategory, item_id=item_id, state=state)
