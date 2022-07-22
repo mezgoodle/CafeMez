@@ -32,5 +32,5 @@ async def get_support_message(message: Message, state: FSMContext) -> Message:
     await bot.send_message(second_id, f'Вам надійшов лист! Щоб відповісти, натисніть кнопку нижче!')
     keyboard = await create_keyboard(messages='one', user_id=message.from_user.id)
     await message.copy_to(second_id, reply_markup=keyboard)
-    await message.answer('Ви надіслали це повідомлення!')
     await state.reset_state()
+    return await message.answer('Ви надіслали це повідомлення!')
