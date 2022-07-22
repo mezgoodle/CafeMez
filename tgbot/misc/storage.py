@@ -38,15 +38,3 @@ class Storage:
         data[identifier] = cart
         with open(self.filename, 'w') as f:
             json.dump(data, f)
-
-
-s = Storage()
-s.add_to_cart('3123123', 'test')
-print(s.get_cart('3123123'))
-s.add_to_cart('3123123', 'test1', 2)
-print(s.get_cart('3123123'))
-s.add_to_cart('3123123', 'test2')
-print(s.get_cart('3123123'))
-s.add_to_cart('31233', 'test2', 4)
-print(s.get_cart('31233'))
-print(s.get_cart('1'))
