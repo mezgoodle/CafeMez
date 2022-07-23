@@ -172,7 +172,7 @@ class Item(Backend):
         items = await self.get_all_objects(f'items/by/{subcategory}')
         return items
 
-    async def get_item(self, item_id) -> dict:
+    async def get_item(self, item_id: str) -> dict:
         item = await self.get_object('items', item_id)
         return item
 
