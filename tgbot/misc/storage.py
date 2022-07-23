@@ -8,8 +8,9 @@ class Storage:
         self.create_file()
 
     def create_file(self):
-        with open(self.filename, 'w') as f:
-            json.dump({}, f)
+        if not os.path.exists(self.filename):
+            with open(self.filename, 'w') as f:
+                json.dump({}, f)
 
     def delete_file(self):
         try:
@@ -27,15 +28,15 @@ class Storage:
 
     def add_to_cart(self, identifier: str, item: str, quantity: int = 1) -> None:
         data = self.read_file()
-        cart = self.getting_data(data, identifier)
+        cart = self.getting_data(data, str(identifier))
         cart.extend([item] * quantity)
-        data[identifier] = cart
+        data[str(identifier)] = cart
         with open(self.filename, 'w') as f:
             json.dump(data, f)
 
     def clean_cart(self, identifier: str) -> None:
         data = self.read_file()
-        data[identifier] = []
+        del data[str(identifier)]
         with open(self.filename, 'w') as f:
             json.dump(data, f)
 
@@ -45,3 +46,5 @@ class Storage:
             return data[key]
         except KeyError:
             return []
+
+
