@@ -57,11 +57,13 @@ async def answer_support_call(call: CallbackQuery, state: FSMContext, callback_d
     new_message = await call.message.edit_text(
         'Ви на зв\'язку з користувачем!\n Щоб завершити спілкування, натисніть кнопку нижче!',
         reply_markup=keyboard)
-    await bot.pin_chat_message(new_message.chat.id, new_message.message_id)
-    return await bot.send_message(second_id,
-                                  'Техпідтримка на зв\'язку з вами! Можете писати сюди ваші повідомлення. \n'
-                                  'Щоб закінчити спілкування, натисніть кнопку нижче',
-                                  reply_markup=keyboard_second_user)
+    await new_message.pin()
+    new_second_message = await bot.send_message(second_id,
+                                                'Техпідтримка на зв\'язку з вами! Можете писати сюди ваші повідомлення. \n'
+                                                'Щоб закінчити спілкування, натисніть кнопку нижче',
+                                                reply_markup=keyboard_second_user)
+    await new_second_message.pin()
+    return new_second_message
 
 
 @dp.message_handler(state='wait_in_support', content_types=ContentTypes.ANY)
