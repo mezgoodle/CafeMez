@@ -145,11 +145,17 @@ class User(Backend):
 
     async def is_staff(self, username: str) -> bool:
         user = await self.get_user(username)
-        return user['is_staff']
+        try:
+            return user['is_staff']
+        except KeyError:
+            return False
 
     async def is_superuser(self, username: str) -> bool:
         user = await self.get_user(username)
-        return user['is_superuser']
+        try:
+            return user['is_superuser']
+        except KeyError:
+            return False
 
 
 class Item(Backend):
