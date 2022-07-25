@@ -13,7 +13,7 @@ async def cart_keyboard(api: Item, items_ids: list) -> InlineKeyboardMarkup:
     for item_id, amount in cart_items.items():
         item = await api.get_item(item_id)
         total_price += float(item['price']) * amount
-        keyboard.row(InlineKeyboardButton(text=item['name'],
+        keyboard.row(InlineKeyboardButton(text=f'{item["name"]}, {amount} шт.',
                                            callback_data=cart_callback.new('show', item_id)),
                      InlineKeyboardButton(text='Видалити',
                                            callback_data=cart_callback.new('remove', item_id)),
