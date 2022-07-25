@@ -34,6 +34,18 @@ class Storage:
         with open(self.filename, 'w') as f:
             json.dump(data, f)
 
+    def remove_from_cart(self, identifier: str, item: str) -> None:
+        data = self.read_file()
+        cart = self.getting_data(data, str(identifier))
+        cart = list(filter((item).__ne__, cart))
+        data[str(identifier)] = cart
+        with open(self.filename, 'w') as f:
+            json.dump(data, f)
+
+    def change_amount(self, identifier: str, item: str, amount: int) -> None:
+        self.remove_from_cart(identifier, item)
+        self.add_to_cart(identifier, item, amount)
+
     def clean_cart(self, identifier: str) -> None:
         data = self.read_file()
         del data[str(identifier)]
