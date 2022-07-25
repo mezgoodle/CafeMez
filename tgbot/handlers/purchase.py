@@ -11,7 +11,8 @@ from tgbot.misc.backend import Item
 from tgbot.misc.storage import Storage
 
 
-@dp.message_handler(lambda message: not message.text.isdigit() and int(message.text) <= 0, state='item_amount')
+@dp.message_handler(lambda message: not message.text.isdigit() and int(message.text) <= 0,
+                    state=['item_amount', 'change_amount'])
 async def item_amount_handler(message: Message):
     return await message.reply(f'Введіть кількість товару у {hbold("цифрах")} та більше нуля')
 
@@ -28,19 +29,48 @@ async def item_amount(message: Message, state: FSMContext):
     return await list_categories(message)
 
 
+@dp.message_handler(state='change_amount')
+async def item_amount(message: Message, state: FSMContext):
+    data = await state.get_data()
+    item_id = data.get('item_id')
+    amount = int(message.text)
+    storage: Storage = message.bot.get('storage')
+    storage.change_amount(message.from_user.id, item_id, amount)
+    cart = storage.get_cart(message.from_user.id)
+    await state.reset_state()
+    await message.answer('Ви успішно змінили кількість товару!')
+    api: Item = message.bot.get('items_api')
+    keyboard = await cart_keyboard(api, cart)
+    return await message.answer('Ваша оновлена корзина:', reply_markup=keyboard)
+
+
 @dp.callback_query_handler(cart_callback.filter(action='show'))
 async def show_item(callback_query: CallbackQuery, callback_data: dict):
-    pass
+    item_id = callback_data['item_id']
+    api: Item = callback_query.bot.get('items_api')
+    item = await api.get_item(item_id)
+    return await callback_query.message.answer(f'{item["name"]} - {item["price"]} грн')
 
 
 @dp.callback_query_handler(cart_callback.filter(action='change'))
-async def change_amount(callback_query: CallbackQuery, callback_data: dict):
-    pass
+async def change_amount(callback_query: CallbackQuery, callback_data: dict, state: FSMContext):
+    item_id = callback_data['item_id']
+    await state.update_data(item_id=item_id)
+    await state.set_state('change_amount')
+    return await callback_query.message.answer('Введіть нову кількість товару')
 
 
 @dp.callback_query_handler(cart_callback.filter(action='remove'))
 async def delete_item(callback_query: CallbackQuery, callback_data: dict):
-    pass
+    item_id = callback_data['item_id']
+    storage: Storage = callback_query.bot.get('storage')
+    storage.remove_from_cart(callback_query.from_user.id, item_id)
+    cart = storage.get_cart(callback_query.from_user.id)
+    await callback_query.message.answer('Ви видалили товар з корзини!')
+    if cart:
+        api: Item = callback_query.bot.get('items_api')
+        keyboard = await cart_keyboard(api, cart)
+        return await callback_query.message.answer('Ваша оновлена корзина:', reply_markup=keyboard)
 
 
 @dp.callback_query_handler(text_contains='buy:')
