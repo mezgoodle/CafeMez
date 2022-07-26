@@ -126,21 +126,43 @@ class Item(TimeStampedModel):
         return f'#{self.id} - {self.name}'
 
 
-class Purchase(TimeStampedModel):
+class Order(TimeStampedModel):
+    PAYMENT_METHOD_CHOICES = [
+        ('CH', 'Cash'),
+        ('CD', 'Card'),
+    ]
+
     id = models.AutoField(primary_key=True)
-    buyer = models.ForeignKey(User, on_delete=models.SET(0), verbose_name='Користувач')
-    item_id = models.ForeignKey(Item, on_delete=models.CASCADE, verbose_name='Продукт')
-    amount = models.DecimalField(max_digits=8, decimal_places=2, verbose_name='Вартість')
-    quantity = models.IntegerField(verbose_name='Кількість')
-    purchase_time = models.DateTimeField(verbose_name='Час покупки', auto_now_add=True)
-    shipping_address = models.CharField(max_length=200, verbose_name='Адреса доставки', null=True)
-    email = models.EmailField(max_length=100, verbose_name='Електронна пошта')
-    reciever = models.CharField(max_length=100, verbose_name='Ім\'я отримувача')
-    successfull = models.BooleanField(default=False, verbose_name='Успішна оплата')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    payment_method = models.CharField(max_length=200, null=True, blank=True, choices=PAYMENT_METHOD_CHOICES)
+    tax_price = models.DecimalField(
+        max_digits=7, decimal_places=2, null=True, blank=True)
+    shipping_price = models.DecimalField(
+        max_digits=7, decimal_places=2, null=True, blank=True, default=0)
+    is_paid = models.BooleanField(default=False)
+    is_delivered = models.BooleanField(default=False)
+
+    @property
+    def total_price(self):
+        return self.tax_price + self.shipping_price
 
     class Meta:
         verbose_name = 'Покупка'
         verbose_name_plural = 'Покупки'
 
     def __str__(self):
-        return f'#{self.id} - {self.item_id} ({self.quantity})'
+        return f'#{self.id} - {self.user}'
+
+
+class OrderItem(TimeStampedModel):
+    id = models.AutoField(primary_key=True)
+    item = models.ForeignKey(Item, null=True, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, null=True, on_delete=models.CASCADE)
+    quantity = models.IntegerField(null=True, blank=True, default=1)
+
+    class Meta:
+        verbose_name = 'Продукт у замовленні'
+        verbose_name_plural = 'Продукти у замовленні'
+
+    def __str__(self):
+        return f'{self.item} у к-сті {self.quantity}'
