@@ -30,7 +30,7 @@ def register_all_middlewares(dispatcher: Dispatcher) -> None:
     # TODO: maybe adding i18n middleware
     # i18n = ACLMiddleware(config.i18n.domain, config.i18n.locales_dir)
     # dispatcher.setup_middleware(i18n)
-    logger.info('Add i18n middleware to the bot')
+    # logger.info('Add i18n middleware to the bot')
     # dispatcher.bot['i18n'] = i18n.gettext
 
 
