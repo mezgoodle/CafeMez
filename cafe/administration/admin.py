@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Item, User, Place, Purchase, Referral, Restaurant, Category, SubCategory
+from .models import Item, User, Place, Referral, Restaurant, Category, SubCategory, Order, OrderItem
 
 
 @admin.register(User)
@@ -34,9 +34,14 @@ class ReferralAdmin(admin.ModelAdmin):
     list_display = ('user_id', 'referrer_id')
 
 
-@admin.register(Purchase)
-class PurchaseAdmin(admin.ModelAdmin):
-    list_display = ('id', 'buyer', 'item_id', 'quantity', 'reciever', 'created', 'successfull')
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'payment_method', 'total_price', 'is_paid', 'is_delivered', 'created')
+
+
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ('id', 'item', 'order', 'quantity', 'created')
 
 
 @admin.register(Place)
