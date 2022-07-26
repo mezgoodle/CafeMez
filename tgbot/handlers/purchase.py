@@ -30,7 +30,7 @@ async def item_amount(message: Message, state: FSMContext):
 
 
 @dp.message_handler(state='change_amount')
-async def item_amount(message: Message, state: FSMContext):
+async def change_item_amount(message: Message, state: FSMContext):
     data = await state.get_data()
     item_id = data.get('item_id')
     amount = int(message.text)
@@ -79,8 +79,11 @@ async def apply_purchase(callback_query: CallbackQuery, callback_data: dict):
 
 
 @dp.callback_query_handler(text_contains='cancel_cart')
-async def cancel_purchase(callback_query: CallbackQuery, callback_data: dict):
-    pass
+async def cancel_purchase(callback_query: CallbackQuery, *args, **kwargs):
+    storage: Storage = callback_query.bot.get('storage')
+    storage.clean_cart(callback_query.from_user.id)
+    await callback_query.message.answer('Ви відмінили покупку!')
+    return await list_categories(callback_query.message)
 
 
 @dp.message_handler(Command("cart"))
