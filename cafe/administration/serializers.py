@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework.relations import HyperlinkedRelatedField
 
 from .models import Place, Restaurant, User, Referral, Item, Category, SubCategory
 
@@ -8,6 +7,7 @@ class RestaurantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Restaurant
         fields = '__all__'
+        lookup_field = 'name'
 
 
 class CategorySerializer(serializers.ModelSerializer):

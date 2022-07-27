@@ -59,8 +59,8 @@ class Restaurant(Backend):
         restaurants = await self.get_all_objects('restaurants')
         return restaurants
 
-    async def get_restaurant(self, restaurant_id) -> dict:
-        restaurant = await self.get_object('restaurants', restaurant_id)
+    async def get_restaurant(self, restaurant_name) -> dict:
+        restaurant = await self.get_object('restaurants', restaurant_name)
         return restaurant
 
     async def create_restaurant(self, name, latitude, longitude) -> Tuple[dict, int]:

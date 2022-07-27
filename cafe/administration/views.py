@@ -121,6 +121,7 @@ def subcategories_by_category(request, category_code: str):
 class RestaurantViewSet(BaseViewSet):
     queryset = Restaurant.objects.all()
     serializer_class = RestaurantSerializer
+    lookup_field = 'name'
 
 
 class ReferralViewSet(BaseViewSet):
