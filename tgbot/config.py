@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-@dataclass
+@dataclass(frozen=True)
 class DbConfig:
     host: str
     password: str
@@ -11,26 +11,26 @@ class DbConfig:
     database: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class AdminCredentials:
     email: str
     password: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class I18N:
     domain: str
     locales_dir: Path
 
 
-@dataclass
+@dataclass(frozen=True)
 class TgBot:
     token: str
     admins: list
     payment_token: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class Config:
     tg_bot: TgBot
     db: DbConfig
