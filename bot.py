@@ -20,6 +20,8 @@ from tgbot.misc.storage import Storage
 from loader import dp
 
 
+# TODO: зробити функціональність для поварів та кур'єрам
+
 def register_all_middlewares(dispatcher: Dispatcher) -> None:
     logger.info('Registering middlewares')
     # config = dispatcher.bot.get('config')
