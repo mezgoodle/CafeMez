@@ -86,17 +86,3 @@ async def cancel_purchase(callback_query: CallbackQuery, *args, **kwargs):
     return await list_categories(callback_query.message)
 
 
-@dp.message_handler(Command("cart"))
-async def show_cart(message: Message):
-    storage: Storage = message.bot.get('storage')
-    api: Item = message.bot.get('items_api')
-    cart = storage.get_cart(message.from_user.id)
-    if not cart:
-        return await message.answer('Корзина порожня!')
-    text = f'- Щоб побачити продукт, натисніть на його {hbold("назву")}\n' \
-           f'- Щоб змінити к-сть, натисніть на {hbold("Змінити")}\n' \
-           f'- Щоб видалити зі списку, натисніть на {hbold("Видалити")}\n' \
-           f'- Щоб підтвердити чи скасувати замовлення, натисніть {hbold("відповідні кнопки")}\n\n' \
-           'Ваша корзина:'
-    keyboard = await cart_keyboard(api, cart)
-    return await message.answer(text, reply_markup=keyboard)
