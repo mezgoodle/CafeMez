@@ -1,5 +1,6 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.utils.markdown import hbold
+from aiogram.dispatcher.filters import Text
 from aiogram.types import CallbackQuery, Message, ContentType
 
 from tgbot.handlers.menu import list_categories
@@ -113,7 +114,7 @@ async def shipping_address_as_location(message: Message, state: FSMContext):
     return await message.answer('Виберіть спосіб оплати', reply_markup=keyboard)
 
 
-@dp.message_handler(lambda message: message.text in ['Картка', 'Готівка'], state='payment_method')
+@dp.message_handler(Text(equals=['Картка', 'Готівка'], ignore_case=True), state='payment_method', )
 async def answer_payment_method(message: Message, state: FSMContext):
     await state.update_data(payment_method=message.text)
     return await message.answer('Ви обрали спосіб оплати: ' + message.text)
