@@ -1,4 +1,3 @@
-from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command
 from aiogram.types import Message
 from aiogram.utils.markdown import hbold, hitalic
@@ -18,11 +17,8 @@ def check_username(command: Command.CommandObj) -> Tuple[bool, str]:
     return True, username[1:]
 
 
-async def start_registration(message: Message, command: Command.CommandObj, state: FSMContext):
-    success, nickname = check_username(command)
-    if success:
-        await User.first()
-        await state.update_data(username=nickname)
-        await User.next()
-        return await message.answer(f'Введіть пароль для користувача {nickname}')
-    return await message.reply(nickname)
+async def start_registration(message: Message) -> Message:
+    await User.first()
+    return await message.answer(
+        'Перешліть будь ласка повідомлення від користувача, якого ви хочете додати в базу даних.\n'
+        f'{hbold("Уважно перегляньте налаштування приватності!")}')

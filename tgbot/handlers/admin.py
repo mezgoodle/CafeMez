@@ -1,6 +1,6 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, ContentType, CallbackQuery
-from aiogram.dispatcher.filters import Command
+from aiogram.dispatcher.filters import Command, ForwardedMessageFilter
 from aiogram.utils.markdown import hitalic, hbold
 from asyncio import sleep
 
@@ -33,21 +33,31 @@ async def show_stats(message: Message) -> Message:
 
 
 @dp.message_handler(Command(['add_admin']), is_general_admin=True)
-async def add_admin(message: Message, command: Command.CommandObj, state: FSMContext) -> Message:
+async def add_admin(message: Message, state: FSMContext) -> Message:
     await state.update_data(is_courier=False, is_chef=False, is_staff=True)
-    return await start_registration(message, command, state)
+    return await start_registration(message)
 
 
 @dp.message_handler(Command(['add_chef']), is_general_admin=True)
-async def add_chef(message: Message, command: Command.CommandObj, state: FSMContext) -> Message:
+async def add_chef(message: Message, state: FSMContext) -> Message:
     await state.update_data(is_chef=True, is_courier=False, is_staff=False)
-    return await start_registration(message, command, state)
+    return await start_registration(message)
 
 
 @dp.message_handler(Command(['add_courier']), is_general_admin=True)
-async def add_courier(message: Message, command: Command.CommandObj, state: FSMContext) -> Message:
+async def add_courier(message: Message, state: FSMContext) -> Message:
     await state.update_data(is_courier=True, is_chef=False, is_staff=False)
-    return await start_registration(message, command, state)
+    return await start_registration(message)
+
+
+@dp.message_handler(ForwardedMessageFilter(True), state=User.credentials)
+async def answer_credentials(message: Message, state: FSMContext) -> Message:
+    await User.next()
+    try:
+        await state.update_data(username=message.forward_from.username, telegram_id=message.forward_from.id)
+    except AttributeError:
+        return await message.reply(f'{hbold("Перегляньте будь ласка налаштування приватності")}')
+    return await message.answer('Введіть пароль')
 
 
 @dp.message_handler(state=User.password)
@@ -59,14 +69,7 @@ async def answer_password(message: Message, state: FSMContext) -> Message:
 
 @dp.message_handler(state=User.email)
 async def answer_email(message: Message, state: FSMContext) -> Message:
-    await User.next()
     await state.update_data(email=message.text)
-    return await message.answer('Введіть ідентифікатор користувача у Telegram')
-
-
-@dp.message_handler(state=User.telegram_id)
-async def answer_id(message: Message, state: FSMContext) -> Message:
-    await state.update_data(telegram_id=message.text)
     data = await state.get_data()
     await state.finish()
     api: UserAPI = message.bot.get('users_api')
