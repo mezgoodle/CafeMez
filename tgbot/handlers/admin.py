@@ -5,14 +5,14 @@ from aiogram.utils.markdown import hitalic, hbold
 from asyncio import sleep
 
 from loader import dp
-from tgbot.misc.admin_utils import check_username
+from tgbot.misc.admin_utils import check_username, start_registration
 from tgbot.keyboards.inline.restaurants_keyboard import restaurants_markup
 from tgbot.keyboards.inline.places_keyboard import admin_places_markup
 from tgbot.keyboards.inline.callback_data import admin_place_callback
 from tgbot.keyboards.reply.restaurants import restaurants_markup as reply_restaurants_markup
 from tgbot.keyboards.reply.location import location_markup
-from tgbot.misc.backend import User, Place
-from tgbot.states.states import Admin, Mailing
+from tgbot.misc.backend import User as UserAPI, Place, Restaurant
+from tgbot.states.states import User, Mailing
 
 
 @dp.message_handler(Command(['stats']), is_admin=True)
@@ -22,7 +22,7 @@ async def show_stats(message: Message) -> Message:
 
 @dp.message_handler(Command(['rs']), is_admin=True)
 async def show_stats(message: Message) -> Message:
-    api = message.bot.get('restaurants_api')
+    api: Restaurant = message.bot.get('restaurants_api')
     restaurants = await api.get_all_restaurants()
     keyboard = await restaurants_markup(restaurants)
     text = f'Список ресторанів у базі даних. Щоб видалити, {hbold("натисніть хрестик")} навпроти імені номеру' \
@@ -34,45 +34,45 @@ async def show_stats(message: Message) -> Message:
 
 @dp.message_handler(Command(['add_admin']), is_general_admin=True)
 async def add_admin(message: Message, command: Command.CommandObj, state: FSMContext) -> Message:
-    success, nickname = check_username(command)
-    if success:
-        await Admin.first()
-        await state.update_data(username=nickname)
-        await Admin.next()
-        return await message.answer(f'Введіть пароль для користувача {nickname}')
-    return await message.reply(nickname)
+    await state.update_data(is_courier=False, is_chef=False, is_staff=True)
+    return await start_registration(message, command, state)
 
 
-@dp.message_handler(state=Admin.password)
+@dp.message_handler(Command(['add_chef']), is_general_admin=True)
+async def add_chef(message: Message, command: Command.CommandObj, state: FSMContext) -> Message:
+    await state.update_data(is_chef=True, is_courier=False, is_staff=False)
+    return await start_registration(message, command, state)
+
+
+@dp.message_handler(Command(['add_courier']), is_general_admin=True)
+async def add_courier(message: Message, command: Command.CommandObj, state: FSMContext) -> Message:
+    await state.update_data(is_courier=True, is_chef=False, is_staff=False)
+    return await start_registration(message, command, state)
+
+
+@dp.message_handler(state=User.password)
 async def answer_password(message: Message, state: FSMContext) -> Message:
-    await Admin.next()
+    await User.next()
     await state.update_data(password=message.text)
     return await message.answer('Введіть поштовий адрес')
 
 
-@dp.message_handler(state=Admin.password)
-async def answer_password(message: Message, state: FSMContext) -> Message:
-    await Admin.next()
-    await state.update_data(password=message.text)
-    return await message.answer('Введіть поштовий адрес')
-
-
-@dp.message_handler(state=Admin.email)
+@dp.message_handler(state=User.email)
 async def answer_email(message: Message, state: FSMContext) -> Message:
-    await Admin.next()
+    await User.next()
     await state.update_data(email=message.text)
     return await message.answer('Введіть ідентифікатор користувача у Telegram')
 
 
-@dp.message_handler(state=Admin.telegram_id)
+@dp.message_handler(state=User.telegram_id)
 async def answer_id(message: Message, state: FSMContext) -> Message:
     await state.update_data(telegram_id=message.text)
     data = await state.get_data()
     await state.finish()
-    api: User = message.bot.get('users_api')
-    _, status = await api.create_user(**data, is_staff=True)
+    api: UserAPI = message.bot.get('users_api')
+    _, status = await api.create_user(**data)
     if status == 201:
-        await message.answer('Адміністратора успішно створено')
+        await message.answer('Користувача успішно створено')
         return await message.answer(
             f'Username: {hbold(data["username"])}\nPassword: {hbold(data["password"])}\nEmail: {hbold(data["email"])}')
     return await message.reply('Виникла проблема. Зверніться до головного адміністратора')
@@ -82,7 +82,7 @@ async def answer_id(message: Message, state: FSMContext) -> Message:
 async def add_admin(message: Message, command: Command.CommandObj) -> Message:
     success, text = check_username(command)
     if success:
-        api: User = message.bot.get('users_api')
+        api: UserAPI = message.bot.get('users_api')
         status = await api.delete_user(text)
         if status == 204:
             return await message.reply(f'Користувача {hbold(text)} успішно видалено')
@@ -161,13 +161,13 @@ async def enter_text(message: Message, state: FSMContext):
     text = message.text
     await state.update_data(text=text)
     await state.reset_state()
-    api: User = message.bot.get('users_api')
+    api: UserAPI = message.bot.get('users_api')
     bot = message.bot
     users = await api.get_all_users()
     for user in users:
         try:
             await bot.send_message(user['telegram_id'], text)
             await sleep(0.3)
-        except Exception as e:
+        except Exception:
             pass
     return await message.answer('Повідомлення надіслано!')
