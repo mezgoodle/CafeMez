@@ -21,7 +21,7 @@ async def show_stats(message: Message) -> Message:
 
 
 @dp.message_handler(Command(['rs']), is_admin=True)
-async def show_stats(message: Message) -> Message:
+async def show_restaurants(message: Message) -> Message:
     api: Restaurant = message.bot.get('restaurants_api')
     restaurants = await api.get_all_restaurants()
     keyboard = await restaurants_markup(restaurants)
@@ -64,6 +64,14 @@ async def answer_credentials(message: Message, state: FSMContext) -> Message:
 async def answer_password(message: Message, state: FSMContext) -> Message:
     await User.next()
     await state.update_data(password=message.text)
+    keyboard = await reply_restaurants_markup(message)
+    return await message.answer('Виберіть ресторан', reply_markup=keyboard)
+
+
+@dp.message_handler(state=User.restaurant)
+async def answer_restaurant(message: Message, state: FSMContext) -> Message:
+    await User.next()
+    await state.update_data(restaurant=message.text)
     return await message.answer('Введіть поштовий адрес')
 
 

@@ -131,6 +131,7 @@ class User(Backend):
                           username: str,
                           email: str,
                           telegram_id: int,
+                          restaurant: str,
                           is_staff: bool = False,
                           is_chef: bool = False,
                           is_courier: bool = False,
@@ -142,7 +143,8 @@ class User(Backend):
             'is_staff': is_staff,
             'email': email,
             'is_chef': is_chef,
-            'is_courier': is_courier
+            'is_courier': is_courier,
+            'connected_restaurant': restaurant
         }
         data, status = await self.create_object('users', data)
         return data, status

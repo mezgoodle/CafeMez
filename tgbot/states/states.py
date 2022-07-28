@@ -4,6 +4,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 class User(StatesGroup):
     credentials = State()
     password = State()
+    restaurant = State()
     email = State()
 
 
