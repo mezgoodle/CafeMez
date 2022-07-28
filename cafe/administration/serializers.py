@@ -58,6 +58,7 @@ class ReferralSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'is_staff', 'is_superuser', 'password', 'telegram_id']
+        fields = ['id', 'username', 'email', 'is_staff', 'is_superuser', 'password', 'telegram_id', 'is_chef',
+                  'is_courier']
         extra_kwargs = {'password': {'write_only': True}}
         lookup_field = 'username'

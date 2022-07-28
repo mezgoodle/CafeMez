@@ -132,6 +132,8 @@ class User(Backend):
                           email: str,
                           telegram_id: int,
                           is_staff: bool = False,
+                          is_chef: bool = False,
+                          is_courier: bool = False,
                           password: str = None) -> Tuple[dict, int]:
         data = {
             'username': username,
@@ -139,6 +141,8 @@ class User(Backend):
             'telegram_id': telegram_id,
             'is_staff': is_staff,
             'email': email,
+            'is_chef': is_chef,
+            'is_courier': is_courier
         }
         data, status = await self.create_object('users', data)
         return data, status

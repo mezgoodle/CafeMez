@@ -48,6 +48,8 @@ class User(TimeStampedModel, AbstractUser):
     email = models.EmailField(max_length=100, verbose_name='Електронна пошта', unique=True)
     telegram_id = models.IntegerField(verbose_name='Ідентифікатор користувача у телеграмі',
                                       default=353057906, unique=True)
+    is_chef = models.BooleanField(default=False, verbose_name='Шеф')
+    is_courier = models.BooleanField(default=False, verbose_name='Кур\'єр')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
