@@ -96,9 +96,10 @@ def get_orders(request, username):
     user = User.objects.get(username=username)
     orders = None
     if user.is_chef:
-        orders = user.connected_restaurant.order_set.all()
+        orders = user.connected_restaurant.order_set.all().filter(is_ready=False)
     elif user.is_courier:
-        orders = user.order_set.all()
+        orders = user.connected_restaurant.order_set.all().filter(is_delivered=False,
+                                                                  shipping_address_latitude__isnull=False)
     serializer = OrderSerializer(orders, many=True)
     return response.Response(serializer.data)
 
