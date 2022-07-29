@@ -59,3 +59,13 @@ async def show_cart(message: Message):
            'Ваша корзина:'
     keyboard = await cart_keyboard(api, cart)
     return await message.answer(text, reply_markup=keyboard)
+
+
+@dp.message_handler(Command("my_orders"), is_chef=True)
+async def show_chef_orders(message: Message):
+    pass
+
+
+@dp.message_handler(Command("my_orders"), is_courier=True)
+async def show_courier_orders(message: Message):
+    pass
