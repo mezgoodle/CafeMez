@@ -149,17 +149,10 @@ class User(Backend):
         data, status = await self.create_object('users', data)
         return data, status
 
-    async def is_staff(self, username: str) -> bool:
+    async def is_job(self, username: str, job: str) -> bool:
         user = await self.get_user(username)
         try:
-            return user['is_staff']
-        except KeyError:
-            return False
-
-    async def is_superuser(self, username: str) -> bool:
-        user = await self.get_user(username)
-        try:
-            return user['is_superuser']
+            return user[job]
         except KeyError:
             return False
 
