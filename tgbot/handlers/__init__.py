@@ -1,6 +1,8 @@
 # TODO: testing all situations
 from . import (admin,
                callbacks,
+               chef,
+               courier,
                help,
                start,
                support,
