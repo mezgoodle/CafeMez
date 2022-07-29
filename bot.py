@@ -7,6 +7,8 @@ from loguru import logger
 
 from tgbot.config import load_config
 from tgbot.filters.admin import IsGeneralAdminFilter, IsAdminFilter
+from tgbot.filters.chef import IsChefFilter
+from tgbot.filters.courier import IsCourierFilter
 from tgbot.middlewares.throttling import ThrottlingMiddleware
 from tgbot.middlewares.callbacks import CallbackMiddleware
 from tgbot.middlewares.subcategories import SubCategoriesMiddleware
@@ -40,6 +42,8 @@ def register_all_filters(dispatcher: Dispatcher) -> None:
     logger.info('Registering filters')
     dispatcher.filters_factory.bind(IsGeneralAdminFilter)
     dispatcher.filters_factory.bind(IsAdminFilter)
+    dispatcher.filters_factory.bind(IsChefFilter)
+    dispatcher.filters_factory.bind(IsCourierFilter)
 
 
 def register_all_handlers(dispatcher: Dispatcher) -> None:
