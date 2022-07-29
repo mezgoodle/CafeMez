@@ -147,8 +147,11 @@ class Order(TimeStampedModel):
     shipping_address_latitude = models.DecimalField(null=True, blank=True, max_digits=10, decimal_places=7)
     shipping_address_name = models.ForeignKey(Restaurant, to_field='name', on_delete=models.CASCADE, null=True,
                                               blank=True)
+    connected_courier = models.OneToOneField(User, to_field='username', on_delete=models.SET_NULL, null=True,
+                                             blank=True, default=None, related_name='courier')
     is_paid = models.BooleanField(default=False)
     is_delivered = models.BooleanField(default=False)
+    is_ready = models.BooleanField(default=False)
 
     @property
     def total_price(self):
