@@ -13,7 +13,8 @@ from .serializers import (PlaceSerializer,
                           ReferralSerializer,
                           ItemSerializer,
                           CategorySerializer,
-                          SubCategorySerializer)
+                          SubCategorySerializer,
+                          OrderSerializer)
 from .utils import set_permissions
 from .permissions import IsAdminOrReadOnly
 
@@ -87,6 +88,18 @@ class ItemViewSet(BaseViewSet):
 def get_items(request, subcategory_code):
     items = Item.objects.filter(subcategory=subcategory_code)
     serializer = ItemSerializer(items, many=True)
+    return response.Response(serializer.data)
+
+
+@api_view(['GET'])
+def get_orders(request, username):
+    user = User.objects.get(username=username)
+    orders = None
+    if user.is_chef:
+        orders = user.connected_restaurant.order_set.all()
+    elif user.is_courier:
+        orders = user.order_set.all()
+    serializer = OrderSerializer(orders, many=True)
     return response.Response(serializer.data)
 
 
