@@ -62,8 +62,17 @@ async def show_cart(message: Message):
 
 
 @dp.message_handler(Command("my_orders"), is_chef=True)
-@dp.message_handler(Command("my_orders"), is_courier=True)
+@dp.message_handler(Command("orders"), is_courier=True)
 async def show_orders(message: Message):
     api: User = message.bot.get('users_api')
     orders = await api.get_orders(message.from_user.username)
     return await message.answer(f'Ваші замовлення:\n{orders}')
+
+
+@dp.message_handler(Command("my_order"), is_courier=True)
+async def show_courier_order(message: Message):
+    pass
+
+@dp.message_handler(Command("my_order"), is_registered=True)
+async def show_customer_order(message: Message):
+    pass
