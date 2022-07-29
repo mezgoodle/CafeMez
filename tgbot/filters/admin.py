@@ -13,7 +13,7 @@ class IsGeneralAdminFilter(BoundFilter):
     async def check(self, message: Message):
         api: User = message.bot['users_api']
         username = message.from_user.username
-        return await api.is_superuser(username)
+        return await api.is_job(username, 'is_superuser')
 
 
 class IsAdminFilter(BoundFilter):
@@ -25,4 +25,4 @@ class IsAdminFilter(BoundFilter):
     async def check(self, message: Message):
         api: User = message.bot['users_api']
         username = message.from_user.username
-        return await api.is_staff(username)
+        return await api.is_job(username, 'is_staff')
