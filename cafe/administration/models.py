@@ -164,6 +164,9 @@ class Order(TimeStampedModel):
     def __str__(self):
         return f'#{self.id} - {self.user}'
 
+    def get_items(self):
+        return self.orderitem_set.all()
+
 
 class OrderItem(TimeStampedModel):
     id = models.AutoField(primary_key=True)
