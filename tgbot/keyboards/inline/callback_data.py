@@ -8,3 +8,4 @@ menu_callback = CallbackData('show_menu', 'level', 'category', 'subcategory', 'i
 buy_item_callback = CallbackData('buy', 'item_id')
 admin_place_callback = CallbackData('admin_place', 'method', 'place_id', 'value')
 cart_callback = CallbackData('cart', 'action', 'item_id')
+order_callback = CallbackData('order', 'action', 'id', 'value')
