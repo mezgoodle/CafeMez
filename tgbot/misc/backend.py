@@ -202,3 +202,7 @@ class Order(Backend):
     async def get_orders(self, username: str) -> list:
         orders = await self.get_all_objects(f'orders/by/{username}')
         return orders
+
+    async def get_order_item(self, item_id: str) -> dict:
+        item = await self.get_object('order_items', item_id)
+        return item
