@@ -156,10 +156,6 @@ class User(Backend):
         except KeyError:
             return False
 
-    async def get_orders(self, username: str) -> list:
-        orders = await self.get_all_objects(f'orders/by/{username}')
-        return orders
-
 
 class Item(Backend):
     def __init__(self, api):
@@ -197,3 +193,12 @@ class Referral(Backend):
         }
         data, status = await self.create_object('referrals', data)
         return data, status
+
+
+class Order(Backend):
+    def __init__(self, api):
+        super().__init__(api)
+
+    async def get_orders(self, username: str) -> list:
+        orders = await self.get_all_objects(f'orders/by/{username}')
+        return orders
