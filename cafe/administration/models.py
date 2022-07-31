@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.forms.models import model_to_dict
 
 
 class TimeStampedModel(models.Model):
@@ -160,6 +161,7 @@ class Order(TimeStampedModel):
     class Meta:
         verbose_name = 'Покупка'
         verbose_name_plural = 'Покупки'
+        ordering = ['-created']
 
     def __str__(self):
         return f'#{self.id} - {self.user}'
@@ -170,7 +172,7 @@ class Order(TimeStampedModel):
 
 class OrderItem(TimeStampedModel):
     id = models.AutoField(primary_key=True)
-    item = models.ForeignKey(Item, null=True, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, to_field='name', null=True, on_delete=models.CASCADE)
     order = models.ForeignKey(Order, null=True, on_delete=models.CASCADE)
     quantity = models.IntegerField(null=True, blank=True, default=1)
 
