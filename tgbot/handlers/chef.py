@@ -26,6 +26,7 @@ async def show_orders(message: Message):
 @dp.callback_query_handler(order_callback.filter(action='show'), is_chef=True)
 async def show_order_item(callback_query: CallbackQuery, callback_data: dict):
     api: Order = callback_query.bot.get('orders_api')
+    # TODO: send here the photo of the item
     item = await api.get_order_item(callback_data['id'])
     return await callback_query.message.answer(f'{hbold(item["item"]["name"])}\n'
                                                f'{hbold("Кількість:" )} {item["quantity"]}\n'
