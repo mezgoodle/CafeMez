@@ -6,9 +6,9 @@ from tgbot.keyboards.inline.callback_data import order_callback
 def orders_keyboard(order):
     keyboard = InlineKeyboardMarkup(row_width=4)
     buttons = []
-    for item in order['items']:
-        buttons.append(InlineKeyboardButton(text=f'{item["item"]} - {item["quantity"]}',
-                                            callback_data=order_callback.new('show', item['id'], '')))
+    for order_item in order['items']:
+        buttons.append(InlineKeyboardButton(text=f'{order_item["item"]["name"]} - {order_item["quantity"]}',
+                                            callback_data=order_callback.new('show', order_item['id'], '')))
     keyboard.row(*buttons)
     keyboard.row(
         InlineKeyboardButton(text=f'{"Оплачене" if order["is_paid"] else "Не оплачене"}',
