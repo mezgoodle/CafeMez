@@ -76,7 +76,7 @@ async def delete_item(callback_query: CallbackQuery, callback_data: dict):
 
 
 @dp.callback_query_handler(text_contains='cancel_cart')
-async def cancel_purchase(callback_query: CallbackQuery, *args, **kwargs):
+async def cancel_purchase(callback_query: CallbackQuery, data: dict):
     storage: Storage = callback_query.bot.get('storage')
     storage.clean_cart(callback_query.from_user.id)
     await callback_query.message.answer('Ви відмінили покупку!')
@@ -84,7 +84,7 @@ async def cancel_purchase(callback_query: CallbackQuery, *args, **kwargs):
 
 
 @dp.callback_query_handler(text_contains='buy:')
-async def apply_purchase(callback_query: CallbackQuery, state: FSMContext, *args, **kwargs):
+async def apply_purchase(callback_query: CallbackQuery, state: FSMContext, data: dict):
     await state.set_state('shipping_address')
     keyboard = await restaurants_markup(callback_query.message)
     text = 'Чи бажаєте ви доставку замовлення?' \
