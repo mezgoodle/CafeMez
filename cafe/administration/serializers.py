@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Place, Restaurant, User, Referral, Item, Category, SubCategory, Order
+from .models import Place, Restaurant, User, Referral, Item, Category, SubCategory, Order, OrderItem
 
 
 class RestaurantSerializer(serializers.ModelSerializer):
@@ -43,6 +43,13 @@ class ItemSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class OrderItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = '__all__'
+        depth = 1
+
+
 class PlaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Place
@@ -56,9 +63,19 @@ class ReferralSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    total_price = serializers.SerializerMethodField()
+
     class Meta:
         model = Order
         fields = '__all__'
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['items'] = OrderItemSerializer(instance.get_items(), many=True).data
+        return data
+
+    def get_total_price(self, instance):
+        return instance.total_price
 
 
 class UserSerializer(serializers.ModelSerializer):
