@@ -7,8 +7,6 @@ from tgbot.misc.backend import Order
 from tgbot.keyboards.inline.orders import orders_keyboard
 from tgbot.keyboards.inline.callback_data import order_callback
 
-from pprint import pprint
-
 
 @dp.message_handler(Command("my_orders"), is_chef=True)
 async def show_orders(message: Message):
