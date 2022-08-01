@@ -25,7 +25,7 @@ class API:
     @api_decorator
     async def put(self, request_url, data=None, headers: dict = None) -> Tuple[dict, int]:
         url = self.base_url % request_url
-        async with self.session.put(url, data=data, headers=headers) as response:
+        async with self.session.patch(url, data=data, headers=headers) as response:
             return await response.json(), response.status
 
     @api_decorator
