@@ -26,17 +26,25 @@ async def show_orders(message: Message):
 @dp.callback_query_handler(order_callback.filter(action='show'), is_chef=True)
 async def show_order_item(callback_query: CallbackQuery, callback_data: dict):
     api: Order = callback_query.bot.get('orders_api')
-    # TODO: send here the photo of the item
     item = await api.get_order_item(callback_data['id'])
-    return await callback_query.message.answer(f'{hbold(item["item"]["name"])}\n'
-                                               f'{hbold("Кількість:" )} {item["quantity"]}\n'
-                                               f'{hbold("Ціна за шт.:")} {item["item"]["price"]} грн.')
+    # TODO: send here the photo of the item
+    text = f'{hbold(item["item"]["name"])}\n' \
+           f'{hbold("Кількість:" )} {item["quantity"]}\n' \
+           f'{hbold("Ціна за шт.:")} {item["item"]["price"]} грн.'
+    # return await callback_query.message.answer_photo(photo=item['item']['photo'], caption=text)
+    return await callback_query.message.answer(text)
 
 
 @dp.callback_query_handler(order_callback.filter(action='paid'), is_chef=True)
 async def change_order_payment(callback_query: CallbackQuery, callback_data: dict):
-    # api: Order = callback_query.bot.get('orders_api')
-    print(callback_data)
+    api: Order = callback_query.bot.get('orders_api')
+    data, status = await api.update_order(callback_data['id'], {'is_paid': callback_data['value']})
+    if status == 200:
+        order = await api.get_order(data['order']['id'])
+        keyboard = orders_keyboard(order)
+        await callback_query.message.answer('Статус оплати змінено!')
+        return await callback_query.message.edit_reply_markup(reply_markup=keyboard)
+    return await callback_query.message.answer('Помилка при зміні статусу оплати!')
 
 
 @dp.callback_query_handler(order_callback.filter(action='ready'), is_chef=True)
