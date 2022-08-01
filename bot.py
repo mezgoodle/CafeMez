@@ -62,13 +62,12 @@ async def on_startup(dispatcher: Dispatcher, webhook_url: str = None) -> None:
     register_all_handlers(dispatcher)
     await register_all_commands(dispatcher)
 
-    dispatcher.bot['api'] = API()
-    dispatcher.bot['places_api'] = Place(API())
-    dispatcher.bot['restaurants_api'] = Restaurant(API())
-    dispatcher.bot['items_api'] = Item(API())
-    dispatcher.bot['users_api'] = User(API())
-    dispatcher.bot['referrals_api'] = Referral(API())
-    dispatcher.bot['orders_api'] = Order(API())
+    dispatcher.bot['places_api'] = Place()
+    dispatcher.bot['restaurants_api'] = Restaurant()
+    dispatcher.bot['items_api'] = Item()
+    dispatcher.bot['users_api'] = User()
+    dispatcher.bot['referrals_api'] = Referral()
+    dispatcher.bot['orders_api'] = Order()
 
     logger.info('Add server API to bot')
 

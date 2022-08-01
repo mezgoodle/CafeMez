@@ -4,47 +4,47 @@ from tgbot.config import load_config, Config
 from typing import Tuple, List, Union
 
 
-class Backend:
+class Backend(API):
     token: str = None
     auth_str = 'Token %s'
 
-    def __init__(self, api):
-        self.api: API = api
+    def __init__(self):
+        super().__init__()
 
     async def get_all_objects(self, collection: str) -> Union[list, int]:
-        items = await self.api.get(collection)
+        items = await self.get(collection)
         return items
 
     async def get_object(self, collection: str, item_id) -> dict:
-        item = await self.api.get(f'{collection}/{item_id}')
+        item = await self.get(f'{collection}/{item_id}')
         return item
 
     async def update_object(self, collection: str, item_id, data: dict) -> Tuple[dict, int]:
         await self.__get_token()
         headers = {'Authorization': self.auth_str % self.token}
-        data, status = await self.api.put(f'{collection}/{item_id}', data, headers=headers)
+        data, status = await self.put(f'{collection}/{item_id}', data, headers=headers)
         return data, status
 
     async def delete_object(self, collection: str, item_id) -> int:
         await self.__get_token()
         headers = {'Authorization': self.auth_str % self.token}
-        status = await self.api.delete(f'{collection}/{item_id}', headers=headers)
+        status = await self.delete(f'{collection}/{item_id}', headers=headers)
         return status
 
     async def create_object(self, collection: str, data: dict) -> Tuple[dict, int]:
         await self.__get_token()
         headers = {'Authorization': self.auth_str % self.token}
-        data, status = await self.api.post(collection, data, headers=headers)
+        data, status = await self.post(collection, data, headers=headers)
         return data, status
 
     async def __get_token(self):
         if not self.token:
             config: Config = load_config()
-            token, status = await self.api.post('token',
-                                                data={
-                                                    'username': config.admin.email,
-                                                    'password': config.admin.password
-                                                })
+            token, status = await self.post('token',
+                                            data={
+                                                'username': config.admin.email,
+                                                'password': config.admin.password
+                                            })
             if status == 200:
                 self.token = token['token']
             else:
@@ -52,8 +52,8 @@ class Backend:
 
 
 class Restaurant(Backend):
-    def __init__(self, api):
-        super().__init__(api)
+    def __init__(self):
+        super().__init__()
 
     async def get_all_restaurants(self) -> list:
         restaurants = await self.get_all_objects('restaurants')
@@ -78,8 +78,8 @@ class Restaurant(Backend):
 
 
 class Place(Backend):
-    def __init__(self, api):
-        super().__init__(api)
+    def __init__(self):
+        super().__init__()
 
     async def get_all_places(self) -> list:
         places = await self.get_all_objects('places')
@@ -107,8 +107,8 @@ class Place(Backend):
 
 
 class User(Backend):
-    def __init__(self, api):
-        super().__init__(api)
+    def __init__(self):
+        super().__init__()
 
     async def get_all_users(self) -> list:
         users = await self.get_all_objects('users')
@@ -158,8 +158,8 @@ class User(Backend):
 
 
 class Item(Backend):
-    def __init__(self, api):
-        super().__init__(api)
+    def __init__(self):
+        super().__init__()
 
     async def create_item(self, data: dict) -> Tuple[dict, int]:
         data, status = await self.create_object('items', data)
@@ -183,8 +183,8 @@ class Item(Backend):
 
 
 class Referral(Backend):
-    def __init__(self, api):
-        super().__init__(api)
+    def __init__(self):
+        super().__init__()
 
     async def apply_referral(self, from_user_id: int, to_user_id: int) -> Tuple[dict, int]:
         data = {
@@ -196,8 +196,8 @@ class Referral(Backend):
 
 
 class Order(Backend):
-    def __init__(self, api):
-        super().__init__(api)
+    def __init__(self):
+        super().__init__()
 
     async def get_orders(self, username: str) -> list:
         orders = await self.get_all_objects(f'orders/by/{username}')
