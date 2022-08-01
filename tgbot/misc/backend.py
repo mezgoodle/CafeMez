@@ -214,3 +214,7 @@ class Order(Backend):
     async def update_order(self, order_id: str, data: dict) -> Tuple[dict, int]:
         data, status = await self.update_object('orders', order_id, data)
         return data, status
+
+    async def delete_order(self, order_id: str) -> int:
+        status = await self.delete_object('orders', order_id)
+        return status
