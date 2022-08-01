@@ -19,11 +19,11 @@ class Backend:
         item = await self.api.get(f'{collection}/{item_id}')
         return item
 
-    async def update_object(self, collection: str, item_id, data: dict) -> int:
+    async def update_object(self, collection: str, item_id, data: dict) -> Tuple[dict, int]:
         await self.__get_token()
         headers = {'Authorization': self.auth_str % self.token}
-        status = await self.api.put(f'{collection}/{item_id}', data, headers=headers)
-        return status
+        data, status = await self.api.put(f'{collection}/{item_id}', data, headers=headers)
+        return data, status
 
     async def delete_object(self, collection: str, item_id) -> int:
         await self.__get_token()
@@ -97,9 +97,9 @@ class Place(Backend):
         status = await self.delete_object('places', place_id)
         return status
 
-    async def update_place(self, place_id, data: dict) -> int:
-        status = await self.update_object('places', place_id, data)
-        return status
+    async def update_place(self, place_id, data: dict) -> Tuple[dict, int]:
+        data, status = await self.update_object('places', place_id, data)
+        return data, status
 
     async def remove_place(self, place_id) -> int:
         status = await self.delete_object('places', place_id)
@@ -203,6 +203,14 @@ class Order(Backend):
         orders = await self.get_all_objects(f'orders/by/{username}')
         return orders
 
+    async def get_order(self, order_id: str) -> dict:
+        order = await self.get_object('orders', order_id)
+        return order
+
     async def get_order_item(self, item_id: str) -> dict:
         item = await self.get_object('order_items', item_id)
         return item
+
+    async def update_order(self, order_id: str, data: dict) -> Tuple[dict, int]:
+        data, status = await self.update_object('order_items', order_id, data)
+        return data, status
