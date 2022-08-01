@@ -1,6 +1,5 @@
 from aiogram.dispatcher.filters import Command
 from aiogram.types import Message, CallbackQuery
-from aiogram.utils.callback_data import CallbackData
 from aiogram.utils.markdown import hbold
 
 from loader import dp
@@ -38,9 +37,8 @@ async def show_order_item(callback_query: CallbackQuery, callback_data: dict):
 @dp.callback_query_handler(order_callback.filter(action='paid'), is_chef=True)
 async def change_order_payment(callback_query: CallbackQuery, callback_data: dict):
     api: Order = callback_query.bot.get('orders_api')
-    data, status = await api.update_order(callback_data['id'], {'is_paid': callback_data['value']})
+    order, status = await api.update_order(callback_data['id'], {'is_paid': callback_data['value']})
     if status == 200:
-        order = await api.get_order(data['order']['id'])
         keyboard = orders_keyboard(order)
         await callback_query.message.answer('Статус оплати змінено!')
         return await callback_query.message.edit_reply_markup(reply_markup=keyboard)
