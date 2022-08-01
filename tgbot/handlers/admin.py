@@ -146,7 +146,7 @@ async def edit_places_in_restaurant(message: Message, state: FSMContext) -> Mess
 @dp.callback_query_handler(admin_place_callback.filter(method='update'), is_admin=True)
 async def update_places_in_restaurant(call: CallbackQuery, callback_data: dict) -> Message:
     api: Place = call.bot.get('places_api')
-    status = await api.update_place(callback_data['place_id'], {'free': callback_data['value']})
+    _, status = await api.update_place(callback_data['place_id'], {'free': callback_data['value']})
     if status == 200:
         return await call.message.edit_text('Місце успішно оновлено')
     return await call.message.edit_text('Виникла помилка. Зверніться до головного адміністратора')
