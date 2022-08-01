@@ -47,5 +47,10 @@ async def change_order_payment(callback_query: CallbackQuery, callback_data: dic
 
 @dp.callback_query_handler(order_callback.filter(action='ready'), is_chef=True)
 async def change_order_ready(callback_query: CallbackQuery, callback_data: dict):
-    # api: Order = callback_query.bot.get('orders_api')
-    print(callback_data)
+    api: Order = callback_query.bot.get('orders_api')
+    order, status = await api.update_order(callback_data['id'], {'is_ready': callback_data['value']})
+    if status == 200:
+        keyboard = orders_keyboard(order)
+        await callback_query.message.answer('Статус приготування змінено!')
+        return await callback_query.message.edit_reply_markup(reply_markup=keyboard)
+    return await callback_query.message.answer('Помилка при зміні статусу приготування!')
