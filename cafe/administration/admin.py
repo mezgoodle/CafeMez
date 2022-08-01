@@ -36,7 +36,7 @@ class ReferralAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'payment_method', 'total_price', 'is_paid', 'is_delivered', 'created')
+    list_display = ('id', 'user', 'payment_method', 'total_price', 'is_paid', 'is_delivered', 'is_ready','created')
 
 
 @admin.register(OrderItem)
