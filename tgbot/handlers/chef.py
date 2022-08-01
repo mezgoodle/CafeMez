@@ -7,6 +7,8 @@ from tgbot.misc.backend import Order
 from tgbot.keyboards.inline.orders import orders_keyboard
 from tgbot.keyboards.inline.callback_data import order_callback
 
+from pprint import pprint
+
 
 @dp.message_handler(Command("my_orders"), is_chef=True)
 async def show_orders(message: Message):
@@ -28,7 +30,7 @@ async def show_order_item(callback_query: CallbackQuery, callback_data: dict):
     item = await api.get_order_item(callback_data['id'])
     # TODO: send here the photo of the item
     text = f'{hbold(item["item"]["name"])}\n' \
-           f'{hbold("Кількість:" )} {item["quantity"]}\n' \
+           f'{hbold("Кількість:")} {item["quantity"]}\n' \
            f'{hbold("Ціна за шт.:")} {item["item"]["price"]} грн.'
     # return await callback_query.message.answer_photo(photo=item['item']['photo'], caption=text)
     return await callback_query.message.answer(text)
@@ -37,9 +39,12 @@ async def show_order_item(callback_query: CallbackQuery, callback_data: dict):
 @dp.callback_query_handler(order_callback.filter(action='paid'), is_chef=True)
 async def change_order_payment(callback_query: CallbackQuery, callback_data: dict):
     api: Order = callback_query.bot.get('orders_api')
-    order, status = await api.update_order(callback_data['id'], {'is_paid': callback_data['value']})
+    new_order, status = await api.update_order(
+        callback_data['id'],
+        {'is_paid': callback_data['value']}
+    )
     if status == 200:
-        keyboard = orders_keyboard(order)
+        keyboard = orders_keyboard(new_order)
         await callback_query.message.answer('Статус оплати змінено!')
         return await callback_query.message.edit_reply_markup(reply_markup=keyboard)
     return await callback_query.message.answer('Помилка при зміні статусу оплати!')
@@ -48,9 +53,12 @@ async def change_order_payment(callback_query: CallbackQuery, callback_data: dic
 @dp.callback_query_handler(order_callback.filter(action='ready'), is_chef=True)
 async def change_order_ready(callback_query: CallbackQuery, callback_data: dict):
     api: Order = callback_query.bot.get('orders_api')
-    order, status = await api.update_order(callback_data['id'], {'is_ready': callback_data['value']})
+    new_order, status = await api.update_order(
+        callback_data['id'],
+        {'is_ready': callback_data['value']}
+    )
     if status == 200:
-        keyboard = orders_keyboard(order)
+        keyboard = orders_keyboard(new_order)
         await callback_query.message.answer('Статус приготування змінено!')
         return await callback_query.message.edit_reply_markup(reply_markup=keyboard)
     return await callback_query.message.answer('Помилка при зміні статусу приготування!')
