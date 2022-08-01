@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from tgbot.keyboards.inline.callback_data import order_callback
 
 
-def orders_keyboard(order):
+def orders_keyboard(order: dict):
     keyboard = InlineKeyboardMarkup(row_width=4)
     buttons = []
     for order_item in order['items']:
