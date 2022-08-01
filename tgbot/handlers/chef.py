@@ -65,7 +65,7 @@ async def change_order_ready(callback_query: CallbackQuery, callback_data: dict)
 
 
 @dp.callback_query_handler(order_callback.filter(action='delete'), is_chef=True)
-async def delуte_order(callback_query: CallbackQuery, callback_data: dict):
+async def delete_order(callback_query: CallbackQuery, callback_data: dict):
     api: Order = callback_query.bot.get('orders_api')
     status = await api.delete_order(callback_data['id'])
     if status == 204:
