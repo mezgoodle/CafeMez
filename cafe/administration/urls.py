@@ -11,6 +11,7 @@ router.register(r'items', views.ItemViewSet)
 router.register(r'restaurants', views.RestaurantViewSet)
 router.register(r'referrals', views.ReferralViewSet)
 router.register(r'users', views.UserViewSet)
+router.register(r'orders', views.OrderViewSet)
 router.register(r'order_items', views.OrderItemViewSet)
 router.register(r'subcategories', views.SubCategoryViewSet)
 

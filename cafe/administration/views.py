@@ -5,7 +5,7 @@ from rest_framework.viewsets import ModelViewSet
 from django.http import Http404
 from loguru import logger
 
-from .models import Place, Restaurant, User, Referral, Item, Category, SubCategory, OrderItem
+from .models import Place, Restaurant, User, Referral, Item, Category, SubCategory, OrderItem, Order
 from .paginator import Paginator
 from .serializers import (PlaceSerializer,
                           RestaurantSerializer,
@@ -65,6 +65,11 @@ class CategoryViewSet(BaseViewSet):
 class SubCategoryViewSet(BaseViewSet):
     queryset = SubCategory.objects.all()
     serializer_class = SubCategorySerializer
+
+
+class OrderViewSet(BaseViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
 
 
 class OrderItemViewSet(BaseViewSet):
