@@ -212,5 +212,5 @@ class Order(Backend):
         return item
 
     async def update_order(self, order_id: str, data: dict) -> Tuple[dict, int]:
-        data, status = await self.update_object('order_items', order_id, data)
+        data, status = await self.update_object('orders', order_id, data)
         return data, status
