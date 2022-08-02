@@ -9,7 +9,8 @@ from tgbot.keyboards.reply.location import location_markup
 from tgbot.keyboards.reply.restaurants import restaurants_markup
 from tgbot.keyboards.inline.places_keyboard import places_markup
 from tgbot.keyboards.inline.cart_keyboard import cart_keyboard
-from tgbot.misc.backend import User, Item
+from tgbot.keyboards.inline.orders import orders_keyboard
+from tgbot.misc.backend import User, Item, Order
 from tgbot.misc.storage import Storage
 
 
@@ -61,6 +62,14 @@ async def show_cart(message: Message):
     return await message.answer(text, reply_markup=keyboard)
 
 
-# @dp.message_handler(Command("my_order"), is_registered=True)
-# async def show_customer_order(message: Message):
-#     pass
+@dp.message_handler(Command("my_orders"), is_registered=True)
+async def show_customer_order(message: Message):
+    api: Order = message.bot.get('orders_api')
+    orders = await api.get_orders_by_username(message.from_user.username)
+    if orders:
+        for order in orders:
+            text = f'{hbold("Замовлення номер - ") + hbold(order["id"])}\n'
+            keyboard = orders_keyboard(order)
+            await message.answer(text, reply_markup=keyboard)
+        return
+    return await message.answer('Ви не зробили жодного замовлення')
