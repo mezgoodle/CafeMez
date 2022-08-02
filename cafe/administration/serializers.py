@@ -62,8 +62,18 @@ class ReferralSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'is_staff', 'is_superuser', 'password', 'telegram_id', 'is_chef',
+                  'is_courier', 'connected_restaurant']
+        extra_kwargs = {'password': {'write_only': True}}
+        lookup_field = 'username'
+
+
 class OrderSerializer(serializers.ModelSerializer):
     total_price = serializers.SerializerMethodField()
+    user = UserSerializer(many=False)
 
     class Meta:
         model = Order
@@ -76,12 +86,3 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def get_total_price(self, instance):
         return instance.total_price
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'email', 'is_staff', 'is_superuser', 'password', 'telegram_id', 'is_chef',
-                  'is_courier', 'connected_restaurant']
-        extra_kwargs = {'password': {'write_only': True}}
-        lookup_field = 'username'
