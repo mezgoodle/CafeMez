@@ -41,15 +41,17 @@ async def show_order_item(callback_query: CallbackQuery, callback_data: dict):
 @dp.callback_query_handler(order_callback.filter(action='paid'), is_courier=True)
 async def change_order_payment(callback_query: CallbackQuery, callback_data: dict):
     api: Order = callback_query.bot.get('orders_api')
-    new_order, status = await api.update_order(
-        callback_data['id'],
-        {'is_paid': callback_data['value']}
-    )
-    if status == 200:
-        keyboard = orders_keyboard(new_order)
-        await callback_query.message.answer('Статус оплати змінено!')
-        return await callback_query.message.edit_reply_markup(reply_markup=keyboard)
-    return await callback_query.message.answer('Помилка при зміні статусу оплати!')
+    order = await api.get_order(callback_data['id'])
+    if order['connected_courier'] == callback_query.from_user.username:
+        new_order, status = await api.update_order(
+            callback_data['id'],
+            {'is_paid': callback_data['value']}
+        )
+        if status == 200:
+            keyboard = orders_keyboard(new_order)
+            await callback_query.message.answer('Статус оплати змінено!')
+            return await callback_query.message.edit_reply_markup(reply_markup=keyboard)
+        return await callback_query.message.answer('Помилка при зміні статусу оплати!')
 
 
 @dp.callback_query_handler(order_callback.filter(action='ready'), is_chef=True)
