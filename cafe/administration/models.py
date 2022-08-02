@@ -1,6 +1,5 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.forms.models import model_to_dict
 
 
 class TimeStampedModel(models.Model):
@@ -30,6 +29,7 @@ class Restaurant(TimeStampedModel):
 
 
 class Place(TimeStampedModel):
+    # TODO: add user who taked the place
     id = models.AutoField(primary_key=True)
     free = models.BooleanField(default=True, verbose_name='Вільне місце')
     restaurant = models.ForeignKey(Restaurant, to_field='name', on_delete=models.CASCADE, verbose_name='Ресторан',
