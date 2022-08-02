@@ -1,5 +1,5 @@
 from rest_framework import response, status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.viewsets import ModelViewSet
 from django.http import Http404
@@ -169,3 +169,20 @@ class UserViewSet(BaseViewSet):
             user.save()
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['get'])
+    def get_order(self, request, username=None):
+        user = self.get_object()
+        try:
+            order = Order.objects.get(connected_courier=user)
+        except Order.DoesNotExist:
+            raise Http404
+        serializer = OrderSerializer(order, many=False)
+        return response.Response(serializer.data)
+
+    @action(detail=True, methods=['get'])
+    def get_orders(self, request, username=None):
+        user = self.get_object()
+        orders = user.order_set.all()
+        serializer = OrderSerializer(orders, many=True)
+        return response.Response(serializer.data)
