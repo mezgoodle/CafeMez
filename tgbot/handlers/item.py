@@ -24,7 +24,7 @@ async def answer_name(message: Message, state: FSMContext):
     return await message.reply("Напишіть ціну товару")
 
 
-@dp.message_handler(state=Item.price)
+@dp.message_handler(lambda message: message.text.isdigit() and float(message.text) > 0, state=Item.price)
 async def answer_price(message: Message, state: FSMContext):
     price = message.text
     await state.update_data(price=price)
@@ -53,7 +53,7 @@ async def answer_photo(message: Message, state: FSMContext, subcategories: list)
 @dp.message_handler(state=Item.subcategory)
 async def answer_subcategory(message: Message, state: FSMContext, subcategories: list):
     subcategory = message.text
-    if not subcategory in subcategories:
+    if subcategory not in subcategories:
         return await message.reply("Оберіть категорію товару із клавіатури")
     api: ItemBackend = message.bot.get('items_api')
     await state.update_data(subcategory=subcategory)
@@ -62,4 +62,4 @@ async def answer_subcategory(message: Message, state: FSMContext, subcategories:
     _, status = await api.create_item(data)
     if status == 201:
         return await message.reply(f'Товар "{data["name"]}" був створений')
-    return await message.reply('f')
+    return await message.reply('Товар не вдалося додати')
