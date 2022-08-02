@@ -23,6 +23,7 @@ from loader import dp
 
 
 # TODO: зробити функціональність для поварів та кур'єрам
+# TODO: inspect code by PyCharm and other tools
 
 def register_all_middlewares(dispatcher: Dispatcher) -> None:
     logger.info('Registering middlewares')
