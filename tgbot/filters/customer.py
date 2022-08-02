@@ -14,4 +14,4 @@ class IsRegisteredFilter(BoundFilter):
         api: User = message.bot['users_api']
         username = message.from_user.username
         user = await api.get_user(username)
-        return 'detail' in user.keys()
+        return 'detail' not in user.keys()
