@@ -15,8 +15,8 @@ class Backend(API):
         items = await self.get(collection)
         return items
 
-    async def get_object(self, collection: str, item_id) -> dict:
-        item = await self.get(f'{collection}/{item_id}')
+    async def get_object(self, collection: str, item_id: str, additional_path: str = None) -> dict:
+        item = await self.get(f'{collection}/{item_id}' + (additional_path if additional_path else ''))
         return item
 
     async def update_object(self, collection: str, item_id, data: dict) -> Tuple[dict, int]:
@@ -206,6 +206,10 @@ class Order(Backend):
     async def get_order(self, order_id: str) -> dict:
         order = await self.get_object('orders', order_id)
         return order
+
+    async def get_orders_by_username(self, username: str) -> List[dict]:
+        orders = await self.get_all_objects(f'users/{username}/get_orders')
+        return orders
 
     async def get_order_item(self, item_id: str) -> dict:
         item = await self.get_object('order_items', item_id)
