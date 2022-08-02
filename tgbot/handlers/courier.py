@@ -25,9 +25,22 @@ async def show_courier_order(message: Message):
     return await message.answer('На даний момент немає замовлень')
 
 
+@dp.callback_query_handler(order_callback.filter(action='delivered'), is_courier=True)
+async def change_order_delivered(callback_query: CallbackQuery, callback_data: dict):
+    # take logic from paid chef
+    pass
+
+
 @dp.message_handler(Command("my_order"), is_courier=True)
 async def show_courier_order(message: Message):
-    pass
+    api: Order = message.bot.get('orders_api')
+    order = await api.get_order_by_courier(message.from_user.username)
+    if 'detail' not in order.keys():
+        text = f'{hbold("Замовлення номер - ") + hbold(order["id"])}\n'
+        keyboard = orders_keyboard(order)
+        await message.answer(text, reply_markup=keyboard)
+        return await message.answer(f'Щоб побачити деталі продукту - {hbold("натисніть на продукт")}\n')
+    return await message.answer('У вас немає замовлень')
 
 
 @dp.callback_query_handler(order_callback.filter(action='courier'), is_courier=True)
