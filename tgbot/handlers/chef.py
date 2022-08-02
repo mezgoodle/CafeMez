@@ -25,6 +25,7 @@ async def show_orders(message: Message):
 
 
 @dp.callback_query_handler(order_callback.filter(action='show'), is_chef=True)
+@dp.callback_query_handler(order_callback.filter(action='show'), is_courier=True)
 async def show_order_item(callback_query: CallbackQuery, callback_data: dict):
     api: Order = callback_query.bot.get('orders_api')
     item = await api.get_order_item(callback_data['id'])
@@ -37,6 +38,7 @@ async def show_order_item(callback_query: CallbackQuery, callback_data: dict):
 
 
 @dp.callback_query_handler(order_callback.filter(action='paid'), is_chef=True)
+@dp.callback_query_handler(order_callback.filter(action='paid'), is_courier=True)
 async def change_order_payment(callback_query: CallbackQuery, callback_data: dict):
     api: Order = callback_query.bot.get('orders_api')
     new_order, status = await api.update_order(
