@@ -60,7 +60,6 @@ async def answer_subcategory(message: Message, state: FSMContext, subcategories:
     data = await state.get_data()
     await state.finish()
     _, status = await api.create_item(data)
-    if status:
-        print(status)
+    if status == 201:
         return await message.reply(f'Товар "{data["name"]}" був створений')
     return await message.reply('f')
