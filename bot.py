@@ -9,6 +9,7 @@ from tgbot.config import load_config
 from tgbot.filters.admin import IsGeneralAdminFilter, IsAdminFilter
 from tgbot.filters.chef import IsChefFilter
 from tgbot.filters.courier import IsCourierFilter
+from tgbot.filters.customer import IsRegisteredFilter
 from tgbot.middlewares.throttling import ThrottlingMiddleware
 from tgbot.middlewares.callbacks import CallbackMiddleware
 from tgbot.middlewares.subcategories import SubCategoriesMiddleware
@@ -45,6 +46,7 @@ def register_all_filters(dispatcher: Dispatcher) -> None:
     dispatcher.filters_factory.bind(IsAdminFilter)
     dispatcher.filters_factory.bind(IsChefFilter)
     dispatcher.filters_factory.bind(IsCourierFilter)
+    dispatcher.filters_factory.bind(IsRegisteredFilter)
 
 
 def register_all_handlers(dispatcher: Dispatcher) -> None:
@@ -63,6 +65,7 @@ async def on_startup(dispatcher: Dispatcher, webhook_url: str = None) -> None:
     register_all_handlers(dispatcher)
     await register_all_commands(dispatcher)
 
+    dispatcher.bot['api'] = API()
     dispatcher.bot['places_api'] = Place()
     dispatcher.bot['restaurants_api'] = Restaurant()
     dispatcher.bot['items_api'] = Item()
