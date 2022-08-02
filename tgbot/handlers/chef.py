@@ -8,7 +8,7 @@ from tgbot.keyboards.inline.orders import orders_keyboard
 from tgbot.keyboards.inline.callback_data import order_callback
 
 
-@dp.message_handler(Command("my_orders"), is_chef=True)
+@dp.message_handler(Command("orders"), is_chef=True)
 async def show_orders(message: Message):
     api: Order = message.bot.get('orders_api')
     orders = await api.get_orders(message.from_user.username)
