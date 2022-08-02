@@ -93,6 +93,9 @@ class ItemViewSet(BaseViewSet):
             serializer = ItemSerializer(item)
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+# TODO: rewrite functional views into ModelViewSet's actions as possible
 
 
 @api_view(['GET'])
