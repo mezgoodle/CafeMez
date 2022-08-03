@@ -27,8 +27,18 @@ async def show_courier_order(message: Message):
 
 @dp.callback_query_handler(order_callback.filter(action='delivered'), is_courier=True)
 async def change_order_delivered(callback_query: CallbackQuery, callback_data: dict):
-    # take logic from paid chef
-    pass
+    api: Order = callback_query.bot.get('orders_api')
+    order = await api.get_order(callback_data['id'])
+    if order['connected_courier'] == callback_query.from_user.username:
+        new_order, status = await api.update_order(
+            callback_data['id'],
+            {'is_delivered': callback_data['value']}
+        )
+        if status == 200:
+            keyboard = orders_keyboard(new_order)
+            await callback_query.message.answer('Статус доставки змінено!')
+            return await callback_query.message.edit_reply_markup(reply_markup=keyboard)
+        return await callback_query.message.answer('Помилка при зміні статусу доставки!')
 
 
 @dp.message_handler(Command("my_order"), is_courier=True)
