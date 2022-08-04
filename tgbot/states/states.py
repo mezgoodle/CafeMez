@@ -14,6 +14,7 @@ class Item(StatesGroup):
     description = State()
     photo = State()
     subcategory = State()
+    approval = State()
 
 
 class Mailing(StatesGroup):
