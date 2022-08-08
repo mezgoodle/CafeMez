@@ -73,6 +73,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     total_price = serializers.SerializerMethodField()
+    tax_price = serializers.SerializerMethodField()
     user = UserSerializer(many=False)
 
     class Meta:
@@ -86,3 +87,6 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def get_total_price(self, instance):
         return instance.total_price
+
+    def get_tax_price(self, instance):
+        return instance.tax_price
