@@ -9,7 +9,7 @@ from tgbot.keyboards.inline.cart_keyboard import cart_keyboard
 from tgbot.keyboards.inline.callback_data import cart_callback
 from tgbot.keyboards.reply.restaurants import restaurants_markup
 from tgbot.keyboards.reply.payment import payments_markup
-from tgbot.misc.backend import Item, Restaurant
+from tgbot.misc.backend import Item, Restaurant, Order
 from tgbot.misc.storage import Storage
 
 
@@ -76,7 +76,7 @@ async def delete_item(callback_query: CallbackQuery, callback_data: dict):
 
 
 @dp.callback_query_handler(text_contains='cancel_cart')
-async def cancel_purchase(callback_query: CallbackQuery, data: dict):
+async def cancel_purchase(callback_query: CallbackQuery):
     storage: Storage = callback_query.bot.get('storage')
     storage.clean_cart(callback_query.from_user.id)
     await callback_query.message.answer('Ви відмінили покупку!')
@@ -84,7 +84,7 @@ async def cancel_purchase(callback_query: CallbackQuery, data: dict):
 
 
 @dp.callback_query_handler(text_contains='buy:')
-async def apply_purchase(callback_query: CallbackQuery, state: FSMContext, data: dict):
+async def apply_purchase(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state('shipping_address')
     keyboard = await restaurants_markup(callback_query.message)
     text = 'Чи бажаєте ви доставку замовлення?' \
@@ -99,7 +99,7 @@ async def shipping_address_as_text(message: Message, state: FSMContext):
     api: Restaurant = message.bot.get('restaurants_api')
     restaurant = await api.get_restaurant(restaurant_name)
     if name := restaurant['name']:
-        await state.update_data(restaurant_name=name)
+        await state.update_data(restaurant_name=name, shipping_price=None, longitude=None, latitude=None)
         await state.set_state('payment_method')
         keyboard = payments_markup()
         return await message.answer('Виберіть спосіб оплати', reply_markup=keyboard)
@@ -108,7 +108,10 @@ async def shipping_address_as_text(message: Message, state: FSMContext):
 @dp.message_handler(state='shipping_address', content_types=ContentType.LOCATION)
 async def shipping_address_as_location(message: Message, state: FSMContext):
     restaurant_location = message.location
-    await state.update_data(longitude=restaurant_location.longitude, latitude=restaurant_location.latitude)
+    api: Order = message.bot.get('orders_api')
+    restaurant_name, shipping_price = await api.get_shipping_price(restaurant_location, message.bot)
+    await state.update_data(shipping_price=shipping_price, restaurant_name=restaurant_name,
+                            longitude=restaurant_location.longitude, latitude=restaurant_location.latitude)
     await state.set_state('payment_method')
     keyboard = payments_markup()
     return await message.answer('Виберіть спосіб оплати', reply_markup=keyboard)
@@ -117,4 +120,15 @@ async def shipping_address_as_location(message: Message, state: FSMContext):
 @dp.message_handler(Text(equals=['Картка', 'Готівка'], ignore_case=True), state='payment_method', )
 async def answer_payment_method(message: Message, state: FSMContext):
     await state.update_data(payment_method=message.text)
+    data = await state.get_data()
+    api: Order = message.bot.get('orders_api')
+    payment_dict = {'Картка': 'CD', 'Готівка': 'CH'}
+    order, status = await api.create_order(user=message.from_user.username,
+                                           payment_method=payment_dict[message.text],
+                                           shipping_address_longitude=float(data['longitude']),
+                                           shipping_address_latitude=float(data['latitude']),
+                                           shipping_address_name=data['restaurant_name'],
+                                           shipping_price=data['shipping_price'],
+                                           )
+    print(order, status)
     return await message.answer('Ви обрали спосіб оплати: ' + message.text)
