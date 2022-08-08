@@ -140,8 +140,6 @@ class Order(TimeStampedModel):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, to_field='username', on_delete=models.SET_NULL, null=True)
     payment_method = models.CharField(max_length=200, null=True, blank=True, choices=PAYMENT_METHOD_CHOICES)
-    # tax_price = models.DecimalField(
-    #     max_digits=7, decimal_places=2, null=True, blank=True)
     shipping_price = models.DecimalField(
         max_digits=7, decimal_places=2, null=True, blank=True, default=0)
     shipping_address_longitude = models.DecimalField(null=True, blank=True, max_digits=10, decimal_places=7)
