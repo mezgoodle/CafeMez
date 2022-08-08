@@ -1,5 +1,9 @@
+from aiogram import Bot
+from aiogram.types import Location
+
 from tgbot.misc.api import API
 from tgbot.config import load_config, Config
+from tgbot.misc.calc_distance import choose_shortest
 
 from typing import Tuple, List, Union
 
@@ -203,6 +207,10 @@ class Order(Backend):
         orders = await self.get_all_objects(f'orders/by/{username}')
         return orders
 
+    async def create_order(self, **kwargs) -> Tuple[dict, int]:
+        order = await self.create_object('orders', kwargs)
+        return order
+
     async def get_order(self, order_id: str) -> dict:
         order = await self.get_object('orders', order_id)
         return order
@@ -226,3 +234,8 @@ class Order(Backend):
     async def delete_order(self, order_id: str) -> int:
         status = await self.delete_object('orders', order_id)
         return status
+
+    @staticmethod
+    async def get_shipping_price(location: Location, bot: Bot) -> tuple:
+        distances = await choose_shortest(location, bot)
+        return distances[0][0], distances[0][1] * 15
