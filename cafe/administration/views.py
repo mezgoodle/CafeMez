@@ -74,7 +74,13 @@ class OrderViewSet(BaseViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            order = Order(**serializer.validated_data)
+            order = Order(user=User.objects.get(username=request.data['user']),
+                          shipping_address_name=Restaurant.objects.get(name=request.data['shipping_address_name']),
+                          payment_method=request.data['payment_method'],
+                          shipping_address_longitude=request.data['shipping_address_longitude']
+                          if 'shipping_address_longitude' in request.data else None,
+                          shipping_address_latitude=request.data['shipping_address_latitude']
+                          if 'shipping_address_latitude' in request.data else None)
             order.save()
             serializer = self.serializer_class(order)
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
