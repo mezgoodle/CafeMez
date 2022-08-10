@@ -72,6 +72,7 @@ async def answer_approval(message: Message, state: FSMContext):
         await state.finish()
         return await message.reply("Товар не додано")
     data = await state.get_data()
+    await state.finish()
     api: ItemBackend = message.bot.get('items_api')
     _, status = await api.create_item(data)
     if status == 201:

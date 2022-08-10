@@ -99,7 +99,7 @@ async def shipping_address_as_text(message: Message, state: FSMContext):
     api: Restaurant = message.bot.get('restaurants_api')
     restaurant = await api.get_restaurant(restaurant_name)
     if name := restaurant['name']:
-        await state.update_data(restaurant_name=name, shipping_price=None, longitude=None, latitude=None)
+        await state.update_data(shipping_address_name=name)
         await state.set_state('payment_method')
         keyboard = payments_markup()
         return await message.answer('Виберіть спосіб оплати', reply_markup=keyboard)
@@ -110,25 +110,21 @@ async def shipping_address_as_location(message: Message, state: FSMContext):
     restaurant_location = message.location
     api: Order = message.bot.get('orders_api')
     restaurant_name, shipping_price = await api.get_shipping_price(restaurant_location, message.bot)
-    await state.update_data(shipping_price=shipping_price, restaurant_name=restaurant_name,
-                            longitude=restaurant_location.longitude, latitude=restaurant_location.latitude)
+    await state.update_data(shipping_price=shipping_price, shipping_address_name=restaurant_name,
+                            shipping_address_longitude=float(restaurant_location.longitude),
+                            shipping_address_latitude=float(restaurant_location.latitude))
     await state.set_state('payment_method')
     keyboard = payments_markup()
     return await message.answer('Виберіть спосіб оплати', reply_markup=keyboard)
 
 
-@dp.message_handler(Text(equals=['Картка', 'Готівка'], ignore_case=True), state='payment_method', )
+@dp.message_handler(Text(equals=['Картка', 'Готівка'], ignore_case=True), state='payment_method')
 async def answer_payment_method(message: Message, state: FSMContext):
-    await state.update_data(payment_method=message.text)
-    data = await state.get_data()
-    api: Order = message.bot.get('orders_api')
     payment_dict = {'Картка': 'CD', 'Готівка': 'CH'}
-    order, status = await api.create_order(user=message.from_user.username,
-                                           payment_method=payment_dict[message.text],
-                                           shipping_address_longitude=float(data['longitude']),
-                                           shipping_address_latitude=float(data['latitude']),
-                                           shipping_address_name=data['restaurant_name'],
-                                           shipping_price=data['shipping_price'],
-                                           )
+    await state.update_data(payment_method=payment_dict[message.text])
+    data = await state.get_data()
+    await state.finish()
+    api: Order = message.bot.get('orders_api')
+    order, status = await api.create_order(user=message.from_user.username, **data)
     print(order, status)
     return await message.answer('Ви обрали спосіб оплати: ' + message.text)
