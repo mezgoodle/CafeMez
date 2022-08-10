@@ -207,8 +207,22 @@ class Order(Backend):
         orders = await self.get_all_objects(f'orders/by/{username}')
         return orders
 
-    async def create_order(self, **kwargs) -> Tuple[dict, int]:
-        order = await self.create_object('orders', kwargs)
+    async def create_order(self,
+                           user: str,
+                           payment_method: str,
+                           shipping_address_name: str,
+                           shipping_address_longitude: float = 0.,
+                           shipping_address_latitude: float = 0.,
+                           shipping_price: float = 0.,
+                           ) -> Tuple[dict, int]:
+        order = await self.create_object('orders', {
+            'user': user,
+            'payment_method': payment_method,
+            'shipping_address_name': shipping_address_name,
+            'shipping_address_longitude': shipping_address_longitude,
+            'shipping_address_latitude': shipping_address_latitude,
+            'shipping_price': shipping_price
+        })
         return order
 
     async def get_order(self, order_id: str) -> dict:
