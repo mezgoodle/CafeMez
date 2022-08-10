@@ -74,7 +74,8 @@ class UserSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     total_price = serializers.SerializerMethodField()
     tax_price = serializers.SerializerMethodField()
-    user = UserSerializer(many=False)
+    user = UserSerializer(many=False, read_only=True)
+    shipping_address_name = RestaurantSerializer(many=False, read_only=True)
 
     class Meta:
         model = Order

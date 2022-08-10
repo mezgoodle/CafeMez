@@ -71,6 +71,20 @@ class OrderViewSet(BaseViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        serializer = self.serializer_class(data=data)
+        if serializer.is_valid():
+            del data['user'], data['shipping_address_name']
+            order = Order(**data,
+                          user=User.objects.get(username=data['user']),
+                          shipping_address_name=Restaurant.objects.get(name=data['shipping_address_name'])
+                          )
+            order.save()
+            serializer = self.serializer_class(order)
+            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class OrderItemViewSet(BaseViewSet):
     queryset = OrderItem.objects.all()
@@ -84,16 +98,16 @@ class ItemViewSet(BaseViewSet):
     search_fields = ['name', 'description']
 
     def create(self, request, *args, **kwargs):
-        serializer = ItemSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             item = Item(name=request.data['name'], price=request.data['price'], description=request.data['description'],
                         photo=request.data['photo'],
                         subcategory=SubCategory.objects.get(code=request.data['subcategory']))
             item.save()
-            serializer = ItemSerializer(item)
+            serializer = self.serializer_class(item)
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
 
 # TODO: rewrite functional views into ModelViewSet's actions as possible
 
