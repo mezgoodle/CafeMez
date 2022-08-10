@@ -211,19 +211,28 @@ class Order(Backend):
                            user: str,
                            payment_method: str,
                            shipping_address_name: str,
-                           shipping_address_longitude: float = 0.,
-                           shipping_address_latitude: float = 0.,
+                           shipping_address_longitude: float = None,
+                           shipping_address_latitude: float = None,
                            shipping_price: float = 0.,
-                           ) -> Tuple[dict, int]:
-        order = await self.create_object('orders', {
+                           ) -> Tuple[int, int]:
+        data = {
             'user': user,
             'payment_method': payment_method,
             'shipping_address_name': shipping_address_name,
-            'shipping_address_longitude': shipping_address_longitude,
-            'shipping_address_latitude': shipping_address_latitude,
             'shipping_price': shipping_price
-        })
-        return order
+        }
+        if shipping_address_latitude:
+            data['shipping_address_latitude'] = shipping_address_latitude
+            data['shipping_address_longitude'] = shipping_address_longitude
+        order, status = await self.create_object('orders', data)
+        return order['id'], status
+
+    async def add_order_items(self, order_id: int, items: List[int]) -> int:
+        item_backend = Item()
+        for item in items:
+            order_item = item_backend.get_item(item)
+            await self.create_object(f'order_items', {})
+        return order_id
 
     async def get_order(self, order_id: str) -> dict:
         order = await self.get_object('orders', order_id)
