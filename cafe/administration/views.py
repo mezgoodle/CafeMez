@@ -72,14 +72,9 @@ class OrderViewSet(BaseViewSet):
     serializer_class = OrderSerializer
 
     def create(self, request, *args, **kwargs):
-        data = request.data
-        serializer = self.serializer_class(data=data)
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            del data['user'], data['shipping_address_name']
-            order = Order(**data,
-                          user=User.objects.get(username=data['user']),
-                          shipping_address_name=Restaurant.objects.get(name=data['shipping_address_name'])
-                          )
+            order = Order(**serializer.validated_data)
             order.save()
             serializer = self.serializer_class(order)
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
