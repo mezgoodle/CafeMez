@@ -1,3 +1,5 @@
+from collections import Counter
+
 from aiogram import Bot
 from aiogram.types import Location
 
@@ -227,12 +229,18 @@ class Order(Backend):
         order, status = await self.create_object('orders', data)
         return order['id'], status
 
-    async def add_order_items(self, order_id: int, items: List[int]) -> int:
+    async def add_order_items(self, order_id: int, items: Counter) -> int:
         item_backend = Item()
-        for item in items:
-            order_item = item_backend.get_item(item)
-            await self.create_object(f'order_items', {})
-        return order_id
+        for item_id, quantity in items.items():
+            order_item = await item_backend.get_item(item_id)
+            _, status = await self.create_object('order_items', {'order': order_id,
+                                                                 'item': order_item['name'],
+                                                                 'quantity': quantity
+                                                                 }
+                                                 )
+            if status != 201:
+                return status
+        return 201
 
     async def get_order(self, order_id: str) -> dict:
         order = await self.get_object('orders', order_id)
