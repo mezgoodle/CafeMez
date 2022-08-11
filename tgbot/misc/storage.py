@@ -1,5 +1,6 @@
 import json
 import os
+from collections import Counter
 
 
 class Storage:
@@ -22,9 +23,9 @@ class Storage:
         with open(self.filename, mode) as f:
             return json.load(f)
 
-    def get_cart(self, identifier: str) -> list:
+    def get_cart(self, identifier: str) -> Counter:
         data = self.read_file()
-        return self.getting_data(data, str(identifier))
+        return Counter(self.getting_data(data, str(identifier)))
 
     def add_to_cart(self, identifier: str, item: str, quantity: int = 1) -> None:
         data = self.read_file()

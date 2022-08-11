@@ -6,10 +6,9 @@ from tgbot.misc.backend import Item
 from collections import Counter
 
 
-async def cart_keyboard(api: Item, items_ids: list) -> InlineKeyboardMarkup:
+async def cart_keyboard(api: Item, cart_items: Counter) -> InlineKeyboardMarkup:
     keyboard = InlineKeyboardMarkup()
     total_price = 0
-    cart_items = Counter(items_ids)
     for item_id, amount in cart_items.items():
         item = await api.get_item(item_id)
         total_price += float(item['price']) * amount
