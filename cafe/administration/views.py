@@ -91,6 +91,17 @@ class OrderItemViewSet(BaseViewSet):
     queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            order_item = OrderItem(order=Order.objects.get(id=request.data['order']),
+                                   item=Item.objects.get(name=request.data['item']),
+                                   quantity=request.data['quantity'])
+            order_item.save()
+            serializer = self.serializer_class(order_item)
+            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ItemViewSet(BaseViewSet):
     queryset = Item.objects.all()
