@@ -126,7 +126,6 @@ async def answer_payment_method(message: Message, state: FSMContext):
     await state.finish()
     api: Order = message.bot.get('orders_api')
     # TODO: Написати логіку для оплати
-    # TODO: Додати товари до ордеру
     # TODO: Очистити корзину
     order_id, status = await api.create_order(user=message.from_user.username, **data)
     if status == 201:
@@ -135,5 +134,5 @@ async def answer_payment_method(message: Message, state: FSMContext):
         status = await api.add_order_items(order_id, cart)
         if status == 201:
             storage.clean_cart(message.from_user.id)
-            return await message.answer('Ваше замовлення прийнято!')
+            return await message.answer('Ваше замовлення прийнято!. Щоб побачити свої замовлення, натисніть /my_orders')
     return await message.answer('Виникла помилка при оформленні замовлення!')
