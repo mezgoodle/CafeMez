@@ -28,21 +28,6 @@ class Restaurant(TimeStampedModel):
         return f'Ресторан {self.id} - {self.name}'
 
 
-class Place(TimeStampedModel):
-    # TODO: add user who taked the place
-    id = models.AutoField(primary_key=True)
-    free = models.BooleanField(default=True, verbose_name='Вільне місце')
-    restaurant = models.ForeignKey(Restaurant, to_field='name', on_delete=models.CASCADE, verbose_name='Ресторан',
-                                   default='МакДональдз. Метро Вокзальна')
-
-    class Meta:
-        verbose_name = 'Місце'
-        verbose_name_plural = 'Місця'
-
-    def __str__(self):
-        return f'Місце {self.id} у ресторані {self.restaurant} - {"Вільне" if self.free else "Зайняте"}'
-
-
 class User(TimeStampedModel, AbstractUser):
     id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=100, verbose_name='Ім\'я користувача в телеграмі', unique=True)
@@ -63,6 +48,23 @@ class User(TimeStampedModel, AbstractUser):
 
     def __str__(self):
         return f'#{self.id} @{self.username}'
+
+
+class Place(TimeStampedModel):
+    id = models.AutoField(primary_key=True)
+    free = models.BooleanField(default=True, verbose_name='Вільне місце')
+    restaurant = models.ForeignKey(Restaurant, to_field='name', on_delete=models.CASCADE, verbose_name='Ресторан',
+                                   default='МакДональдз. Метро Вокзальна')
+    customer = models.ForeignKey(User, to_field='username', on_delete=models.CASCADE, verbose_name='Замовник',
+                                 null=True,
+                                 blank=True)
+
+    class Meta:
+        verbose_name = 'Місце'
+        verbose_name_plural = 'Місця'
+
+    def __str__(self):
+        return f'Місце {self.id} у ресторані {self.restaurant} - {"Вільне" if self.free else "Зайняте"}'
 
 
 class Referral(TimeStampedModel):
