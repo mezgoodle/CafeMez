@@ -10,7 +10,7 @@ async def places_markup(message: Message, restaurant_name: str) -> InlineKeyboar
     for place in places:
         if place['free']:
             place_button = InlineKeyboardButton(text=f"✅{place['id']}",
-                                                callback_data=f"place:{place['id']}")
+                                                callback_data=f"place:{place['id']}:{restaurant_name}")
         else:
             place_button = InlineKeyboardButton(text=f"❌{place['id']}",
                                                 callback_data='busy_place')
@@ -36,12 +36,14 @@ async def admin_places_markup(message: Message, restaurant_name: str) -> InlineK
     return markup
 
 
-def place_markup(number: str) -> InlineKeyboardMarkup:
+def place_markup(number: str, restaurant_name: str) -> InlineKeyboardMarkup:
     markup = InlineKeyboardMarkup(row_width=2)
     place_button = InlineKeyboardButton(text=f"✅Орендувати",
-                                        callback_data=place_callback.new(number=number, choice='yes'))
+                                        callback_data=place_callback.new(number=number, choice='yes',
+                                                                         restaurant=restaurant_name))
     markup.insert(place_button)
     place_button = InlineKeyboardButton(text=f"❌Обрати інше",
-                                        callback_data=place_callback.new(number=number, choice='no'))
+                                        callback_data=place_callback.new(number=number, choice='no',
+                                                                         restaurant=restaurant_name))
     markup.insert(place_button)
     return markup

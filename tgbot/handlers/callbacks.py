@@ -51,8 +51,8 @@ async def accept_offer(call: CallbackQuery, callback_data: dict) -> Message:
 
 
 @dp.callback_query_handler(place_data.filter(choice='no'))
-async def deny_offer(call: CallbackQuery) -> Message:
-    markup = await places_markup(call.message)
+async def deny_offer(call: CallbackQuery, callback_data: dict) -> Message:
+    markup = await places_markup(call.message, callback_data['restaurant'])
     message = call.message
     await message.answer('Оберіть вільне місце, яке хочете забронювати', reply_markup=markup)
     return await message.reply('Оренда буде дійсна дві години від початку оренди')
@@ -60,8 +60,9 @@ async def deny_offer(call: CallbackQuery) -> Message:
 
 @dp.callback_query_handler(text_contains='place')
 async def place_callback(call: CallbackQuery) -> Message:
-    place = call.data.split(":")[-1]
-    markup = place_markup(place)
+    place = call.data.split(":")[-2]
+    restaurant_name = call.data.split(':')[-1]
+    markup = place_markup(place, restaurant_name)
     date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     text = f'Ви впевнені у оренді місця з номером {hbold(place)}?\nОренда буде записана на ім\'я: ' \
            f'{hbold(call.from_user.full_name)}\nПочаток оренди: {hbold(date)}'
