@@ -7,12 +7,12 @@ async def places_markup(message: Message, restaurant_name: str) -> InlineKeyboar
     api = message.bot.get('places_api')
     places = await api.get_places_by_restaurant(restaurant_name)
     markup = InlineKeyboardMarkup(row_width=5)
-    for place in places:
+    for index, place in enumerate(places, start=1):
         if place['free']:
-            place_button = InlineKeyboardButton(text=f"✅{place['id']}",
+            place_button = InlineKeyboardButton(text=f"✅{index}",
                                                 callback_data=f"place:{place['id']}:{restaurant_name}")
         else:
-            place_button = InlineKeyboardButton(text=f"❌{place['id']}",
+            place_button = InlineKeyboardButton(text=f"❌{index}",
                                                 callback_data='busy_place')
         markup.insert(place_button)
     return markup
