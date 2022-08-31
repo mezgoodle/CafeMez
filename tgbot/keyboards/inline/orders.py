@@ -9,7 +9,6 @@ def orders_keyboard(order: dict):
     for order_item in order['items']:
         buttons.append(InlineKeyboardButton(text=f'{order_item["item"]["name"]} - {order_item["quantity"]}',
                                             callback_data=order_callback.new('show', order_item['id'], '')))
-    # TODO: maybe remove conditions
     keyboard.row(*buttons)
     buttons = [InlineKeyboardButton(text=f'{"Оплачене" if order["is_paid"] else "Не оплачене"}',
                                     callback_data=order_callback.new('paid', order['id'], not order['is_paid'])),

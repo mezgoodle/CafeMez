@@ -6,7 +6,6 @@ from django.http import Http404
 from loguru import logger
 
 from .models import Place, Restaurant, User, Referral, Item, Category, SubCategory, OrderItem, Order
-from .paginator import Paginator
 from .serializers import (PlaceSerializer,
                           RestaurantSerializer,
                           UserSerializer,
@@ -22,9 +21,6 @@ from .permissions import IsAdminOrReadOnly
 
 class BaseViewSet(ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
-
-    # TODO: fix this problem
-    # pagination_class = Paginator
 
     def list(self, request, *args, **kwargs):
         # logger.info(f'Get list of objects; {request=}; {args=}; {kwargs=}')

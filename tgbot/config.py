@@ -1,6 +1,5 @@
 import os
 from dataclasses import dataclass
-from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -18,12 +17,6 @@ class AdminCredentials:
 
 
 @dataclass(frozen=True)
-class I18N:
-    domain: str
-    locales_dir: Path
-
-
-@dataclass(frozen=True)
 class TgBot:
     token: str
     admins: list
@@ -35,7 +28,6 @@ class Config:
     tg_bot: TgBot
     db: DbConfig
     admin: AdminCredentials
-    i18n: I18N
 
 
 def load_config(path: str = None) -> Config:
@@ -55,11 +47,7 @@ def load_config(path: str = None) -> Config:
             database=os.getenv('DB_NAME', 'database'),
         ),
         admin=AdminCredentials(
-            password=os.getenv('PASSWORD', 'password'),
-            email=os.getenv('EMAIL', 'email'),
-        ),
-        i18n=I18N(
-            domain='tgbot',
-            locales_dir=Path(__file__).parent / 'locales',
-        ),
+            email=os.getenv('EMAIL', 'mezgoodle@gmail.com'),
+            password=os.getenv('PASSWORD', '1Max2Victor'),
+        )
     )

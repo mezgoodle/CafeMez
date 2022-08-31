@@ -127,6 +127,7 @@ async def answer_payment_method(message: Message, state: FSMContext):
     api: Order = message.bot.get('orders_api')
     # TODO: Написати логіку для оплати
     # TODO: Очистити корзину
+    # TODO: Сповіщувати кухаря про нове замовлення
     order_id, status = await api.create_order(user=message.from_user.username, **data)
     if status == 201:
         storage: Storage = message.bot.get('storage')
