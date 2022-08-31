@@ -7,7 +7,7 @@ from tgbot.misc.api import API
 from tgbot.config import load_config, Config
 from tgbot.misc.calc_distance import choose_shortest
 
-from typing import Tuple, List, Union
+from typing import Tuple, List, Union, Dict
 
 
 class Backend(API):
@@ -124,7 +124,9 @@ class User(Backend):
         user = await self.get_object('users', username)
         return user
 
-    async def get_staff(self) -> list:
+    async def get_staff(self, restaurant_name=None) -> Union[Dict[str, list], list]:
+        if restaurant_name:
+            return await self.get_all_objects(f'users/get_staff/{restaurant_name}')
         users = await self.get_all_users()
         staff = list(filter(lambda user: user['is_staff'], users))
         return staff
