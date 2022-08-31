@@ -215,3 +215,11 @@ class UserViewSet(BaseViewSet):
         orders = user.order_set.all()
         serializer = OrderSerializer(orders, many=True)
         return response.Response(serializer.data)
+
+    @action(detail=False, url_path='get_staff/(?P<restaurant>[^/.]+)')
+    def get_staff(self, request, restaurant):
+        staff = User.objects.filter(is_staff=True, connected_restaurant=restaurant)
+        chefs = User.objects.filter(is_chef=True, connected_restaurant=restaurant)
+        staff_serializer = self.get_serializer(staff, many=True)
+        chefs_serializer = self.get_serializer(chefs, many=True)
+        return response.Response({'staff': staff_serializer.data, 'chefs': chefs_serializer.data})
