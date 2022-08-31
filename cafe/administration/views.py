@@ -223,3 +223,9 @@ class UserViewSet(BaseViewSet):
         staff_serializer = self.get_serializer(staff, many=True)
         chefs_serializer = self.get_serializer(chefs, many=True)
         return response.Response({'staff': staff_serializer.data, 'chefs': chefs_serializer.data})
+
+    @action(detail=False)
+    def get_admins(self, request):
+        staff = User.objects.filter(is_staff=True)
+        serializer = self.get_serializer(staff, many=True)
+        return response.Response(serializer.data)

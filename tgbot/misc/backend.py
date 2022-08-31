@@ -127,9 +127,7 @@ class User(Backend):
     async def get_staff(self, restaurant_name=None) -> Union[Dict[str, list], list]:
         if restaurant_name:
             return await self.get_all_objects(f'users/get_staff/{restaurant_name}')
-        users = await self.get_all_users()
-        staff = list(filter(lambda user: user['is_staff'], users))
-        return staff
+        return await self.get_all_objects('users/get_admins')
 
     async def delete_user(self, username: str) -> int:
         status = await self.delete_object('users', username)
