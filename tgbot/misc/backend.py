@@ -137,11 +137,11 @@ class User(Backend):
                           username: str,
                           email: str,
                           telegram_id: int,
-                          restaurant: str,
+                          restaurant: str = None,
                           is_staff: bool = False,
                           is_chef: bool = False,
                           is_courier: bool = False,
-                          password: str = None) -> Tuple[dict, int]:
+                          password: str = 'test') -> Tuple[dict, int]:
         data = {
             'username': username,
             'password': password,

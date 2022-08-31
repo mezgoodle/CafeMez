@@ -8,6 +8,7 @@ from loader import dp, bot
 
 from datetime import datetime
 
+from tgbot.misc.backend import User
 from tgbot.misc.invoices.invoice import Item
 
 
@@ -37,6 +38,14 @@ async def place_callback(call: CallbackQuery) -> Message:
 async def accept_offer(call: CallbackQuery, callback_data: dict) -> Message:
     number = callback_data['number']
     restaurant = callback_data['restaurant']
+    api: User = call.bot.get('users_api')
+    user = await api.get_user(call.from_user.username)
+    need_email = False
+    if 'detail' in user.keys():
+        need_email = True
+    else:
+        pass
+        # TODO: apply discount if there is a referral
     place_invoice = Item(
         title=f'Місце з номером {number}',
         description=f'Оренда місця з номером {number} у ресторані {restaurant} '
@@ -52,7 +61,8 @@ async def accept_offer(call: CallbackQuery, callback_data: dict) -> Message:
             )
         ],
         start_parameter=f'create_invoice_rent_place_{number}',
-        payload=f'place:{number}:{restaurant}'
+        payload=f'place:{number}:{restaurant}',
+        need_email=need_email
     )
     return await bot.send_invoice(call.from_user.id, **place_invoice.generate_invoice())
 
