@@ -1,7 +1,10 @@
+from datetime import datetime
+
+from aiogram import Bot
 from aiogram.dispatcher import FSMContext
 from aiogram.utils.markdown import hbold
 from aiogram.dispatcher.filters import Text
-from aiogram.types import CallbackQuery, Message, ContentType
+from aiogram.types import CallbackQuery, Message, ContentType, LabeledPrice
 
 from tgbot.handlers.menu import list_categories
 from loader import dp
@@ -9,8 +12,9 @@ from tgbot.keyboards.inline.cart_keyboard import cart_keyboard
 from tgbot.keyboards.inline.callback_data import cart_callback
 from tgbot.keyboards.reply.restaurants import restaurants_markup
 from tgbot.keyboards.reply.payment import payments_markup
-from tgbot.misc.backend import Item, Restaurant, Order
+from tgbot.misc.backend import Item, Restaurant, Order, User
 from tgbot.misc.storage import Storage
+from tgbot.misc.invoices.invoice import Item as ItemInvoice
 
 
 @dp.message_handler(lambda message: not message.text.isdigit() and int(message.text) <= 0,
@@ -110,7 +114,7 @@ async def shipping_address_as_location(message: Message, state: FSMContext):
     restaurant_location = message.location
     api: Order = message.bot.get('orders_api')
     restaurant_name, shipping_price = await api.get_shipping_price(restaurant_location, message.bot)
-    await state.update_data(shipping_price=shipping_price, shipping_address_name=restaurant_name,
+    await state.update_data(shipping_price=round(shipping_price, 2), shipping_address_name=restaurant_name,
                             shipping_address_longitude=float(restaurant_location.longitude),
                             shipping_address_latitude=float(restaurant_location.latitude))
     await state.set_state('payment_method')
@@ -121,19 +125,48 @@ async def shipping_address_as_location(message: Message, state: FSMContext):
 @dp.message_handler(Text(equals=['Картка', 'Готівка'], ignore_case=True), state='payment_method')
 async def answer_payment_method(message: Message, state: FSMContext):
     payment_dict = {'Картка': 'CD', 'Готівка': 'CH'}
-    await state.update_data(payment_method=payment_dict[message.text])
+    payment_method = payment_dict[message.text]
+    await state.update_data(payment_method=payment_method)
     data = await state.get_data()
+    bot: Bot = message.bot
     await state.finish()
-    api: Order = message.bot.get('orders_api')
+    api: Order = bot.get('orders_api')
     # TODO: Написати логіку для оплати
-    # TODO: Очистити корзину
     # TODO: Сповіщувати кухаря про нове замовлення
     order_id, status = await api.create_order(user=message.from_user.username, **data)
     if status == 201:
-        storage: Storage = message.bot.get('storage')
+        storage: Storage = bot.get('storage')
         cart = storage.get_cart(message.from_user.id)
         status = await api.add_order_items(order_id, cart)
         if status == 201:
             storage.clean_cart(message.from_user.id)
+            if payment_method == 'CD':
+                users_api: User = bot.get('users_api')
+                order = await api.get_order(str(order_id))
+                prices = [
+                    LabeledPrice(
+                        label='Вартість замовлення',
+                        amount=int(order['total_price']) * 100
+                    ),
+                ]
+                user = await users_api.get_user(message.from_user.username)
+                need_email = False
+                if 'detail' in user.keys():
+                    need_email = True
+                else:
+                    pass
+                    # TODO: apply discount if there is a referral
+                order_invoice = ItemInvoice(
+                    title=f'Замовлення з номером {order_id}',
+                    description=f'Замовлення номер {order_id} у ресторані {order["shipping_address_name"]["name"]}'
+                                f'{" із доставкою" if order["shipping_address_longitude"] else ""}. '
+                                f'Створене {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}',
+                    prices=prices,
+                    start_parameter=f'create_invoice_order_{order_id}',
+                    payload=f'order:{order_id}:{order["shipping_address_name"]["name"]}',
+                    need_email=need_email
+                )
+                await message.answer('Ваше замовлення прийнято! Оплатіть його будь ласка.')
+                return await bot.send_invoice(message.from_user.id, **order_invoice.generate_invoice())
             return await message.answer('Ваше замовлення прийнято!. Щоб побачити свої замовлення, натисніть /my_orders')
     return await message.answer('Виникла помилка при оформленні замовлення!')
