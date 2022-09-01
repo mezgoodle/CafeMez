@@ -51,6 +51,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
+    'COERCE_DECIMAL_TO_STRING': False,
 }
 
 MIDDLEWARE = [
