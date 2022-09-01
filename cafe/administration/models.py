@@ -160,7 +160,7 @@ class Order(TimeStampedModel):
 
     @property
     def tax_price(self):
-        return sum([item.item.price for item in self.orderitem_set.all()])
+        return sum([item.item.price * item.quantity for item in self.orderitem_set.all()])
 
     class Meta:
         verbose_name = 'Покупка'
