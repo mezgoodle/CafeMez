@@ -41,6 +41,15 @@ async def change_order_delivered(callback_query: CallbackQuery, callback_data: d
         return await callback_query.message.answer('Помилка при зміні статусу доставки!')
 
 
+@dp.callback_query_handler(order_callback.filter(action='coords'), is_courier=True)
+@dp.callback_query_handler(order_callback.filter(action='coords'), is_registered=True)
+async def show_order_coords(callback_query: CallbackQuery, callback_data: dict):
+    api: Order = callback_query.bot.get('orders_api')
+    order = await api.get_order(callback_data['id'])
+    long, lat = order['shipping_address_longitude'], order['shipping_address_latitude']
+    return await callback_query.message.answer_location(lat, long)
+
+
 @dp.message_handler(Command("my_order"), is_courier=True)
 async def show_courier_order(message: Message):
     api: Order = message.bot.get('orders_api')
