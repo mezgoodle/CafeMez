@@ -16,6 +16,7 @@ async def show_orders(message: Message):
 
 @dp.callback_query_handler(order_callback.filter(action='show'), is_chef=True)
 @dp.callback_query_handler(order_callback.filter(action='show'), is_courier=True)
+@dp.callback_query_handler(order_callback.filter(action='show'), is_admin=True)
 async def show_order_item(callback_query: CallbackQuery, callback_data: dict):
     api: Order = callback_query.bot.get('orders_api')
     item = await api.get_order_item(callback_data['id'])
@@ -41,7 +42,7 @@ async def change_order_ready(callback_query: CallbackQuery, callback_data: dict)
     return await callback_query.message.answer('Помилка при зміні статусу приготування!')
 
 
-@dp.callback_query_handler(order_callback.filter(action='delete'), is_chef=True)
+@dp.callback_query_handler(order_callback.filter(action='delete'), is_admin=True)
 async def delete_order(callback_query: CallbackQuery, callback_data: dict):
     api: Order = callback_query.bot.get('orders_api')
     status = await api.delete_order(callback_data['id'])

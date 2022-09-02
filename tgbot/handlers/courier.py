@@ -4,7 +4,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.utils.markdown import hbold
 
 from loader import dp
-from tgbot.misc.backend import Order
+from tgbot.misc.backend import Order, User
 from tgbot.keyboards.inline.orders import orders_keyboard
 from tgbot.keyboards.inline.callback_data import order_callback
 from tgbot.misc.orders import show_orders_message
@@ -19,8 +19,10 @@ async def show_courier_order(message: Message):
 @dp.callback_query_handler(order_callback.filter(action='paid'), is_courier=True)
 async def change_order_payment(callback_query: CallbackQuery, callback_data: dict):
     api: Order = callback_query.bot.get('orders_api')
+    users_api: User = callback_query.bot.get('users_api')
     order = await api.get_order(callback_data['id'])
-    if order['connected_courier'] == callback_query.from_user.username:
+    if order['connected_courier'] == callback_query.from_user.username or await users_api.is_job(
+            callback_query.from_user.username, 'is_staff'):
         new_order, status = await api.update_order(
             callback_data['id'],
             {'is_paid': callback_data['value']}
