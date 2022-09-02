@@ -136,6 +136,8 @@ def get_orders(request, username):
     elif user.is_courier:
         orders = user.connected_restaurant.order_set.all().filter(is_delivered=False,
                                                                   shipping_address_latitude__isnull=False)
+    elif user.is_staff:
+        orders = user.connected_restaurant.order_set.all()
     serializer = OrderSerializer(orders, many=True)
     return response.Response(serializer.data)
 

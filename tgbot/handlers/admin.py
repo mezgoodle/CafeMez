@@ -12,12 +12,13 @@ from tgbot.keyboards.inline.callback_data import admin_place_callback
 from tgbot.keyboards.reply.restaurants import restaurants_markup as reply_restaurants_markup
 from tgbot.keyboards.reply.location import location_markup
 from tgbot.misc.backend import User as UserAPI, Place, Restaurant
+from tgbot.misc.orders import show_orders_message
 from tgbot.states.states import User, Mailing
 
 
-@dp.message_handler(Command(['stats']), is_admin=True)
-async def show_stats(message: Message) -> Message:
-    return await message.reply(f'Hello, {message.from_user.username}!')
+@dp.message_handler(Command(['orders']), is_admin=True)
+async def show_orders(message: Message) -> Message:
+    return await show_orders_message(message)
 
 
 @dp.message_handler(Command(['rs']), is_admin=True)
