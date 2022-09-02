@@ -44,7 +44,9 @@ async def change_order_delivered(callback_query: CallbackQuery, callback_data: d
         )
         if status == 200:
             keyboard = orders_keyboard(new_order)
-            await bot.send_message(order['user']['telegram_id'], 'Ваше замовлення доставлене')
+            await bot.send_message(order['user']['telegram_id'],
+                                   f'Статус доставки вашого замовлення із номером {new_order["id"]} змінено на "'
+                                   f'{hbold("доставлене") if new_order["is_delivered"] else hbold("не доставлене")}"!')
             await callback_query.message.answer('Статус доставки змінено!')
             return await callback_query.message.edit_reply_markup(reply_markup=keyboard)
         return await callback_query.message.answer('Помилка при зміні статусу доставки!')
