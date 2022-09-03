@@ -155,7 +155,8 @@ class Order(TimeStampedModel):
 
     @property
     def total_price(self):
-        return self.tax_price + self.shipping_price
+        if self.orderitem_set.first():
+            return self.tax_price + self.shipping_price
 
     @property
     def tax_price(self):
