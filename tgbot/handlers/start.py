@@ -16,7 +16,8 @@ async def register_referral(message: Message):
     _, status = await api.apply_referral(int(referral), message.from_user.id)
     if status == 201:
         return await message.answer(
-            'Ви успішно зареєстрували чужий реферал. Щоб створити свій реферал, введіть команду /my_ref')
+            'Ви успішно зареєстрували чужий реферал. Щоб створити свій реферал, введіть команду /my_ref. '
+            'Щоб побачити, як користуватись ботом, введіть команду /help')
     elif status == 400:
         return await message.answer(
             f'Невірний реферал. Можуть бути {hbold("дві помилки")}:\n'
@@ -27,4 +28,8 @@ async def register_referral(message: Message):
 
 @dp.message_handler(CommandStart())
 async def cmd_start(message: Message):
-    return await message.answer("Hello, I'm a bot!")
+    return await message.answer('Вітаємо! Щоб побачити усі доступні команди, введіть команду:\n'
+                                '* /help - для усіх користувачів\n'
+                                '* /admin_help - для адміністраторів\n'
+                                '* /chef_help - для шеф-кухарів\n'
+                                '* /courier_help - для кур\'єрів\n')
