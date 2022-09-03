@@ -114,7 +114,7 @@ async def shipping_address_as_location(message: Message, state: FSMContext):
     restaurant_location = message.location
     api: Order = message.bot.get('orders_api')
     restaurant_name, shipping_price = await api.get_shipping_price(restaurant_location, message.bot)
-    await state.update_data(shipping_price=round(shipping_price, 2), shipping_address_name=restaurant_name,
+    await state.update_data(shipping_price=round(shipping_price), shipping_address_name=restaurant_name,
                             shipping_address_longitude=float(restaurant_location.longitude),
                             shipping_address_latitude=float(restaurant_location.latitude))
     await state.set_state('payment_method')
@@ -131,24 +131,18 @@ async def answer_payment_method(message: Message, state: FSMContext):
     bot: Bot = message.bot
     await state.finish()
     api: Order = bot.get('orders_api')
-    # TODO: Написати логіку для оплати
-    # TODO: Сповіщувати кухаря про нове замовлення
     order_id, status = await api.create_order(user=message.from_user.username, **data)
     if status == 201:
         storage: Storage = bot.get('storage')
         cart = storage.get_cart(message.from_user.id)
-        status = await api.add_order_items(order_id, cart)
+        status, prices = await api.add_order_items(order_id, cart)
         if status == 201:
             storage.clean_cart(message.from_user.id)
             if payment_method == 'CD':
                 users_api: User = bot.get('users_api')
                 order = await api.get_order(str(order_id))
-                prices = [
-                    LabeledPrice(
-                        label='Вартість замовлення',
-                        amount=int(order['total_price']) * 100
-                    ),
-                ]
+                if price := order['shipping_price']:
+                    prices.append(LabeledPrice(label='Вартість доставки', amount=int(price) * 100))
                 user = await users_api.get_user(message.from_user.username)
                 need_email = False
                 if 'detail' in user.keys():

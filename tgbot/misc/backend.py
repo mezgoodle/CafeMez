@@ -1,7 +1,7 @@
 from collections import Counter
 
 from aiogram import Bot
-from aiogram.types import Location
+from aiogram.types import Location, LabeledPrice
 
 from tgbot.misc.api import API
 from tgbot.config import load_config, Config
@@ -221,7 +221,7 @@ class Order(Backend):
             'user': user,
             'payment_method': payment_method,
             'shipping_address_name': shipping_address_name,
-            'shipping_price': shipping_price
+            'shipping_price': float(shipping_price)
         }
         if shipping_address_latitude:
             data['shipping_address_latitude'] = shipping_address_latitude
@@ -229,10 +229,15 @@ class Order(Backend):
         order, status = await self.create_object('orders', data)
         return order['id'], status
 
-    async def add_order_items(self, order_id: int, items: Counter) -> int:
+    async def add_order_items(self, order_id: int, items: Counter) -> Union[Tuple[int, list], int]:
         item_backend = Item()
+        prices = []
         for item_id, quantity in items.items():
             order_item = await item_backend.get_item(item_id)
+            prices.append(LabeledPrice(
+                label=f'{order_item["name"]}, {quantity} шт.',
+                amount=int(order_item['price']) * 100 * quantity
+            ))
             _, status = await self.create_object('order_items', {'order': order_id,
                                                                  'item': order_item['name'],
                                                                  'quantity': quantity
@@ -240,7 +245,7 @@ class Order(Backend):
                                                  )
             if status != 201:
                 return status
-        return 201
+        return 201, prices
 
     async def get_order(self, order_id: str) -> dict:
         order = await self.get_object('orders', order_id)
