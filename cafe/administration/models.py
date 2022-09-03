@@ -142,8 +142,7 @@ class Order(TimeStampedModel):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, to_field='username', on_delete=models.SET_NULL, null=True)
     payment_method = models.CharField(max_length=200, null=True, blank=True, choices=PAYMENT_METHOD_CHOICES)
-    shipping_price = models.DecimalField(
-        max_digits=7, decimal_places=2, null=True, blank=True, default=0)
+    shipping_price = models.DecimalField(null=True, blank=True, max_digits=4, decimal_places=2)
     shipping_address_longitude = models.DecimalField(null=True, blank=True, max_digits=10, decimal_places=7)
     shipping_address_latitude = models.DecimalField(null=True, blank=True, max_digits=10, decimal_places=7)
     shipping_address_name = models.ForeignKey(Restaurant, to_field='name', on_delete=models.CASCADE, null=True,

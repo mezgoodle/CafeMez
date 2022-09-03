@@ -76,7 +76,8 @@ class OrderViewSet(BaseViewSet):
                           shipping_address_longitude=request.data['shipping_address_longitude']
                           if 'shipping_address_longitude' in request.data else None,
                           shipping_address_latitude=request.data['shipping_address_latitude']
-                          if 'shipping_address_latitude' in request.data else None)
+                          if 'shipping_address_latitude' in request.data else None,
+                          shipping_price=request.data['shipping_price'])
             order.save()
             serializer = self.serializer_class(order)
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
