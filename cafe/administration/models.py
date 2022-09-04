@@ -154,6 +154,7 @@ class Order(TimeStampedModel):
     is_paid = models.BooleanField(default=False)
     is_delivered = models.BooleanField(default=False)
     is_ready = models.BooleanField(default=False)
+    is_finished = models.BooleanField(default=False)
 
     @property
     def total_price(self):

@@ -138,7 +138,7 @@ def get_orders(request, username):
         orders = user.connected_restaurant.order_set.all().filter(is_delivered=False,
                                                                   shipping_address_latitude__isnull=False)
     elif user.is_staff:
-        orders = user.connected_restaurant.order_set.all()
+        orders = user.connected_restaurant.order_set.filter(is_finished=False)
     serializer = OrderSerializer(orders, many=True)
     return response.Response(serializer.data)
 
@@ -211,7 +211,7 @@ class UserViewSet(BaseViewSet):
     @action(detail=True, methods=['get'])
     def get_orders(self, request, username=None):
         user = self.get_object()
-        orders = user.order_set.all()
+        orders = user.order_set.filter(is_finished=False)
         serializer = OrderSerializer(orders, many=True)
         return response.Response(serializer.data)
 
