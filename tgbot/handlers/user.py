@@ -56,6 +56,7 @@ async def enter_email(message: Message, state: FSMContext) -> Message:
         return await message.answer('Ви успішно зареєстровані')
     return await message.answer('Виникла помилка при реєстрації. Зверніться до служби підтримки')
 
+
 @dp.message_handler(Command(['my_ref']))
 async def show_my_ref(message: Message) -> Message:
     api: User = message.bot.get('users_api')

@@ -1,3 +1,4 @@
+from aiogram import Bot
 from aiogram.dispatcher.filters import Command
 from aiogram.types import Message, CallbackQuery
 from aiogram.utils.markdown import hbold
@@ -30,12 +31,16 @@ async def show_order_item(callback_query: CallbackQuery, callback_data: dict):
 @dp.callback_query_handler(order_callback.filter(action='ready'), is_chef=True)
 async def change_order_ready(callback_query: CallbackQuery, callback_data: dict):
     api: Order = callback_query.bot.get('orders_api')
+    bot: Bot = callback_query.bot
     new_order, status = await api.update_order(
         callback_data['id'],
         {'is_ready': callback_data['value']}
     )
     if status == 200:
         keyboard = orders_keyboard(new_order)
+        await bot.send_message(new_order['user']['telegram_id'],
+                               f'Статус доставки вашого замовлення із номером {new_order["id"]} змінено на "'
+                               f'{hbold("готове") if new_order["is_ready"] else hbold("не готове")}"!')
         await callback_query.message.answer('Статус приготування змінено!')
         return await callback_query.message.edit_reply_markup(reply_markup=keyboard)
     return await callback_query.message.answer('Помилка при зміні статусу приготування!')
