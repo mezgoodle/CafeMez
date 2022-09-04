@@ -36,6 +36,26 @@ async def show_places(message: Message, state: FSMContext) -> Message:
     return await message.reply('Оренда буде дійсна дві години від початку оренди')
 
 
+@dp.message_handler(Command('register'))
+async def register(message: Message, state: FSMContext) -> Message:
+    api: User = message.bot.get('users_api')
+    user = await api.get_user(message.from_user.username)
+    if 'detail' in user:
+        await state.set_state('enter_email')
+        return await message.reply('Введіть вашу електронну адресу')
+    return await message.reply('Ви вже зареєстровані!')
+
+
+@dp.message_handler(state='enter_email')
+async def enter_email(message: Message, state: FSMContext) -> Message:
+    email = message.text
+    api: User = message.bot.get('users_api')
+    data, status = await api.create_user(message.from_user.username, email, message.from_user.id)
+    await state.finish()
+    if status == 201:
+        return await message.answer('Ви успішно зареєстровані')
+    return await message.answer('Виникла помилка при реєстрації. Зверніться до служби підтримки')
+
 @dp.message_handler(Command(['my_ref']))
 async def show_my_ref(message: Message) -> Message:
     api: User = message.bot.get('users_api')
@@ -83,5 +103,5 @@ async def show_faq(message: Message):
                                 f'Якщо ви тільки ввели реферальне посилання, то ваша знижка - 2%.\n\n'
                                 f'{hbold("Чому відрізняється загальна сума замовлення в чеку від тієї, що надає бот?")}\n\n'
                                 f'Бот не враховує знижки до суми, то цифра у чеку - {hbold("головна")}.\n\n'
-                                f'{hbold("Коли працюють знижки?")}\n\n.'
+                                f'{hbold("Коли працюють знижки?")}\n\n'
                                 f'Знижки працюють тільки, якщо ви оплатили карткою через бота')
