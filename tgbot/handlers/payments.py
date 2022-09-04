@@ -4,6 +4,7 @@ from aiogram.types import PreCheckoutQuery, ContentType, Message
 from loader import dp
 from tgbot.misc.payments import handle_place_payment, handle_order_payment
 from tgbot.misc.backend import User
+from tgbot.misc.referral import increase_referred
 
 
 @dp.pre_checkout_query_handler()
@@ -25,4 +26,5 @@ async def pre_checkout(query: PreCheckoutQuery):
 
 @dp.message_handler(content_types=ContentType.SUCCESSFUL_PAYMENT)
 async def process_pay(message: Message):
+    await increase_referred(message)
     return await message.answer('Оплата теж успішна! Не видаляйте чек. Вам необхідно показати його у ресторані!')

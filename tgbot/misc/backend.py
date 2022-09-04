@@ -162,6 +162,9 @@ class User(Backend):
         except KeyError:
             return False
 
+    async def increase_referred(self, username: str, previous: int) -> None:
+        await self.update_object('users', username, {'referred': previous + 1})
+
 
 class Item(Backend):
     def __init__(self):
@@ -203,6 +206,12 @@ class Referral(Backend):
     async def get_discount(self, username: str) -> Union[int, bool]:
         discount = await self.get_object('users', username, '/get_discount')
         return discount
+
+    async def get_referrer_parent(self, username: str) -> Union[dict, bool]:
+        data = await self.get_object('users', username, '/get_referrer')
+        if 'detail' in data:
+            return False
+        return data
 
 
 class Order(Backend):
