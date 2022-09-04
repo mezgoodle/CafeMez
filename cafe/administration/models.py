@@ -38,6 +38,7 @@ class User(TimeStampedModel, AbstractUser):
     is_courier = models.BooleanField(default=False, verbose_name='Кур\'єр')
     connected_restaurant = models.ForeignKey(Restaurant, to_field='name', on_delete=models.CASCADE,
                                              verbose_name='Ресторан', null=True, blank=True)
+    referred = models.IntegerField(default=0, verbose_name='К-сть людей, що використали його реферал')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
