@@ -10,9 +10,7 @@ from tgbot.keyboards.inline.callback_data import order_callback
 from tgbot.misc.orders import show_orders_message
 
 
-@dp.message_handler(Command("orders"), is_courier=True)
-async def show_courier_order(message: Message):
-    return await show_orders_message(message)
+
 
 
 @dp.callback_query_handler(order_callback.filter(action='paid'), is_admin=True)

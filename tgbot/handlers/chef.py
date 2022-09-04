@@ -9,14 +9,13 @@ from tgbot.keyboards.inline.callback_data import order_callback
 from tgbot.misc.orders import show_orders_message
 
 
+@dp.message_handler(Command("orders"), is_courier=True)
 @dp.message_handler(Command("orders"), is_chef=True)
 async def show_orders(message: Message):
     return await show_orders_message(message)
 
 
-@dp.callback_query_handler(order_callback.filter(action='show'), is_chef=True)
-@dp.callback_query_handler(order_callback.filter(action='show'), is_courier=True)
-@dp.callback_query_handler(order_callback.filter(action='show'), is_admin=True)
+@dp.callback_query_handler(order_callback.filter(action='show'), is_registered=True)
 async def show_order_item(callback_query: CallbackQuery, callback_data: dict):
     api: Order = callback_query.bot.get('orders_api')
     item = await api.get_order_item(callback_data['id'])
