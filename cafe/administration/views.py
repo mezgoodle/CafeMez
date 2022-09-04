@@ -218,11 +218,17 @@ class UserViewSet(BaseViewSet):
     @action(detail=True, methods=['get'])
     def get_discount(self, request, username=None):
         user = self.get_object()
-        if user.referral_set.first():
-            return response.Response(15)
+        if (count := user.referred) != 0:
+            return response.Response(count * 0.5)
         if Referral.objects.filter(user_id=user.telegram_id).first():
-            return response.Response(5)
+            return response.Response(2)
         return response.Response(False)
+
+    @action(detail=True, methods=['get'])
+    def get_referrer(self, request, username=None):
+        user = self.get_object()
+        ref = Referral.objects.filter(user_id=user.telegram_id).first()
+        return response.Response({'username': ref.referrer_id.username, 'number': ref.referrer_id.referred})
 
     @action(detail=False, url_path='get_staff/(?P<restaurant>[^/.]+)')
     def get_staff(self, request, restaurant):
