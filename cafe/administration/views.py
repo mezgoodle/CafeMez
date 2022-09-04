@@ -228,7 +228,11 @@ class UserViewSet(BaseViewSet):
     def get_referrer(self, request, username=None):
         user = self.get_object()
         ref = Referral.objects.filter(user_id=user.telegram_id).first()
-        return response.Response({'username': ref.referrer_id.username, 'number': ref.referrer_id.referred})
+        return response.Response({'username': ref.referrer_id.username,
+                                  'number': ref.referrer_id.referred,
+                                  'activated': ref.activated,
+                                  'id': ref.id}
+                                 )
 
     @action(detail=False, url_path='get_staff/(?P<restaurant>[^/.]+)')
     def get_staff(self, request, restaurant):

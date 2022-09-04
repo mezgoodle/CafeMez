@@ -74,6 +74,7 @@ class Referral(TimeStampedModel):
                                   default=353057906, unique=True)
     referrer_id = models.ForeignKey(User, to_field='telegram_id', on_delete=models.CASCADE,
                                     verbose_name='Користувач')
+    activated = models.BooleanField(default=False, verbose_name='Активований')
 
     class Meta:
         verbose_name = 'Реферал'

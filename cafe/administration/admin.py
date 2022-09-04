@@ -31,12 +31,12 @@ class SubCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Referral)
 class ReferralAdmin(admin.ModelAdmin):
-    list_display = ('user_id', 'referrer_id')
+    list_display = ('user_id', 'referrer_id', 'activated')
 
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'payment_method', 'total_price', 'is_paid', 'is_delivered', 'is_ready','created')
+    list_display = ('id', 'user', 'payment_method', 'total_price', 'is_paid', 'is_delivered', 'is_ready', 'created')
 
 
 @admin.register(OrderItem)
