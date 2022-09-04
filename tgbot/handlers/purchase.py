@@ -12,7 +12,7 @@ from tgbot.keyboards.inline.cart_keyboard import cart_keyboard
 from tgbot.keyboards.inline.callback_data import cart_callback
 from tgbot.keyboards.reply.restaurants import restaurants_markup
 from tgbot.keyboards.reply.payment import payments_markup
-from tgbot.misc.backend import Item, Restaurant, Order, User
+from tgbot.misc.backend import Item, Restaurant, Order, User, Referral
 from tgbot.misc.storage import Storage
 from tgbot.misc.invoices.invoice import Item as ItemInvoice
 
@@ -148,8 +148,9 @@ async def answer_payment_method(message: Message, state: FSMContext):
                 if 'detail' in user.keys():
                     need_email = True
                 else:
-                    pass
-                    # TODO: apply discount if there is a referral
+                    ref_api: Referral = message.bot.get('referrals_api')
+                    if discount := await ref_api.get_discount(message.from_user.username):
+                        prices.append(LabeledPrice(label='Знижка', amount=int(-order['total_price'] * discount)))
                 order_invoice = ItemInvoice(
                     title=f'Замовлення з номером {order_id}',
                     description=f'Замовлення номер {order_id} у ресторані {order["shipping_address_name"]["name"]}'

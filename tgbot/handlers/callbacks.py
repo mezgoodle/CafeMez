@@ -8,7 +8,7 @@ from loader import dp, bot
 
 from datetime import datetime
 
-from tgbot.misc.backend import User
+from tgbot.misc.backend import User, Referral
 from tgbot.misc.invoices.invoice import Item
 
 
@@ -41,25 +41,23 @@ async def accept_offer(call: CallbackQuery, callback_data: dict) -> Message:
     api: User = call.bot.get('users_api')
     user = await api.get_user(call.from_user.username)
     need_email = False
+    prices = [
+        LabeledPrice(
+            label='Оренда столика',
+            amount=100 * 100
+        )
+    ]
     if 'detail' in user.keys():
         need_email = True
     else:
-        pass
-        # TODO: apply discount if there is a referral
+        ref_api: Referral = call.bot.get('referrals_api')
+        if discount := await ref_api.get_discount(call.from_user.username):
+            prices.append(LabeledPrice(label='Знижка', amount=int(-100 * discount)))
     place_invoice = Item(
         title=f'Місце з номером {number}',
         description=f'Оренда місця з номером {number} у ресторані {restaurant} '
                     f'на дату {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}',
-        prices=[
-            LabeledPrice(
-                label='Оренда столика',
-                amount=100 * 100
-            ),
-            LabeledPrice(
-                label='Знижка',
-                amount=-10 * 100
-            )
-        ],
+        prices=prices,
         start_parameter=f'create_invoice_rent_place_{number}',
         payload=f'place:{number}:{restaurant}',
         need_email=need_email
