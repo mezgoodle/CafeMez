@@ -17,5 +17,6 @@ async def set_default_commands(bot: Bot) -> None:
         BotCommand(command='menu', description='Відкрити меню'),
         BotCommand(command='cart', description='Показати корзину'),
         BotCommand(command='my_orders', description='Показати замовлення'),
+        BotCommand(command='faq', description='Часті питання та відповіді'),
     ]
     await bot.set_my_commands(commands=commands)

@@ -73,3 +73,15 @@ async def show_customer_order(message: Message):
             await message.answer(text, reply_markup=keyboard)
         return
     return await message.answer('Ви не зробили жодного замовлення')
+
+
+@dp.message_handler(Command("faq"))
+async def show_faq(message: Message):
+    return await message.answer(f'{hbold("Як працює система знижок?")}\n\n'
+                                f'Чим більше людей роблять покупок карткою, після того, '
+                                f'як ввели ваше реферальне посилання, тим більша є ваша знижка.\n'
+                                f'Якщо ви тільки ввели реферальне посилання, то ваша знижка - 2%.\n\n'
+                                f'{hbold("Чому відрізняється загальна сума замовлення в чеку від тієї, що надає бот?")}\n\n'
+                                f'Бот не враховує знижки до суми, то цифра у чеку - {hbold("головна")}.\n\n'
+                                f'{hbold("Коли працюють знижки?")}\n\n.'
+                                f'Знижки працюють тільки, якщо ви оплатили карткою через бота')
