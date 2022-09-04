@@ -210,8 +210,11 @@ class Referral(Backend):
     async def get_referrer_parent(self, username: str) -> Union[dict, bool]:
         data = await self.get_object('users', username, '/get_referrer')
         if 'detail' in data:
-            return False
+            return {'activated': True}
         return data
+
+    async def activate_referral(self, ref_id: str) -> None:
+        await self.update_object('referrals', ref_id, {'activated': True})
 
 
 class Order(Backend):
