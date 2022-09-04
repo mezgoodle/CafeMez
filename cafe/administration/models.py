@@ -163,8 +163,8 @@ class Order(TimeStampedModel):
         return sum([item.item.price * item.quantity for item in self.orderitem_set.all()])
 
     class Meta:
-        verbose_name = 'Покупка'
-        verbose_name_plural = 'Покупки'
+        verbose_name = 'Замовлення'
+        verbose_name_plural = 'Замовлення'
         ordering = ['-created']
 
     def __str__(self):
