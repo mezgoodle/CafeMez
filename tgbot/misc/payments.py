@@ -12,7 +12,7 @@ from random import choice
 async def handle_place_payment(query: PreCheckoutQuery, data: list, username: str) -> Message:
     bot: Bot = query.bot
     places_api: Place = bot.get('places_api')
-    return await handle_payment(query, places_api, data[2], {'free': False, 'customer': username}, data[1], 'chefs')
+    return await handle_payment(query, places_api, data[2], {'free': False, 'customer': username}, data[1], 'staff')
 
 
 async def handle_order_payment(query: PreCheckoutQuery, data: list, *args):

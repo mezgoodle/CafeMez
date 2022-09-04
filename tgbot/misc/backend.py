@@ -21,7 +21,7 @@ class Backend(API):
         items = await self.get(collection)
         return items
 
-    async def get_object(self, collection: str, item_id: str, additional_path: str = None) -> dict:
+    async def get_object(self, collection: str, item_id: str, additional_path: str = None) -> Union[dict, int]:
         item = await self.get(f'{collection}/{item_id}' + (additional_path if additional_path else ''))
         return item
 
@@ -199,6 +199,10 @@ class Referral(Backend):
         }
         data, status = await self.create_object('referrals', data)
         return data, status
+
+    async def get_discount(self, username: str) -> Union[int, bool]:
+        discount = await self.get_object('users', username, '/get_discount')
+        return discount
 
 
 class Order(Backend):
