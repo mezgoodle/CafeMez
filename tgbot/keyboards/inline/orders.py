@@ -21,6 +21,9 @@ def orders_keyboard(order: dict):
                                                                              not order['is_delivered'])))
     keyboard.row(*buttons)
     keyboard.add(InlineKeyboardButton(text=f'Сума: {order["total_price"]}', callback_data=f'text'))
+    keyboard.add(InlineKeyboardButton(text=f'{"Виконане" if order["is_finished"] else "Не виконане"}',
+                                      callback_data=order_callback.new('finished', order_id,
+                                                                       not order['is_finished'])))
     buttons = [InlineKeyboardButton(text=f'Замовник - {order["user"]["username"]}',
                                     url=f'https://t.me/{order["user"]["username"]}')]
     if order['shipping_address_longitude']:

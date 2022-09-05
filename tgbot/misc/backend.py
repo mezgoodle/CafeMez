@@ -25,10 +25,12 @@ class Backend(API):
         item = await self.get(f'{collection}/{item_id}' + (additional_path if additional_path else ''))
         return item
 
-    async def update_object(self, collection: str, item_id, data: dict) -> Tuple[dict, int]:
+    async def update_object(self, collection: str, item_id, data: dict, additional_path: str = None) -> Tuple[
+        dict, int]:
         await self.__get_token()
         headers = {'Authorization': self.auth_str % self.token}
-        data, status = await self.put(f'{collection}/{item_id}', data, headers=headers)
+        data, status = await self.put(f'{collection}/{item_id}' + (additional_path if additional_path else ''), data,
+                                      headers=headers)
         return data, status
 
     async def delete_object(self, collection: str, item_id) -> int:
@@ -285,6 +287,10 @@ class Order(Backend):
 
     async def delete_order(self, order_id: str) -> int:
         status = await self.delete_object('orders', order_id)
+        return status
+
+    async def finish_order(self, order_id: str) -> int:
+        data, status = await self.update_object('orders', order_id, {}, '/finish_order')
         return status
 
     @staticmethod

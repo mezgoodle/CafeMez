@@ -82,3 +82,19 @@ async def take_order(callback_query: CallbackQuery, callback_data: dict):
         await callback_query.message.answer('Ви успішно взяли замовлення!')
         return await callback_query.message.edit_reply_markup(reply_markup=keyboard)
     return await callback_query.message.answer('Помилка при взятті замовлення!')
+
+
+@dp.callback_query_handler(order_callback.filter(action='finished'), is_admin=True)
+@dp.callback_query_handler(order_callback.filter(action='finished'), is_courier=True)
+async def finish_order(callback_query: CallbackQuery, callback_data: dict):
+    api: Order = callback_query.bot.get('orders_api')
+    users_api: User = callback_query.bot.get('users_api')
+    order = await api.get_order(callback_data['id'])
+    if order['connected_courier'] == callback_query.from_user.username or await users_api.is_job(
+            callback_query.from_user.username,
+            'is_staff'):
+        status = await api.finish_order(callback_data['id'])
+        if status == 200:
+            await callback_query.message.answer('Статус замовлення змінено!')
+            return await callback_query.message.delete()
+        return await callback_query.message.answer('Помилка при зміні статусу замовлення!')
