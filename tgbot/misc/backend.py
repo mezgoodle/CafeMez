@@ -144,17 +144,23 @@ class User(Backend):
                           is_chef: bool = False,
                           is_courier: bool = False,
                           password: str = 'test') -> Tuple[dict, int]:
-        data = {
-            'username': username,
-            'password': password,
-            'telegram_id': telegram_id,
-            'is_staff': is_staff,
-            'email': email,
-            'is_chef': is_chef,
-            'is_courier': is_courier,
-            'connected_restaurant': restaurant
-        }
-        data, status = await self.create_object('users', data)
+        existed_user = await self.get_user(username)
+        if 'detail' in existed_user.keys():
+            data = {
+                'username': username,
+                'password': password,
+                'telegram_id': telegram_id,
+                'is_staff': is_staff,
+                'email': email,
+                'is_chef': is_chef,
+                'is_courier': is_courier,
+                'connected_restaurant': restaurant
+            }
+            data, status = await self.create_object('users', data)
+            return data, status
+        data, status = await self.update_object('users', username, {'is_staff': is_staff,
+                                                                    'is_chef': is_chef,
+                                                                    'is_courier': is_courier})
         return data, status
 
     async def is_job(self, username: str, job: str) -> bool:

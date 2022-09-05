@@ -83,7 +83,7 @@ async def answer_email(message: Message, state: FSMContext) -> Message:
     await state.finish()
     api: UserAPI = message.bot.get('users_api')
     _, status = await api.create_user(**data)
-    if status == 201:
+    if status == 201 or status == 200:
         await message.answer('Користувача успішно створено')
         return await message.answer(
             f'Username: {hbold(data["username"])}\nPassword: {hbold(data["password"])}\nEmail: {hbold(data["email"])}')
