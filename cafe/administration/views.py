@@ -83,6 +83,14 @@ class OrderViewSet(BaseViewSet):
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=True, methods=['patch'])
+    def finish_order(self, request, pk=None):
+        order = self.get_object()
+        order.connected_courier = None
+        order.is_finished = True
+        order.save()
+        return response.Response(True)
+
 
 class OrderItemViewSet(BaseViewSet):
     queryset = OrderItem.objects.all()
