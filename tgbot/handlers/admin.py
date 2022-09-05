@@ -8,11 +8,11 @@ from loader import dp
 from tgbot.misc.admin_utils import check_username, start_registration
 from tgbot.keyboards.inline.restaurants_keyboard import restaurants_markup
 from tgbot.keyboards.inline.places_keyboard import admin_places_markup
-from tgbot.keyboards.inline.callback_data import admin_place_callback
+from tgbot.keyboards.inline.callback_data import admin_place_callback, order_callback
 from tgbot.keyboards.reply.restaurants import restaurants_markup as reply_restaurants_markup
 from tgbot.keyboards.reply.location import location_markup
-from tgbot.misc.backend import User as UserAPI, Place, Restaurant
-from tgbot.misc.orders import show_orders_message
+from tgbot.misc.backend import User as UserAPI, Place, Restaurant, Order
+from tgbot.misc.staff_actions import show_orders_message, finish_order_action, staff_action
 from tgbot.states.states import User, Mailing
 
 
@@ -183,3 +183,25 @@ async def enter_text(message: Message, state: FSMContext):
         except Exception:
             pass
     return await message.answer('Повідомлення надіслано!')
+
+
+@dp.callback_query_handler(order_callback.filter(action='finished'), is_admin=True)
+async def finish_order(callback_query: CallbackQuery, callback_data: dict):
+    return await finish_order_action(callback_query, callback_data, 'Статус замовлення змінено!',
+                                     'Помилка при зміні статусу замовлення!')
+
+
+@dp.callback_query_handler(order_callback.filter(action='paid'), is_admin=True)
+async def change_order_payment(callback_query: CallbackQuery, callback_data: dict):
+    return await staff_action(callback_query, callback_data, {'is_paid': callback_data['value']},
+                              'Статус оплати змінено!', 'Помилка при зміні статусу оплати!')
+
+
+@dp.callback_query_handler(order_callback.filter(action='delete'), is_admin=True)
+async def delete_order(callback_query: CallbackQuery, callback_data: dict):
+    api: Order = callback_query.bot.get('orders_api')
+    status = await api.delete_order(callback_data['id'])
+    if status == 204:
+        await callback_query.message.delete()
+        return await callback_query.message.answer('Замовлення успішно видалено!')
+    return await callback_query.message.answer('Помилка при видалення замовлення!')
