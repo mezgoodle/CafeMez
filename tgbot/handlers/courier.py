@@ -19,7 +19,7 @@ async def change_order_payment(callback_query: CallbackQuery, callback_data: dic
 async def change_order_delivered(callback_query: CallbackQuery, callback_data: dict):
     additional_text = f'Статус доставки вашого замовлення із номером {callback_data["id"]} ' \
                       f'змінено на {hbold("доставлене") if callback_data["value"] == "True" else hbold("не доставлене")}"!'
-    return await staff_action(callback_query, callback_data, {'is_paid': callback_data['value']},
+    return await staff_action(callback_query, callback_data, {'is_delivered': callback_data['value']},
                               'Статус доставки змінено!', 'Помилка при зміні статусу доставки!', True, additional_text)
 
 
