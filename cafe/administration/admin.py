@@ -6,7 +6,7 @@ from .models import Item, User, Place, Referral, Restaurant, Category, SubCatego
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('email', 'is_staff', 'is_chef', 'is_courier', 'is_active', 'telegram_id', 'referred')
-    list_filter = ('email', 'is_staff', 'is_chef', 'is_courier', 'is_active',)
+    list_filter = ('is_staff', 'is_chef', 'is_courier', 'is_active', 'connected_restaurant')
     search_fields = ('email', 'telegram_id', 'username')
     ordering = ('email',)
 
