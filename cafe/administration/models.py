@@ -1,3 +1,5 @@
+import decimal
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -158,6 +160,16 @@ class Order(TimeStampedModel):
 
     @property
     def total_price(self):
+        if self.orderitem_set.first():
+            suma = self.total_price_without_discount
+            if (count := self.user.referred) != 0:
+                return round(suma - suma * decimal.Decimal(count * 0.5 / 100), 2)
+            if Referral.objects.filter(user_id=self.user.telegram_id).first():
+                return round(suma - suma * decimal.Decimal(2 / 100), 2)
+            return suma
+
+    @property
+    def total_price_without_discount(self):
         if self.orderitem_set.first():
             return self.tax_price + self.shipping_price
 

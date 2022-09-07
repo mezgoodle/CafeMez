@@ -74,6 +74,7 @@ class UserSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     tax_price = serializers.SerializerMethodField()
     total_price = serializers.SerializerMethodField()
+    total_price_without_discount = serializers.SerializerMethodField()
     user = UserSerializer(many=False, read_only=True)
     shipping_address_name = RestaurantSerializer(many=False, read_only=True)
 
@@ -91,3 +92,6 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def get_tax_price(self, instance):
         return instance.tax_price
+
+    def get_total_price_without_discount(self, instance):
+        return instance.total_price_without_discount

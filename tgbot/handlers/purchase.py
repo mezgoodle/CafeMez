@@ -150,7 +150,8 @@ async def answer_payment_method(message: Message, state: FSMContext):
                 else:
                     ref_api: Referral = message.bot.get('referrals_api')
                     if discount := await ref_api.get_discount(message.from_user.username):
-                        prices.append(LabeledPrice(label='Знижка', amount=int(-order['total_price'] * discount)))
+                        prices.append(
+                            LabeledPrice(label='Знижка', amount=int(-order['total_price_without_discount'] * discount)))
                 order_invoice = ItemInvoice(
                     title=f'Замовлення з номером {order_id}',
                     description=f'Замовлення номер {order_id} у ресторані {order["shipping_address_name"]["name"]}'
