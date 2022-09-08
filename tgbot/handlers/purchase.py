@@ -31,7 +31,7 @@ async def item_amount(message: Message, state: FSMContext):
     storage: Storage = message.bot.get('storage')
     storage.add_to_cart(message.from_user.id, item_id, amount)
     await state.reset_state()
-    await message.answer('Ви успішно додали товар до корзини!')
+    await message.answer('Ви успішно додали товар до корзини! Щоб її переглянути, натисніть /cart')
     return await list_categories(message)
 
 
