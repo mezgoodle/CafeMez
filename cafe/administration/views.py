@@ -91,12 +91,6 @@ class OrderViewSet(BaseViewSet):
         order.save()
         return response.Response(True)
 
-    @action(detail=False, methods=['get'])
-    def finished_orders(self, request):
-        orders = self.get_queryset().filter(is_finished=True)
-        serializer = self.get_serializer(orders, many=True)
-        return response.Response(serializer.data)
-
 
 class OrderItemViewSet(BaseViewSet):
     queryset = OrderItem.objects.all()
@@ -112,6 +106,12 @@ class OrderItemViewSet(BaseViewSet):
             serializer = self.serializer_class(order_item)
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'])
+    def finished_orders(self, request):
+        items = OrderItem.objects.filter(order__is_finished=True)
+        serializer = OrderItemSerializer(items, many=True)
+        return response.Response(serializer.data)
 
 
 class ItemViewSet(BaseViewSet):

@@ -198,6 +198,10 @@ class Item(Backend):
         item = await self.get_object('items', item_id)
         return item
 
+    async def get_items_from_finished_orders(self) -> list:
+        data = await self.get_all_objects('order_items/finished_orders')
+        return data
+
 
 class Referral(Backend):
     def __init__(self):
@@ -298,10 +302,6 @@ class Order(Backend):
     async def finish_order(self, order_id: str) -> int:
         data, status = await self.update_object('orders', order_id, {}, '/finish_order')
         return status
-
-    async def get_finished_orders(self) -> list:
-        data = await self.get_all_objects('orders/finished_orders')
-        return data
 
     @staticmethod
     async def get_shipping_price(location: Location, bot: Bot) -> tuple:
