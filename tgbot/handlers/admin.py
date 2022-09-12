@@ -2,6 +2,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, ContentType, CallbackQuery
 from aiogram.dispatcher.filters import Command, ForwardedMessageFilter
 from aiogram.utils.markdown import hitalic, hbold
+from aiogram.utils.exceptions import ChatNotFound
 from asyncio import sleep
 
 from loader import dp
@@ -180,7 +181,7 @@ async def enter_text(message: Message, state: FSMContext):
         try:
             await bot.send_message(user['telegram_id'], text)
             await sleep(0.3)
-        except Exception:
+        except ChatNotFound:
             pass
     return await message.answer('Повідомлення надіслано!')
 

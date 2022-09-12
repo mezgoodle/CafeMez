@@ -26,7 +26,6 @@ from loader import dp
 
 def register_all_middlewares(dispatcher: Dispatcher) -> None:
     logger.info('Registering middlewares')
-    # config = dispatcher.bot.get('config')
     dispatcher.setup_middleware(ThrottlingMiddleware())
     dispatcher.setup_middleware(CallbackMiddleware())
     dispatcher.setup_middleware(SupportMiddleware())
