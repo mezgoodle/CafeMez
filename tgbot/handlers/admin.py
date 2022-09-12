@@ -12,9 +12,18 @@ from tgbot.keyboards.inline.places_keyboard import admin_places_markup
 from tgbot.keyboards.inline.callback_data import admin_place_callback, order_callback
 from tgbot.keyboards.reply.restaurants import restaurants_markup as reply_restaurants_markup
 from tgbot.keyboards.reply.location import location_markup
-from tgbot.misc.backend import User as UserAPI, Place, Restaurant, Order
+from tgbot.misc.backend import User as UserAPI, Place, Restaurant, Order, Item
 from tgbot.misc.staff_actions import show_orders_message, finish_order_action, staff_action
 from tgbot.states.states import User, Mailing
+from tgbot.misc.stats import make_analysis
+
+
+@dp.message_handler(Command(['stats']), is_general_admin=True)
+async def show_stats(message: Message) -> Message:
+    api: Item = message.bot.get('items_api')
+    data = await api.get_items_from_finished_orders()
+    make_analysis(data)
+    return await message.answer('hihi')
 
 
 @dp.message_handler(Command(['orders']), is_admin=True)
