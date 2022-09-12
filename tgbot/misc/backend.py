@@ -299,6 +299,10 @@ class Order(Backend):
         data, status = await self.update_object('orders', order_id, {}, '/finish_order')
         return status
 
+    async def get_finished_orders(self) -> list:
+        data = await self.get_all_objects('orders/finished_orders')
+        return data
+
     @staticmethod
     async def get_shipping_price(location: Location, bot: Bot) -> tuple:
         distances = await choose_shortest(location, bot)

@@ -91,6 +91,12 @@ class OrderViewSet(BaseViewSet):
         order.save()
         return response.Response(True)
 
+    @action(detail=False, methods=['get'])
+    def finished_orders(self, request):
+        orders = self.get_queryset().filter(is_finished=True)
+        serializer = self.get_serializer(orders, many=True)
+        return response.Response(serializer.data)
+
 
 class OrderItemViewSet(BaseViewSet):
     queryset = OrderItem.objects.all()
