@@ -4,7 +4,8 @@ import pandas as pd
 def make_analysis(data: list):
     df: pd.DataFrame = prepare_df(data)
     df = casting_types(df)
-    print(df.head())
+    print(df.groupby('restaurant').agg(['count', 'mean']))
+    df.to_csv('./data.csv')
 
 
 def prepare_df(data: list):
