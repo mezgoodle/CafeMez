@@ -1,5 +1,4 @@
 import pandas as pd
-from pprint import pprint
 
 
 def make_analysis(data: list):
@@ -8,6 +7,7 @@ def make_analysis(data: list):
 
 
 def prepare_df(data: list):
+
     df = pd.DataFrame([
         {
             'name': order_item['item']['name'],
@@ -18,6 +18,3 @@ def prepare_df(data: list):
         } for order_item in data
     ])
     return df
-
-
-
