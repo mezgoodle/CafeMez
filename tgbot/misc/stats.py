@@ -1,10 +1,19 @@
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import matplotlib
+
+matplotlib.use('TkAgg')
 
 
 def make_analysis(data: list):
     df: pd.DataFrame = prepare_df(data)
     df = casting_types(df)
-    print(df.groupby('restaurant').agg(['count', 'mean']))
+    print(df.groupby('name')['price'].agg(['count', 'mean']))
+    sns.countplot(x=df['restaurant'], palette='Greens')
+    plt.savefig('plot.png')
+    sns.barplot(x='price', y='restaurant', hue='name', data=df, palette="Greens")
+    plt.show()
     df.to_csv('./data.csv')
 
 
