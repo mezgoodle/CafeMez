@@ -22,7 +22,7 @@ from tgbot.misc.stats import make_analysis
 async def show_stats(message: Message) -> Message:
     api: Item = message.bot.get('items_api')
     data = await api.get_items_from_finished_orders()
-    make_analysis(data)
+    await make_analysis(data, message)
     return await message.answer('hihi')
 
 
