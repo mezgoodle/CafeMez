@@ -7,9 +7,9 @@ from aiogram.types import Message, InputFile
 import string
 import random
 import os
+import io
 
 matplotlib.use('TkAgg')
-# TODO: https://morioh.com/p/b8f24b983853
 
 
 async def make_analysis(data: list, message: Message):
@@ -17,9 +17,9 @@ async def make_analysis(data: list, message: Message):
     df = casting_types(df)
     await plot_restaurant_count(df, message)
     await plot_items_price(df, message)
-    return
     await histplot_items(df, message)
     await scatter_time(df, message)
+    return
     
     
     d = df.groupby('name')['price'].agg(['median', 'mean'])
@@ -53,41 +53,39 @@ def casting_types(df: pd.DataFrame):
 
 
 async def plot_restaurant_count(df: pd.DataFrame, message: Message):
-    ax = sns.countplot(x=df['restaurant'], palette='Greens')
-    fig = ax.figure
-    path_name = id_generator()
-    fig.savefig(path_name)
-    photo_bytes = InputFile(path_or_bytesio=path_name)
-    await message.answer_photo(photo_bytes, 'Кількість замовлень у кожному ресторані')
-    os.remove(path_name)
+    fig, ax=plt.subplots(figsize=(6,6))
+    sns.countplot(x=df['restaurant'], palette='Greens')
+    img = io.BytesIO()
+    fig.savefig(img)
+    img.seek(0)
+    await message.answer_photo(img, 'Кількість замовлень у кожному ресторані')
 
 
 async def plot_items_price(df: pd.DataFrame, message: Message):
-    ax = sns.barplot(x='quantity', y='restaurant', hue='name', data=df, palette="Greens")
-    fig = ax.figure
-    path_name = id_generator()
-    fig.savefig(path_name)
-    photo_bytes = InputFile(path_or_bytesio=path_name)
-    await message.answer_photo(photo_bytes, 'Бла бла')
-    os.remove(path_name)
+    fig, ax=plt.subplots(figsize=(6,6))
+    sns.barplot(x='quantity', y='restaurant', hue='name', data=df, palette="Greens")
+    img = io.BytesIO()
+    fig.savefig(img)
+    img.seek(0)
+    await message.answer_photo(img, 'Бла бла')
 
 
 async def histplot_items(df: pd.DataFrame, message: Message):
+    fig, ax=plt.subplots(figsize=(6,6))
     sns.histplot(df['name'])
-    path_name = id_generator()
-    plt.savefig(path_name)
-    photo_bytes = InputFile(path_or_bytesio=path_name)
-    await message.answer_photo(photo_bytes, 'хістплот айтемс')
-    os.remove(path_name)
+    img = io.BytesIO()
+    fig.savefig(img)
+    img.seek(0)
+    await message.answer_photo(img, 'хістплот айтемс')
 
 
 async def scatter_time(df: pd.DataFrame, message: Message):
+    fig, ax=plt.subplots(figsize=(6,6))
     df.plot.scatter(x='time', y='restaurant', s=100)
-    path_name = id_generator()
-    plt.savefig(path_name)
-    photo_bytes = InputFile(path_or_bytesio=path_name)
-    await message.answer_photo(photo_bytes, 'scatter time')
-    os.remove(path_name)
+    img = io.BytesIO()
+    fig.savefig(img)
+    img.seek(0)
+    await message.answer_photo(img, 'scatter time')
 
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
