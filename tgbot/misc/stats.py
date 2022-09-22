@@ -2,11 +2,8 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib
-from aiogram.types import Message, InputFile
+from aiogram.types import Message
 
-import string
-import random
-import os
 import io
 
 matplotlib.use('TkAgg')
@@ -86,7 +83,3 @@ async def scatter_time(df: pd.DataFrame, message: Message):
     fig.savefig(img)
     img.seek(0)
     await message.answer_photo(img, 'scatter time')
-
-
-def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size)) + '.png'
