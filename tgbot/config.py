@@ -47,7 +47,7 @@ def load_config(path: str = None) -> Config:
             database=os.getenv('DB_NAME', 'database'),
         ),
         admin=AdminCredentials(
-            email=os.getenv('EMAIL', 'mezgoodle@gmail.com'),
-            password=os.getenv('PASSWORD', '1Max2Victor'),
+            email=os.getenv('EMAIL', 'email'),
+            password=os.getenv('PASSWORD', 'password'),
         )
     )
