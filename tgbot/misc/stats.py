@@ -91,8 +91,6 @@ async def histplot_items(df: pd.DataFrame, message: Message):
 async def scatter_time(df: pd.DataFrame, message: Message):
     fig, _ = plt.subplots(figsize=(6,6))
     sns.scatterplot(data=df, x="time_period", y='name', hue='restaurant')
-    # sns.scatterplot(data=df, x="name", y='price', hue="restaurant")
-    # df.plot.scatter(x='time_period', y='restaurant', s=100)
     img = io.BytesIO()
     fig.savefig(img)
     img.seek(0)
