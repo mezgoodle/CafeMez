@@ -6,6 +6,7 @@ from aiogram.types import Message
 from aiogram.utils.markdown import hbold
 
 import io
+from datetime import datetime, timedelta
 
 matplotlib.use('TkAgg')
 
@@ -28,10 +29,31 @@ def prepare_df(data: list):
             'quantity': order_item['quantity'],
             'time': order_item['created'],
             'restaurant': order_item['order']['shipping_address_name'],
-            # TODO: make time_period to the day parts
+            'time_period': make_period(order_item['created'])
         } for order_item in data
     ])
     return df
+
+
+def make_period(time) -> str:
+    time = parsing_iso_string(time)
+    hour = time.hour
+    periods = {
+        (8, 12): 'Early day',
+        (12, 18): 'Late day',
+        (18, 22): 'Evening'
+    }
+    for key, value in periods.items():
+        if key[0] <= hour < key[1]:
+            return value
+    return periods[(8, 12)]
+
+
+def parsing_iso_string(time: str):
+    dt, _, us = time.partition(".")
+    dt = datetime.strptime(dt, "%Y-%m-%dT%H:%M:%S")
+    us = int(us.rstrip("Z"), 10)
+    return dt + timedelta(microseconds=us)
 
 
 def casting_types(df: pd.DataFrame):
@@ -68,8 +90,9 @@ async def histplot_items(df: pd.DataFrame, message: Message):
 
 async def scatter_time(df: pd.DataFrame, message: Message):
     fig, _ = plt.subplots(figsize=(6,6))
-    sns.scatterplot(data=df, x="name", y='price', hue="restaurant")
-    df.plot.scatter(x='time', y='restaurant', s=100)
+    sns.scatterplot(data=df, x="time_period", y='name', hue='restaurant')
+    # sns.scatterplot(data=df, x="name", y='price', hue="restaurant")
+    # df.plot.scatter(x='time_period', y='restaurant', s=100)
     img = io.BytesIO()
     fig.savefig(img)
     img.seek(0)
