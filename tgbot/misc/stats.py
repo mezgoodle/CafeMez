@@ -61,49 +61,49 @@ def casting_types(df: pd.DataFrame):
     return df
 
 
-async def plot_restaurant_count(df: pd.DataFrame, message: Message):
+async def plot_restaurant_count(df: pd.DataFrame, message: Message) -> Message:
     fig, _ = plt.subplots(figsize=(6,6))
     sns.countplot(x=df['restaurant'], palette='Greens')
     img = io.BytesIO()
     fig.savefig(img)
     img.seek(0)
-    await message.answer_photo(img, 'Кількість замовлень у кожному ресторані')
+    return await message.answer_photo(img, 'Кількість замовлень у кожному ресторані')
 
 
-async def plot_items_price(df: pd.DataFrame, message: Message):
+async def plot_items_price(df: pd.DataFrame, message: Message) -> Message:
     fig, _ = plt.subplots(figsize=(6,6))
     sns.barplot(x='quantity', y='restaurant', hue='name', data=df, palette="Greens")
     img = io.BytesIO()
     fig.savefig(img)
     img.seek(0)
-    await message.answer_photo(img, 'Бла бла')
+    return await message.answer_photo(img, 'Кількість товарів, які замовили у різних ресторанах')
 
 
-async def histplot_items(df: pd.DataFrame, message: Message):
+async def histplot_items(df: pd.DataFrame, message: Message) -> Message:
     fig, _ = plt.subplots(figsize=(6,6))
     sns.histplot(df['name'])
     img = io.BytesIO()
     fig.savefig(img)
     img.seek(0)
-    await message.answer_photo(img, 'хістплот айтемс')
+    return await message.answer_photo(img, 'Кількість товарів, які замовили')
 
 
-async def scatter_time(df: pd.DataFrame, message: Message):
+async def scatter_time(df: pd.DataFrame, message: Message) -> Message:
     fig, _ = plt.subplots(figsize=(6,6))
     sns.scatterplot(data=df, x="time_period", y='name', hue='restaurant')
     img = io.BytesIO()
     fig.savefig(img)
     img.seek(0)
-    await message.answer_photo(img, 'scatter time')
+    return await message.answer_photo(img, 'У який час який товар замовляють та у якому ресторані')
 
 
 async def send_text(df: pd.DataFrame, message: Message):
-    text = ''
-    grouped_df = df.groupby('name')['price'].agg(['median', 'mean'])
+    text = 'Статистика прибутку по ресторанах\n'
+    grouped_df = df.groupby('restaurant')['price'].agg(['median', 'mean'])
     indexes = grouped_df.index
     columns = grouped_df.columns
     for index in indexes:
-        text += f'Товар {hbold(index)}: '
+        text += f'Ресторан {hbold(index)}: '
         for column in columns:
             text += f'{column} - {hbold(grouped_df.loc[index, column])}, '
         text += '\n'
