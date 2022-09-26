@@ -71,7 +71,10 @@ async def plot_restaurant_count(df: pd.DataFrame, message: Message) -> Message:
 
 
 async def plot_items_price(df: pd.DataFrame, message: Message) -> Message:
-    fig, _ = plt.subplots(figsize=(6,6))
+    fig, axs = plt.subplots(figsize=(6,6))
+    for tick in axs.get_yticklabels():
+        tick.set_rotation(90)
+    fig.align_ylabels()
     sns.barplot(x='quantity', y='restaurant', hue='name', data=df, palette="Greens")
     img = io.BytesIO()
     fig.savefig(img)
@@ -98,7 +101,7 @@ async def scatter_time(df: pd.DataFrame, message: Message) -> Message:
 
 
 async def send_text(df: pd.DataFrame, message: Message):
-    text = 'Статистика прибутку по ресторанах\n'
+    text = 'Статистика прибутку по ресторанах:\n'
     grouped_df = df.groupby('restaurant')['price'].agg(['median', 'mean'])
     indexes = grouped_df.index
     columns = grouped_df.columns
