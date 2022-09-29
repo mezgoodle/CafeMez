@@ -20,7 +20,7 @@ jobs:
           pip install pylint flake8 pytest
       - name: Analysing the code with pylint
         run: |
-          pylint $(git ls-files '*.py') --ignore=cafe/administration/migrations
+          pylint $(git ls-files '*.py')
       - name: Lint with flake8
         run: |
           flake8 . --count --statistics
