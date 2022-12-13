@@ -30,7 +30,7 @@ jobs:
           flake8 . --count --statistics --exclude cafe/administration/migrations --exit-zero
       - name: Analysing the code with pylint
         run: |
-          pylint . --exit-zero
+          pylint tgbot --exit-zero
       - name: Test with pytype
         run: |
-          pytype --exit-zero
+          pytype tgbot --exit-zero
