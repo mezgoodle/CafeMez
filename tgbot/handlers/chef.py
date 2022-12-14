@@ -13,7 +13,8 @@ async def show_orders(message: Message):
     return await show_orders_message(message)
 
 
-@dp.callback_query_handler(order_callback.filter(action='show'), is_registered=True)
+@dp.callback_query_handler(order_callback.filter(action='show'),
+                           is_registered=True)
 async def show_order_item(callback_query: CallbackQuery, callback_data: dict):
     return await show_item(callback_query, callback_data)
 

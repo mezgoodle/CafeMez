@@ -24,7 +24,8 @@ async def answer_name(message: Message, state: FSMContext):
     return await message.reply("Напишіть ціну товару")
 
 
-@dp.message_handler(lambda message: message.text.isdigit() and float(message.text) > 0, state=Item.price)
+@dp.message_handler(lambda message: message.text.isdigit()
+                    and float(message.text) > 0, state=Item.price)
 async def answer_price(message: Message, state: FSMContext):
     price = message.text
     await state.update_data(price=price)
@@ -66,7 +67,8 @@ async def answer_subcategory(message: Message, state: FSMContext, subcategories:
     return await message.reply("Вас усе задовільняє?", reply_markup=keyboard)
 
 
-@dp.message_handler(lambda message: message.text in ['Так', 'Ні'], state=Item.approval)
+@dp.message_handler(lambda message: message.text in [
+                    'Так', 'Ні'], state=Item.approval)
 async def answer_approval(message: Message, state: FSMContext):
     if message.text == 'Ні':
         await state.finish()

@@ -9,13 +9,15 @@ from tgbot.keyboards.inline.orders import orders_keyboard
 from tgbot.keyboards.inline.callback_data import order_callback
 
 
-@dp.callback_query_handler(order_callback.filter(action='paid'), is_courier=True)
+@dp.callback_query_handler(order_callback.filter(action='paid'),
+                           is_courier=True)
 async def change_order_payment(callback_query: CallbackQuery, callback_data: dict):
     return await staff_action(callback_query, callback_data, {'is_paid': callback_data['value']},
                               'Статус оплати змінено!', 'Помилка при зміні статусу оплати!', True)
 
 
-@dp.callback_query_handler(order_callback.filter(action='delivered'), is_courier=True)
+@dp.callback_query_handler(order_callback.filter(action='delivered'),
+                           is_courier=True)
 async def change_order_delivered(callback_query: CallbackQuery, callback_data: dict):
     additional_text = f'Статус доставки вашого замовлення із номером {callback_data["id"]} ' \
                       f'змінено на {hbold("доставлене") if callback_data["value"] == "True" else hbold("не доставлене")}"!'
@@ -23,8 +25,10 @@ async def change_order_delivered(callback_query: CallbackQuery, callback_data: d
                               'Статус доставки змінено!', 'Помилка при зміні статусу доставки!', True, additional_text)
 
 
-@dp.callback_query_handler(order_callback.filter(action='coords'), is_courier=True)
-@dp.callback_query_handler(order_callback.filter(action='coords'), is_registered=True)
+@dp.callback_query_handler(order_callback.filter(action='coords'),
+                           is_courier=True)
+@dp.callback_query_handler(order_callback.filter(action='coords'),
+                           is_registered=True)
 async def show_order_coords(callback_query: CallbackQuery, callback_data: dict):
     api: Order = callback_query.bot.get('orders_api')
     order = await api.get_order(callback_data['id'])
@@ -44,7 +48,8 @@ async def show_courier_order(message: Message):
     return await message.answer('У вас немає замовлень')
 
 
-@dp.callback_query_handler(order_callback.filter(action='courier'), is_courier=True)
+@dp.callback_query_handler(order_callback.filter(action='courier'),
+                           is_courier=True)
 async def take_order(callback_query: CallbackQuery, callback_data: dict):
     additional_text = f'Ваше замовлення #{callback_data["id"]} узяв кур\'єр @{callback_query.from_user.username}'
     return await staff_action(callback_query, callback_data, {'connected_courier': callback_query.from_user.username},
@@ -52,7 +57,8 @@ async def take_order(callback_query: CallbackQuery, callback_data: dict):
                               additional_text=additional_text)
 
 
-@dp.callback_query_handler(order_callback.filter(action='finished'), is_courier=True)
+@dp.callback_query_handler(order_callback.filter(action='finished'),
+                           is_courier=True)
 async def finish_order(callback_query: CallbackQuery, callback_data: dict):
     return await finish_order_action(callback_query, callback_data, 'Статус замовлення змінено!',
                                      'Помилка при зміні статусу замовлення!', True)

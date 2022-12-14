@@ -52,7 +52,8 @@ async def accept_offer(call: CallbackQuery, callback_data: dict) -> Message:
     else:
         ref_api: Referral = call.bot.get('referrals_api')
         if discount := await ref_api.get_discount(call.from_user.username):
-            prices.append(LabeledPrice(label='Знижка', amount=int(-100 * discount)))
+            prices.append(LabeledPrice(label='Знижка',
+                          amount=int(-100 * discount)))
     place_invoice = Item(
         title=f'Місце з номером {number}',
         description=f'Оренда місця з номером {number} у ресторані {restaurant} '

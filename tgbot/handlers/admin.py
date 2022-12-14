@@ -120,7 +120,8 @@ async def add_restaurant(message: Message, state: FSMContext) -> Message:
     return await message.reply('Надішліть локацію через кнопку або просто як вкладення', reply_markup=markup)
 
 
-@dp.message_handler(state='cafe_coords', content_types=ContentType.LOCATION, is_admin=True)
+@dp.message_handler(state='cafe_coords',
+                    content_types=ContentType.LOCATION, is_admin=True)
 async def add_cafe_coords(message: Message, state: FSMContext) -> Message:
     await state.set_state('cafe_name')
     await state.update_data(longitude=message.location.longitude, latitude=message.location.latitude)
@@ -153,7 +154,8 @@ async def edit_places_in_restaurant(message: Message, state: FSMContext) -> Mess
     return await message.answer('Будь ласка, редагуйте місця за допомогою кнопок', reply_markup=keyboard)
 
 
-@dp.callback_query_handler(admin_place_callback.filter(method='update'), is_admin=True)
+@dp.callback_query_handler(admin_place_callback.filter(method='update'),
+                           is_admin=True)
 async def update_places_in_restaurant(call: CallbackQuery, callback_data: dict) -> Message:
     api: Place = call.bot.get('places_api')
     _, status = await api.update_place(callback_data['place_id'], {'free': callback_data['value']})
@@ -162,7 +164,8 @@ async def update_places_in_restaurant(call: CallbackQuery, callback_data: dict) 
     return await call.message.edit_text('Виникла помилка. Зверніться до головного адміністратора')
 
 
-@dp.callback_query_handler(admin_place_callback.filter(method='remove'), is_admin=True)
+@dp.callback_query_handler(admin_place_callback.filter(method='remove'),
+                           is_admin=True)
 async def delete_places_in_restaurant(call: CallbackQuery, callback_data: dict) -> Message:
     api: Place = call.bot.get('places_api')
     status = await api.remove_place(callback_data['place_id'])
@@ -194,7 +197,8 @@ async def enter_text(message: Message, state: FSMContext):
     return await message.answer('Повідомлення надіслано!')
 
 
-@dp.callback_query_handler(order_callback.filter(action='finished'), is_admin=True)
+@dp.callback_query_handler(order_callback.filter(action='finished'),
+                           is_admin=True)
 async def finish_order(callback_query: CallbackQuery, callback_data: dict):
     return await finish_order_action(callback_query, callback_data, 'Статус замовлення змінено!',
                                      'Помилка при зміні статусу замовлення!')
@@ -206,7 +210,8 @@ async def change_order_payment(callback_query: CallbackQuery, callback_data: dic
                               'Статус оплати змінено!', 'Помилка при зміні статусу оплати!')
 
 
-@dp.callback_query_handler(order_callback.filter(action='delete'), is_admin=True)
+@dp.callback_query_handler(order_callback.filter(action='delete'),
+                           is_admin=True)
 async def delete_order(callback_query: CallbackQuery, callback_data: dict):
     api: Order = callback_query.bot.get('orders_api')
     status = await api.delete_order(callback_data['id'])
