@@ -24,12 +24,11 @@ async def show_orders_message(message: Message) -> Message:
 async def show_item(callback_query: CallbackQuery, callback_data: dict):
     api: Order = callback_query.bot.get('orders_api')
     item = await api.get_order_item(callback_data['id'])
-    # TODO: send here the photo of the item
     text = f'{hbold(item["item"]["name"])}\n' \
            f'{hbold("Кількість:")} {item["quantity"]}\n' \
            f'{hbold("Ціна за шт.:")} {item["item"]["price"]} грн.'
-    # return await callback_query.message.answer_photo(photo=item['item']['photo'], caption=text)
-    return await callback_query.message.answer(text)
+    return await callback_query.message.answer_photo(photo=item['item']['photo'], caption=text)
+    # return await callback_query.message.answer(text)
 
 
 async def staff_action(callback_query: CallbackQuery,
