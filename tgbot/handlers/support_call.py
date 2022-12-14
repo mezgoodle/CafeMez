@@ -74,7 +74,8 @@ async def not_supported(message: Message, state: FSMContext) -> Message:
     return await message.answer('Дочекайтесь відповіді оператора або відміність сеанс!', reply_markup=keyboard)
 
 
-@dp.callback_query_handler(cancel_support_callback.filter(), state=['in_support', 'wait_in_support', None])
+@dp.callback_query_handler(cancel_support_callback.filter(),
+                           state=['in_support', 'wait_in_support', None])
 async def exit_support(call: CallbackQuery, state: FSMContext, callback_data: dict) -> Message:
     bot: Bot = call.bot
     user_id = int(callback_data.get('user_id'))

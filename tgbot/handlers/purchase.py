@@ -109,20 +109,23 @@ async def shipping_address_as_text(message: Message, state: FSMContext):
         return await message.answer('Виберіть спосіб оплати', reply_markup=keyboard)
 
 
-@dp.message_handler(state='shipping_address', content_types=ContentType.LOCATION)
+@dp.message_handler(state='shipping_address',
+                    content_types=ContentType.LOCATION)
 async def shipping_address_as_location(message: Message, state: FSMContext):
     restaurant_location = message.location
     api: Order = message.bot.get('orders_api')
     restaurant_name, shipping_price = await api.get_shipping_price(restaurant_location, message.bot)
     await state.update_data(shipping_price=round(shipping_price), shipping_address_name=restaurant_name,
-                            shipping_address_longitude=float(restaurant_location.longitude),
+                            shipping_address_longitude=float(
+                                restaurant_location.longitude),
                             shipping_address_latitude=float(restaurant_location.latitude))
     await state.set_state('payment_method')
     keyboard = payments_markup()
     return await message.answer('Виберіть спосіб оплати', reply_markup=keyboard)
 
 
-@dp.message_handler(Text(equals=['Картка', 'Готівка'], ignore_case=True), state='payment_method')
+@dp.message_handler(Text(equals=['Картка', 'Готівка'],
+                    ignore_case=True), state='payment_method')
 async def answer_payment_method(message: Message, state: FSMContext):
     payment_dict = {'Картка': 'CD', 'Готівка': 'CH'}
     payment_method = payment_dict[message.text]
@@ -142,7 +145,10 @@ async def answer_payment_method(message: Message, state: FSMContext):
                 users_api: User = bot.get('users_api')
                 order = await api.get_order(str(order_id))
                 if price := order['shipping_price']:
-                    prices.append(LabeledPrice(label='Вартість доставки', amount=int(price) * 100))
+                    prices.append(
+                        LabeledPrice(
+                            label='Вартість доставки',
+                            amount=int(price) * 100))
                 user = await users_api.get_user(message.from_user.username)
                 need_email = False
                 if 'detail' in user.keys():

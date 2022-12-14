@@ -23,7 +23,8 @@ async def send_to_support(call: CallbackQuery, state: FSMContext, callback_data:
     return await call.message.answer('Надішліть ваше повідомлення, яким ви хочете поділитись')
 
 
-@dp.message_handler(state='wait_for_support_message', content_types=ContentTypes.ANY)
+@dp.message_handler(state='wait_for_support_message',
+                    content_types=ContentTypes.ANY)
 async def get_support_message(message: Message, state: FSMContext) -> Message:
     data = await state.get_data()
     second_id = data['second_id']

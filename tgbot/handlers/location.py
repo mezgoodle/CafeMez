@@ -15,8 +15,7 @@ async def nearest_restaurants(message: Message) -> Message:
     text = '\n\n'.join(
         [
             text_format.format(
-                name=name, url=hlink(
-                    'Google', url), distance=distance)
+                name=name, url=hlink('Google', url), distance=distance)
             for name, distance, url, location in closest_restaurants
         ]
     )

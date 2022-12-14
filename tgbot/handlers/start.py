@@ -9,7 +9,8 @@ from tgbot.misc.backend import Referral
 from re import compile
 
 
-@dp.message_handler(CommandStart(deep_link=compile(r'^[0-9]{3,15}$')), ChatTypeFilter(ChatType.PRIVATE))
+@dp.message_handler(CommandStart(deep_link=compile(
+    r'^[0-9]{3,15}$')), ChatTypeFilter(ChatType.PRIVATE))
 async def register_referral(message: Message):
     referral = message.get_args()
     api: Referral = message.bot.get('referrals_api')
