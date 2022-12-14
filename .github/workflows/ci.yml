@@ -33,4 +33,4 @@ jobs:
           pylint tgbot --exit-zero
       - name: Test with pytype
         run: |
-          pytype tgbot --exit-zero
+          pytype
