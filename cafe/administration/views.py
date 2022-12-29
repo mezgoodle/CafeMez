@@ -5,16 +5,28 @@ from rest_framework.viewsets import ModelViewSet
 from django.http import Http404
 from loguru import logger
 
-from .models import Place, Restaurant, User, Referral, Item, Category, SubCategory, OrderItem, Order
-from .serializers import (PlaceSerializer,
-                          RestaurantSerializer,
-                          UserSerializer,
-                          ReferralSerializer,
-                          ItemSerializer,
-                          CategorySerializer,
-                          SubCategorySerializer,
-                          OrderSerializer,
-                          OrderItemSerializer)
+from .models import (
+    Place,
+    Restaurant,
+    User,
+    Referral,
+    Item,
+    Category,
+    SubCategory,
+    OrderItem,
+    Order,
+)
+from .serializers import (
+    PlaceSerializer,
+    RestaurantSerializer,
+    UserSerializer,
+    ReferralSerializer,
+    ItemSerializer,
+    CategorySerializer,
+    SubCategorySerializer,
+    OrderSerializer,
+    OrderItemSerializer,
+)
 from .utils import set_permissions
 from .permissions import IsAdminOrReadOnly
 
@@ -55,12 +67,25 @@ class PlaceViewSet(BaseViewSet):
 class CategoryViewSet(BaseViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    lookup_field = 'code'
+    lookup_field = "code"
 
 
 class SubCategoryViewSet(BaseViewSet):
     queryset = SubCategory.objects.all()
     serializer_class = SubCategorySerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            subcategory = SubCategory(
+                name=request.data["name"],
+                code=request.data["code"],
+                category=Category.objects.get(code=request.data["category"]),
+            )
+            subcategory.save()
+            serializer = self.serializer_class(subcategory)
+            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OrderViewSet(BaseViewSet):
@@ -70,20 +95,26 @@ class OrderViewSet(BaseViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            order = Order(user=User.objects.get(username=request.data['user']),
-                          shipping_address_name=Restaurant.objects.get(name=request.data['shipping_address_name']),
-                          payment_method=request.data['payment_method'],
-                          shipping_address_longitude=request.data['shipping_address_longitude']
-                          if 'shipping_address_longitude' in request.data else None,
-                          shipping_address_latitude=request.data['shipping_address_latitude']
-                          if 'shipping_address_latitude' in request.data else None,
-                          shipping_price=request.data['shipping_price'])
+            order = Order(
+                user=User.objects.get(username=request.data["user"]),
+                shipping_address_name=Restaurant.objects.get(
+                    name=request.data["shipping_address_name"]
+                ),
+                payment_method=request.data["payment_method"],
+                shipping_address_longitude=request.data["shipping_address_longitude"]
+                if "shipping_address_longitude" in request.data
+                else None,
+                shipping_address_latitude=request.data["shipping_address_latitude"]
+                if "shipping_address_latitude" in request.data
+                else None,
+                shipping_price=request.data["shipping_price"],
+            )
             order.save()
             serializer = self.serializer_class(order)
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['patch'])
+    @action(detail=True, methods=["patch"])
     def finish_order(self, request, pk=None):
         order = self.get_object()
         order.connected_courier = None
@@ -99,15 +130,17 @@ class OrderItemViewSet(BaseViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            order_item = OrderItem(order=Order.objects.get(id=request.data['order']),
-                                   item=Item.objects.get(name=request.data['item']),
-                                   quantity=request.data['quantity'])
+            order_item = OrderItem(
+                order=Order.objects.get(id=request.data["order"]),
+                item=Item.objects.get(name=request.data["item"]),
+                quantity=request.data["quantity"],
+            )
             order_item.save()
             serializer = self.serializer_class(order_item)
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def finished_orders(self, request):
         items = OrderItem.objects.filter(order__is_finished=True)
         serializer = OrderItemSerializer(items, many=True)
@@ -118,14 +151,18 @@ class ItemViewSet(BaseViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     filter_backends = [SearchFilter, OrderingFilter]
-    search_fields = ['name', 'description']
+    search_fields = ["name", "description"]
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            item = Item(name=request.data['name'], price=request.data['price'], description=request.data['description'],
-                        photo=request.data['photo'],
-                        subcategory=SubCategory.objects.get(code=request.data['subcategory']))
+            item = Item(
+                name=request.data["name"],
+                price=request.data["price"],
+                description=request.data["description"],
+                photo=request.data["photo"],
+                subcategory=SubCategory.objects.get(code=request.data["subcategory"]),
+            )
             item.save()
             serializer = self.serializer_class(item)
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -135,51 +172,52 @@ class ItemViewSet(BaseViewSet):
 # TODO: rewrite functional views into ModelViewSet's actions as possible
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def get_items(request, subcategory_code):
     items = Item.objects.filter(subcategory=subcategory_code)
     serializer = ItemSerializer(items, many=True)
     return response.Response(serializer.data)
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def get_orders(request, username):
     user = User.objects.get(username=username)
     orders = None
     if user.is_chef:
         orders = user.connected_restaurant.order_set.all().filter(is_ready=False)
     elif user.is_courier:
-        orders = user.connected_restaurant.order_set.all().filter(is_delivered=False,
-                                                                  shipping_address_latitude__isnull=False)
+        orders = user.connected_restaurant.order_set.all().filter(
+            is_delivered=False, shipping_address_latitude__isnull=False
+        )
     elif user.is_staff:
         orders = user.connected_restaurant.order_set.filter(is_finished=False)
     serializer = OrderSerializer(orders, many=True)
     return response.Response(serializer.data)
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def places_by_restaurant(request, restaurant_name):
     try:
         restaurant = Restaurant.objects.get(name=restaurant_name)
     except Restaurant.DoesNotExist:
-        logger.error(f'Restaurant {restaurant_name} does not exist')
+        logger.error(f"Restaurant {restaurant_name} does not exist")
         raise Http404
 
-    logger.info(f'Get places by restaurant; {request=}; {restaurant_name=}')
+    logger.info(f"Get places by restaurant; {request=}; {restaurant_name=}")
     places = restaurant.place_set.all()
     serializer = PlaceSerializer(places, many=True)
     return response.Response(serializer.data)
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def subcategories_by_category(request, category_code: str):
     try:
         category = Category.objects.get(code=category_code)
     except Category.DoesNotExist:
-        logger.error(f'Category {category_code} does not exist')
+        logger.error(f"Category {category_code} does not exist")
         raise Http404
 
-    logger.info(f'Get subcategories by category; {request=}; {category_code=}')
+    logger.info(f"Get subcategories by category; {request=}; {category_code=}")
     subcategories = category.subcategory_set.all()
     serializer = SubCategorySerializer(subcategories, many=True)
     return response.Response(serializer.data)
@@ -188,7 +226,7 @@ def subcategories_by_category(request, category_code: str):
 class RestaurantViewSet(BaseViewSet):
     queryset = Restaurant.objects.all()
     serializer_class = RestaurantSerializer
-    lookup_field = 'name'
+    lookup_field = "name"
 
 
 class ReferralViewSet(BaseViewSet):
@@ -199,20 +237,20 @@ class ReferralViewSet(BaseViewSet):
 class UserViewSet(BaseViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    lookup_field = 'username'
+    lookup_field = "username"
 
     def create(self, request, *args, **kwargs):
-        logger.info(f'Create user; {request=}; {request.data=}')
+        logger.info(f"Create user; {request=}; {request.data=}")
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            user.set_password(request.data['password'])
+            user.set_password(request.data["password"])
             set_permissions(user)
             user.save()
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def get_order(self, request, username=None):
         user = self.get_object()
         try:
@@ -222,14 +260,14 @@ class UserViewSet(BaseViewSet):
         serializer = OrderSerializer(order, many=False)
         return response.Response(serializer.data)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def get_orders(self, request, username=None):
         user = self.get_object()
         orders = user.order_set.filter(is_finished=False)
         serializer = OrderSerializer(orders, many=True)
         return response.Response(serializer.data)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def get_discount(self, request, username=None):
         user = self.get_object()
         if (count := user.referred) != 0:
@@ -238,23 +276,28 @@ class UserViewSet(BaseViewSet):
             return response.Response(2)
         return response.Response(False)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def get_referrer(self, request, username=None):
         user = self.get_object()
         ref = Referral.objects.filter(user_id=user.telegram_id).first()
-        return response.Response({'username': ref.referrer_id.username,
-                                  'number': ref.referrer_id.referred,
-                                  'activated': ref.activated,
-                                  'id': ref.id}
-                                 )
+        return response.Response(
+            {
+                "username": ref.referrer_id.username,
+                "number": ref.referrer_id.referred,
+                "activated": ref.activated,
+                "id": ref.id,
+            }
+        )
 
-    @action(detail=False, url_path='get_staff/(?P<restaurant>[^/.]+)')
+    @action(detail=False, url_path="get_staff/(?P<restaurant>[^/.]+)")
     def get_staff(self, request, restaurant):
         staff = User.objects.filter(is_staff=True, connected_restaurant=restaurant)
         chefs = User.objects.filter(is_chef=True, connected_restaurant=restaurant)
         staff_serializer = self.get_serializer(staff, many=True)
         chefs_serializer = self.get_serializer(chefs, many=True)
-        return response.Response({'staff': staff_serializer.data, 'chefs': chefs_serializer.data})
+        return response.Response(
+            {"staff": staff_serializer.data, "chefs": chefs_serializer.data}
+        )
 
     @action(detail=False)
     def get_admins(self, request):
