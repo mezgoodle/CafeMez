@@ -1,10 +1,10 @@
 from django.urls import path, include
 from rest_framework.authtoken.views import obtain_auth_token
-from rest_framework.routers import SimpleRouter
+from rest_framework.routers import DefaultRouter
 
 from . import views
 
-router = SimpleRouter(trailing_slash=False)  # trailing slash is False for production
+router = DefaultRouter(trailing_slash=False)  # trailing slash is False for production
 router.register(r"places", views.PlaceViewSet)
 router.register(r"categories", views.CategoryViewSet)
 router.register(r"items", views.ItemViewSet)
