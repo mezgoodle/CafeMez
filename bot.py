@@ -103,7 +103,7 @@ async def on_shutdown(dispatcher: Dispatcher) -> None:
 if __name__ == "__main__":
     logger.add(
         "tgbot.log",
-        format="{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}",
+        format="{time:YYYY-MM-DD at HH:mm:ss} | {level} | {file} | {function}, {line} | {message}",
         rotation="5 KB",
         compression="zip",
         enqueue=True,
