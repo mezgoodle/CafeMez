@@ -1,13 +1,12 @@
 from collections import Counter
+from typing import Dict, List, Tuple, Union
 
 from aiogram import Bot
-from aiogram.types import Location, LabeledPrice
+from aiogram.types import LabeledPrice, Location
 
+from tgbot.config import config
 from tgbot.misc.api import API
-from tgbot.config import load_config, Config
 from tgbot.misc.calc_distance import choose_shortest
-
-from typing import Tuple, List, Union, Dict
 
 
 class Backend(API):
@@ -55,12 +54,11 @@ class Backend(API):
 
     async def __get_token(self):
         if not self.token:
-            config: Config = load_config()
             token, status = await self.post(
                 "token",
                 data={
-                    "username": config.admin.email,
-                    "password": config.admin.password,
+                    "username": config.admin_email,
+                    "password": config.admin_password,
                 },
             )
             if status == 200:

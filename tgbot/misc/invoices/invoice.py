@@ -3,7 +3,7 @@ from typing import List
 
 from aiogram.types import LabeledPrice
 
-from tgbot.config import load_config
+from tgbot.config import config
 
 
 @dataclass
@@ -13,8 +13,8 @@ class Item:
     payload: str
     start_parameter: str
     prices: List[LabeledPrice]
-    provider_token: str = load_config().tg_bot.payment_token
-    currency: str = 'UAH'
+    provider_token: str = config.payment_token.get_secret_value()
+    currency: str = "UAH"
     provider_data: dict = None
     photo_url: str = None
     photo_size: int = None
