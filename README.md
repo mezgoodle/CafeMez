@@ -1,4 +1,5 @@
 # bot_template
+
 My template for aiogram bots
 
 <h1 id="project-title" align="center">
@@ -9,6 +10,7 @@ My template for aiogram bots
   <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/mezgoodle/bot_template?style=flat-square" />
   <img alt="GitHub closed pull requests" src="https://img.shields.io/github/issues-pr-closed/mezgoodle/bot_template?style=flat-square" />
   <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/mezgoodle/bot_template?style=flat-square">
+  <a href="https://wakatime.com/badge/user/13631fc5-0ee5-4aed-920d-b02dc1546d51/project/fc412cd7-374b-4457-88a6-38e03d0ee97e"><img src="https://wakatime.com/badge/user/13631fc5-0ee5-4aed-920d-b02dc1546d51/project/fc412cd7-374b-4457-88a6-38e03d0ee97e.svg" alt="wakatime"></a>
 </h1>
 
 <p align="center">
@@ -69,7 +71,7 @@ classDiagram
     class `tgbot.handlers`{
     }
     class some_handler{
-      
+
     }
     class `tgbot.filters`{
       custom_filter
@@ -84,19 +86,19 @@ classDiagram
         inline_keyboard
     }
     class `tgbot.middlewares` {
-        
+
     }
     class custom_middleware {
         rate_limit()
     }
     class `tgbot.misc` {
-        
+
     }
     class `tgbot.models` {
-        
+
     }
     class `tgbot.services` {
-        
+
     }
     class set_default_commands {
         set_commands()
