@@ -1,14 +1,14 @@
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-import matplotlib
-from aiogram.types import Message
-from aiogram.utils.markdown import hbold
-
 import io
 from datetime import datetime, timedelta
 
-matplotlib.use('TkAgg')
+import matplotlib
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+from aiogram.types import Message
+from aiogram.utils.markdown import hbold
+
+matplotlib.use("TkAgg")
 
 
 async def make_analysis(data: list, message: Message) -> Message:
@@ -22,27 +22,26 @@ async def make_analysis(data: list, message: Message) -> Message:
 
 
 def prepare_df(data: list):
-    df = pd.DataFrame([
-        {
-            'name': order_item['item']['name'],
-            'price': order_item['item']['price'],
-            'quantity': order_item['quantity'],
-            'time': order_item['created'],
-            'restaurant': order_item['order']['shipping_address_name'],
-            'time_period': make_period(order_item['created'])
-        } for order_item in data
-    ])
+    df = pd.DataFrame(
+        [
+            {
+                "name": order_item["item"]["name"],
+                "price": order_item["item"]["price"],
+                "quantity": order_item["quantity"],
+                "time": order_item["created"],
+                "restaurant": order_item["order"]["shipping_address_name"],
+                "time_period": make_period(order_item["created"]),
+            }
+            for order_item in data
+        ]
+    )
     return df
 
 
 def make_period(time) -> str:
     time = parsing_iso_string(time)
     hour = time.hour
-    periods = {
-        (8, 12): 'Early day',
-        (12, 18): 'Late day',
-        (18, 22): 'Evening'
-    }
+    periods = {(8, 12): "Early day", (12, 18): "Late day", (18, 22): "Evening"}
     for key, value in periods.items():
         if key[0] <= hour < key[1]:
             return value
@@ -57,57 +56,61 @@ def parsing_iso_string(time: str):
 
 
 def casting_types(df: pd.DataFrame):
-    df['time'] = pd.to_datetime(df['time']).dt.normalize()
+    df["time"] = pd.to_datetime(df["time"]).dt.normalize()
     return df
 
 
 async def plot_restaurant_count(df: pd.DataFrame, message: Message) -> Message:
-    fig, _ = plt.subplots(figsize=(6,6))
-    sns.countplot(x=df['restaurant'], palette='Greens')
+    fig, _ = plt.subplots(figsize=(6, 6))
+    sns.countplot(x=df["restaurant"], palette="Greens")
     img = io.BytesIO()
     fig.savefig(img)
     img.seek(0)
-    return await message.answer_photo(img, 'Кількість замовлень у кожному ресторані')
+    return await message.answer_photo(img, "Кількість замовлень у кожному ресторані")
 
 
 async def plot_items_price(df: pd.DataFrame, message: Message) -> Message:
-    fig, axs = plt.subplots(figsize=(6,6))
+    fig, axs = plt.subplots(figsize=(6, 6))
     for tick in axs.get_yticklabels():
         tick.set_rotation(90)
     fig.align_ylabels()
-    sns.barplot(x='quantity', y='restaurant', hue='name', data=df, palette="Greens")
+    sns.barplot(x="quantity", y="restaurant", hue="name", data=df, palette="Greens")
     img = io.BytesIO()
     fig.savefig(img)
     img.seek(0)
-    return await message.answer_photo(img, 'Кількість товарів, які замовили у різних ресторанах')
+    return await message.answer_photo(
+        img, "Кількість товарів, які замовили у різних ресторанах"
+    )
 
 
 async def histplot_items(df: pd.DataFrame, message: Message) -> Message:
-    fig, _ = plt.subplots(figsize=(6,6))
-    sns.histplot(df['name'])
+    fig, _ = plt.subplots(figsize=(6, 6))
+    sns.histplot(df["name"])
     img = io.BytesIO()
     fig.savefig(img)
     img.seek(0)
-    return await message.answer_photo(img, 'Кількість товарів, які замовили')
+    return await message.answer_photo(img, "Кількість товарів, які замовили")
 
 
 async def scatter_time(df: pd.DataFrame, message: Message) -> Message:
-    fig, _ = plt.subplots(figsize=(6,6))
-    sns.scatterplot(data=df, x="time_period", y='name', hue='restaurant')
+    fig, _ = plt.subplots(figsize=(6, 6))
+    sns.scatterplot(data=df, x="time_period", y="name", hue="restaurant")
     img = io.BytesIO()
     fig.savefig(img)
     img.seek(0)
-    return await message.answer_photo(img, 'У який час який товар замовляють та у якому ресторані')
+    return await message.answer_photo(
+        img, "У який час який товар замовляють та у якому ресторані"
+    )
 
 
 async def send_text(df: pd.DataFrame, message: Message):
-    text = 'Статистика прибутку по ресторанах:\n'
-    grouped_df = df.groupby('restaurant')['price'].agg(['median', 'mean'])
+    text = "Статистика прибутку по ресторанах:\n"
+    grouped_df = df.groupby("restaurant")["price"].agg(["median", "mean"])
     indexes = grouped_df.index
     columns = grouped_df.columns
     for index in indexes:
-        text += f'Ресторан {hbold(index)}: '
+        text += f"Ресторан {hbold(index)}: "
         for column in columns:
-            text += f'{column} - {hbold(grouped_df.loc[index, column])}, '
-        text += '\n'
+            text += f"{column} - {hbold(grouped_df.loc[index, column])}, "
+        text += "\n"
     return await message.answer(text)
