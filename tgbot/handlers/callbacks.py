@@ -1,14 +1,13 @@
-from aiogram.types import CallbackQuery, Message, LabeledPrice
-from aiogram.utils.markdown import hbold, hitalic
-
-from tgbot.keyboards.inline.places_keyboard import place_markup, places_markup
-from tgbot.keyboards.inline.restaurants_keyboard import restaurants_markup
-from tgbot.keyboards.inline.callback_data import place_callback as place_data
-from loader import dp, bot
-
 from datetime import datetime
 
-from tgbot.misc.backend import User, Referral
+from aiogram.types import CallbackQuery, LabeledPrice, Message
+from aiogram.utils.markdown import hbold, hitalic
+
+from loader import bot, dp
+from tgbot.keyboards.inline.callback_data import place_callback as place_data
+from tgbot.keyboards.inline.places_keyboard import place_markup, places_markup
+from tgbot.keyboards.inline.restaurants_keyboard import restaurants_markup
+from tgbot.misc.backend import Referral, Restaurant, User
 from tgbot.misc.invoices.invoice import Item
 
 
@@ -20,7 +19,7 @@ async def place_callback(call: CallbackQuery) -> Message:
 @dp.callback_query_handler(text_contains="rs:")
 async def place_callback(call: CallbackQuery) -> Message:
     restaurant_id = call.data.split(":")[1]
-    api = call.bot.get("restaurants_api")
+    api: Restaurant = call.bot.get("restaurants_api")
     status = await api.delete_restaurant(restaurant_id)
     if status == 204:
         restaurants = await api.get_all_restaurants()
