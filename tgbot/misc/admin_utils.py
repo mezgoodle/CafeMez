@@ -38,7 +38,10 @@ async def start_registration(message: Message) -> Message:
         Message: message from the bot
     """
     await User.first()
-    return await message.answer(
+    await message.answer(
         "Перешліть будь ласка повідомлення від користувача, якого ви хочете додати в базу даних.\n"
         f'{hbold("Уважно перегляньте налаштування приватності!")}'
+    )
+    return await message.answer(
+        "Увага! Якщо користувач вже зареєстрований, зміниться тільки його роль та приєднаний ресторан"
     )
