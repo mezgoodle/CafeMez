@@ -241,7 +241,6 @@ async def enter_text(message: Message, state: FSMContext):
     return await message.answer("Повідомлення надіслано!")
 
 
-# TODO: Check callbacks
 @dp.callback_query_handler(order_callback.filter(action="finished"), is_admin=True)
 async def finish_order(callback_query: CallbackQuery, callback_data: dict):
     return await finish_order_action(
