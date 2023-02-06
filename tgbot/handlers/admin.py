@@ -1,34 +1,38 @@
-from aiogram.dispatcher import FSMContext
-from aiogram.types import Message, ContentType, CallbackQuery
-from aiogram.dispatcher.filters import Command, ForwardedMessageFilter
-from aiogram.utils.markdown import hitalic, hbold
-from aiogram.utils.exceptions import ChatNotFound
 from asyncio import sleep
 
+from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Command, ForwardedMessageFilter
+from aiogram.types import CallbackQuery, ContentType, Message
+from aiogram.utils.exceptions import ChatNotFound
+from aiogram.utils.markdown import hbold, hitalic
+
 from loader import dp
-from tgbot.misc.admin_utils import check_username, start_registration
-from tgbot.keyboards.inline.restaurants_keyboard import restaurants_markup
-from tgbot.keyboards.inline.places_keyboard import admin_places_markup
 from tgbot.keyboards.inline.callback_data import admin_place_callback, order_callback
+from tgbot.keyboards.inline.places_keyboard import admin_places_markup
+from tgbot.keyboards.inline.restaurants_keyboard import restaurants_markup
+from tgbot.keyboards.reply.location import location_markup
 from tgbot.keyboards.reply.restaurants import (
     restaurants_markup as reply_restaurants_markup,
 )
-from tgbot.keyboards.reply.location import location_markup
-from tgbot.misc.backend import User as UserAPI, Place, Restaurant, Order, Item
+from tgbot.misc.admin_utils import check_username, start_registration
+from tgbot.misc.backend import Item, Order, Place, Restaurant
+from tgbot.misc.backend import User as UserAPI
 from tgbot.misc.staff_actions import (
-    show_orders_message,
     finish_order_action,
+    show_orders_message,
     staff_action,
 )
-from tgbot.states.states import User, Mailing
 from tgbot.misc.stats import make_analysis
+from tgbot.states.states import Mailing, User
 
 
 @dp.message_handler(Command(["stats"]), is_general_admin=True)
 async def show_stats(message: Message) -> Message:
     api: Item = message.bot.get("items_api")
     data = await api.get_items_from_finished_orders()
-    return await make_analysis(data, message)
+    if data:
+        return await make_analysis(data, message)
+    return await message.answer("У базі даних немає закінчених замовлень")
 
 
 @dp.message_handler(Command(["orders"]), is_admin=True)
@@ -107,7 +111,7 @@ async def answer_email(message: Message, state: FSMContext) -> Message:
     if status == 201 or status == 200:
         await message.answer("Користувача успішно створено")
         return await message.answer(
-            f'Username: {hbold(data["username"])}\nPassword: {hbold(data["password"])}\nEmail: {hbold(data["email"])}'
+            f'Username: {hbold(data["username"])}\nПароль: {hbold(data["password"])}\nПоштова адреса: {hbold(data["email"])}'
         )
     return await message.reply(
         "Виникла проблема. Зверніться до головного адміністратора"
@@ -237,6 +241,7 @@ async def enter_text(message: Message, state: FSMContext):
     return await message.answer("Повідомлення надіслано!")
 
 
+# TODO: Check callbacks
 @dp.callback_query_handler(order_callback.filter(action="finished"), is_admin=True)
 async def finish_order(callback_query: CallbackQuery, callback_data: dict):
     return await finish_order_action(
