@@ -17,20 +17,49 @@ class Backend(API):
         super().__init__()
 
     async def get_all_objects(self, collection: str) -> Union[list, int]:
+        """Method for getting all the objects from table
+
+        Args:
+            collection (str): name of the table
+
+        Returns:
+            Union[list, int]: list of the objects, some requests can return integer
+        """
         items = await self.get(collection)
         return items
 
     async def get_object(
         self, collection: str, item_id: str, additional_path: str = None
     ) -> Union[dict, int]:
+        """Methof for getting single object from the table
+
+        Args:
+            collection (str): name of the table
+            item_id (str): id of the object in the database
+            additional_path (str, optional): some additional url part, that comes after item id. Defaults to None.
+
+        Returns:
+            Union[dict, int]: object, some requests can return integer
+        """
         item = await self.get(
             f"{collection}/{item_id}" + (additional_path if additional_path else "")
         )
         return item
 
     async def update_object(
-        self, collection: str, item_id, data: dict, additional_path: str = None
+        self, collection: str, item_id: str, data: dict, additional_path: str = None
     ) -> Tuple[dict, int]:
+        """Method for updating object
+
+        Args:
+            collection (str): name of the table
+            item_id (str): id of the object in the database
+            data (dict): new data
+            additional_path (str, optional): some additional url part, that comes after item id. Defaults to None.
+
+        Returns:
+            Tuple[dict, int]: updated object and status
+        """
         await self.__get_token()
         headers = {"Authorization": self.auth_str % self.token}
         data, status = await self.put(
@@ -41,24 +70,47 @@ class Backend(API):
         return data, status
 
     async def delete_object(self, collection: str, item_id) -> int:
+        """Method for deleting object
+
+        Args:
+            collection (str): name of the table
+            item_id (_type_): id of the object in the database
+
+        Returns:
+            int: status code
+        """
         await self.__get_token()
         headers = {"Authorization": self.auth_str % self.token}
         status = await self.delete(f"{collection}/{item_id}", headers=headers)
         return status
 
     async def create_object(self, collection: str, data: dict) -> Tuple[dict, int]:
+        """Method for creating object
+
+        Args:
+            collection (str): name of the table
+            data (dict): dict with data of the new object
+
+        Returns:
+            Tuple[dict, int]: created object and status code
+        """
         await self.__get_token()
         headers = {"Authorization": self.auth_str % self.token}
         data, status = await self.post(collection, data, headers=headers)
         return data, status
 
     async def __get_token(self):
+        """Private method for getting token
+
+        Raises:
+            Exception: if it is unavailable get token via http request
+        """
         if not self.token:
             token, status = await self.post(
                 "token",
                 data={
-                    "username": config.admin_email,
-                    "password": config.admin_password,
+                    "username": config.admin_email.get_secret_value(),
+                    "password": config.admin_password.get_secret_value(),
                 },
             )
             if status == 200:
@@ -84,8 +136,8 @@ class Restaurant(Backend):
         data, status = await self.create_object("restaurants", data)
         return data, status
 
-    async def delete_restaurant(self, restaurant_id) -> int:
-        status = await self.delete_object("restaurants", restaurant_id)
+    async def delete_restaurant(self, restaurant_name: str) -> int:
+        status = await self.delete_object("restaurants", restaurant_name)
         return status
 
 
@@ -163,7 +215,12 @@ class User(Backend):
         data, status = await self.update_object(
             "users",
             username,
-            {"is_staff": is_staff, "is_chef": is_chef, "is_courier": is_courier},
+            {
+                "is_staff": is_staff,
+                "is_chef": is_chef,
+                "is_courier": is_courier,
+                "connected_restaurant": restaurant,
+            },
         )
         return data, status
 
@@ -253,7 +310,7 @@ class Order(Backend):
             "user": user,
             "payment_method": payment_method,
             "shipping_address_name": shipping_address_name,
-            "shipping_price": float(shipping_price),
+            "shipping_price": round(float(shipping_price), 3),
         }
         if shipping_address_latitude:
             data["shipping_address_latitude"] = shipping_address_latitude

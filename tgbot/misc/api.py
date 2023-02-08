@@ -76,4 +76,5 @@ class API:
             return response.status
 
     async def close(self):
+        """Method for closing session"""
         await self.session.close()
