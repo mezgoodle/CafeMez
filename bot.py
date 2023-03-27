@@ -21,8 +21,6 @@ from tgbot.misc.storage import Storage
 from tgbot.services.admins_notify import on_startup_notify
 from tgbot.services.setting_commands import set_default_commands
 
-# TODO: inspect code by PyCharm and other tools
-
 
 def register_all_middlewares(dispatcher: Dispatcher) -> None:
     logger.info("Registering middlewares")
