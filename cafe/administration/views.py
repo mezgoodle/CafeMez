@@ -1,34 +1,34 @@
-from rest_framework import response, status
-from rest_framework.decorators import api_view, action
-from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.viewsets import ModelViewSet
 from django.http import Http404
 from loguru import logger
+from rest_framework import response, status
+from rest_framework.decorators import action, api_view
+from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.viewsets import ModelViewSet
 
 from .models import (
-    Place,
-    Restaurant,
-    User,
-    Referral,
-    Item,
     Category,
-    SubCategory,
-    OrderItem,
+    Item,
     Order,
+    OrderItem,
+    Place,
+    Referral,
+    Restaurant,
+    SubCategory,
+    User,
 )
+from .permissions import IsAdminOrReadOnly
 from .serializers import (
-    PlaceSerializer,
-    RestaurantSerializer,
-    UserSerializer,
-    ReferralSerializer,
-    ItemSerializer,
     CategorySerializer,
-    SubCategorySerializer,
-    OrderSerializer,
+    ItemSerializer,
     OrderItemSerializer,
+    OrderSerializer,
+    PlaceSerializer,
+    ReferralSerializer,
+    RestaurantSerializer,
+    SubCategorySerializer,
+    UserSerializer,
 )
 from .utils import set_permissions
-from .permissions import IsAdminOrReadOnly
 
 
 class BaseViewSet(ModelViewSet):

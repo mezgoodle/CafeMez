@@ -1,15 +1,15 @@
 from rest_framework import serializers
 
 from .models import (
-    Place,
-    Restaurant,
-    User,
-    Referral,
-    Item,
     Category,
-    SubCategory,
+    Item,
     Order,
     OrderItem,
+    Place,
+    Referral,
+    Restaurant,
+    SubCategory,
+    User,
 )
 
 

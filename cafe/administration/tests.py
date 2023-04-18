@@ -1,12 +1,12 @@
 import json
-from rest_framework.test import APITestCase
-from rest_framework.authtoken.models import Token
-from rest_framework import status
+
 from django.urls import reverse
+from rest_framework import status
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APITestCase
 
 from .models import *
 from .serializers import *
-
 
 # class LoginTestCase(APITestCase):
 #     def test_login(self):
@@ -21,21 +21,23 @@ from .serializers import *
 
 class RestaurantTestCase(APITestCase):
     def setUp(self) -> None:
-        self.user = User.objects.create(email='mezgoodle@gmail.com', password='123456')
+        self.user = User.objects.create(email="mezgoodle@gmail.com", password="123456")
         self.token = Token.objects.create(user=self.user)
         # self.api_authentication()
 
     def api_authentication(self):
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token)
 
     def test_restaurant_list(self):
         initial_restaurants_count = Restaurant.objects.count()
-        response = self.client.get(reverse('restaurant-list'))
+        response = self.client.get(reverse("restaurant-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), initial_restaurants_count)
 
     def test_restaurant_detail(self):
-        response = self.client.get(reverse('restaurant-detail', kwargs={'name': 'test'}))
+        response = self.client.get(
+            reverse("restaurant-detail", kwargs={"name": "test"})
+        )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     # def test_restaurant_creation(self):
