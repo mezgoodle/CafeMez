@@ -9,8 +9,12 @@ from tgbot.misc.backend import Order
 from tgbot.misc.staff_actions import finish_order_action, staff_action
 
 
-@dp.callback_query_handler(order_callback.filter(action="paid"), is_courier=True)
-async def change_order_payment(callback_query: CallbackQuery, callback_data: dict):
+@dp.callback_query_handler(
+    order_callback.filter(action="paid"), is_courier=True
+)
+async def change_order_payment(
+    callback_query: CallbackQuery, callback_data: dict
+):
     return await staff_action(
         callback_query,
         callback_data,
@@ -21,8 +25,12 @@ async def change_order_payment(callback_query: CallbackQuery, callback_data: dic
     )
 
 
-@dp.callback_query_handler(order_callback.filter(action="delivered"), is_courier=True)
-async def change_order_delivered(callback_query: CallbackQuery, callback_data: dict):
+@dp.callback_query_handler(
+    order_callback.filter(action="delivered"), is_courier=True
+)
+async def change_order_delivered(
+    callback_query: CallbackQuery, callback_data: dict
+):
     additional_text = (
         f'Статус доставки вашого замовлення із номером {callback_data["id"]} '
         f'змінено на {hbold("доставлене") if callback_data["value"] == "True" else hbold("не доставлене")}"!'
@@ -38,12 +46,21 @@ async def change_order_delivered(callback_query: CallbackQuery, callback_data: d
     )
 
 
-@dp.callback_query_handler(order_callback.filter(action="coords"), is_courier=True)
-@dp.callback_query_handler(order_callback.filter(action="coords"), is_registered=True)
-async def show_order_coords(callback_query: CallbackQuery, callback_data: dict):
+@dp.callback_query_handler(
+    order_callback.filter(action="coords"), is_courier=True
+)
+@dp.callback_query_handler(
+    order_callback.filter(action="coords"), is_registered=True
+)
+async def show_order_coords(
+    callback_query: CallbackQuery, callback_data: dict
+):
     api: Order = callback_query.bot.get("orders_api")
     order = await api.get_order(callback_data["id"])
-    long, lat = order["shipping_address_longitude"], order["shipping_address_latitude"]
+    long, lat = (
+        order["shipping_address_longitude"],
+        order["shipping_address_latitude"],
+    )
     return await callback_query.message.answer_location(lat, long)
 
 
@@ -61,7 +78,9 @@ async def show_courier_order(message: Message):
     return await message.answer("У вас немає замовлень")
 
 
-@dp.callback_query_handler(order_callback.filter(action="courier"), is_courier=True)
+@dp.callback_query_handler(
+    order_callback.filter(action="courier"), is_courier=True
+)
 async def take_order(callback_query: CallbackQuery, callback_data: dict):
     additional_text = f'Ваше замовлення #{callback_data["id"]} узяв кур\'єр @{callback_query.from_user.username}'
     return await staff_action(
@@ -74,7 +93,9 @@ async def take_order(callback_query: CallbackQuery, callback_data: dict):
     )
 
 
-@dp.callback_query_handler(order_callback.filter(action="finished"), is_courier=True)
+@dp.callback_query_handler(
+    order_callback.filter(action="finished"), is_courier=True
+)
 async def finish_order(callback_query: CallbackQuery, callback_data: dict):
     return await finish_order_action(
         callback_query,

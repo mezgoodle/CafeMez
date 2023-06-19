@@ -105,7 +105,9 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data["items"] = OrderItemSerializer(instance.get_items(), many=True).data
+        data["items"] = OrderItemSerializer(
+            instance.get_items(), many=True
+        ).data
         return data
 
     def get_total_price(self, instance):
