@@ -39,7 +39,9 @@ class API:
             Tuple[dict, int]: created object and status
         """
         url = self.base_url % request_url
-        async with self.session.post(url, data=data, headers=headers) as response:
+        async with self.session.post(
+            url, data=data, headers=headers
+        ) as response:
             return await response.json(), response.status
 
     @api_decorator
@@ -57,7 +59,9 @@ class API:
             Tuple[dict, int]: updated object and status
         """
         url = self.base_url % request_url
-        async with self.session.patch(url, data=data, headers=headers) as response:
+        async with self.session.patch(
+            url, data=data, headers=headers
+        ) as response:
             return await response.json(), response.status
 
     @api_decorator

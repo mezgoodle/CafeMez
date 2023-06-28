@@ -42,12 +42,17 @@ class Backend(API):
             Union[dict, int]: object, some requests can return integer
         """
         item = await self.get(
-            f"{collection}/{item_id}" + (additional_path if additional_path else "")
+            f"{collection}/{item_id}"
+            + (additional_path if additional_path else "")
         )
         return item
 
     async def update_object(
-        self, collection: str, item_id: str, data: dict, additional_path: str = None
+        self,
+        collection: str,
+        item_id: str,
+        data: dict,
+        additional_path: str = None,
     ) -> Tuple[dict, int]:
         """Method for updating object
 
@@ -63,7 +68,8 @@ class Backend(API):
         await self.__get_token()
         headers = {"Authorization": self.auth_str % self.token}
         data, status = await self.put(
-            f"{collection}/{item_id}" + (additional_path if additional_path else ""),
+            f"{collection}/{item_id}"
+            + (additional_path if additional_path else ""),
             data,
             headers=headers,
         )
@@ -84,7 +90,9 @@ class Backend(API):
         status = await self.delete(f"{collection}/{item_id}", headers=headers)
         return status
 
-    async def create_object(self, collection: str, data: dict) -> Tuple[dict, int]:
+    async def create_object(
+        self, collection: str, data: dict
+    ) -> Tuple[dict, int]:
         """Method for creating object
 
         Args:
@@ -131,7 +139,9 @@ class Restaurant(Backend):
         restaurant = await self.get_object("restaurants", restaurant_name)
         return restaurant
 
-    async def create_restaurant(self, name, latitude, longitude) -> Tuple[dict, int]:
+    async def create_restaurant(
+        self, name, latitude, longitude
+    ) -> Tuple[dict, int]:
         data = {"name": name, "latitude": latitude, "longitude": longitude}
         data, status = await self.create_object("restaurants", data)
         return data, status
@@ -150,7 +160,9 @@ class Place(Backend):
         return places
 
     async def get_places_by_restaurant(self, restaurant_name: str) -> list:
-        places = await self.get_all_objects(f"places/restaurant/{restaurant_name}")
+        places = await self.get_all_objects(
+            f"places/restaurant/{restaurant_name}"
+        )
         return places
 
     async def get_place(self, place_id) -> dict:
@@ -178,9 +190,13 @@ class User(Backend):
         user = await self.get_object("users", username)
         return user
 
-    async def get_staff(self, restaurant_name=None) -> Union[Dict[str, list], list]:
+    async def get_staff(
+        self, restaurant_name=None
+    ) -> Union[Dict[str, list], list]:
         if restaurant_name:
-            return await self.get_all_objects(f"users/get_staff/{restaurant_name}")
+            return await self.get_all_objects(
+                f"users/get_staff/{restaurant_name}"
+            )
         return await self.get_all_objects("users/get_admins")
 
     async def delete_user(self, username: str) -> int:
@@ -248,7 +264,9 @@ class Item(Backend):
         return categories
 
     async def get_subcategories(self, category: str) -> List[dict]:
-        subcategories = await self.get_all_objects(f"subcategories/by/{category}")
+        subcategories = await self.get_all_objects(
+            f"subcategories/by/{category}"
+        )
         return subcategories
 
     async def get_items(self, subcategory: str) -> List[dict]:
@@ -333,7 +351,11 @@ class Order(Backend):
             )
             _, status = await self.create_object(
                 "order_items",
-                {"order": order_id, "item": order_item["name"], "quantity": quantity},
+                {
+                    "order": order_id,
+                    "item": order_item["name"],
+                    "quantity": quantity,
+                },
             )
             if status != 201:
                 return status
@@ -355,7 +377,9 @@ class Order(Backend):
         item = await self.get_object("order_items", item_id)
         return item
 
-    async def update_order(self, order_id: str, data: dict) -> Tuple[dict, int]:
+    async def update_order(
+        self, order_id: str, data: dict
+    ) -> Tuple[dict, int]:
         data, status = await self.update_object("orders", order_id, data)
         return data, status
 
@@ -364,7 +388,9 @@ class Order(Backend):
         return status
 
     async def finish_order(self, order_id: str) -> int:
-        data, status = await self.update_object("orders", order_id, {}, "/finish_order")
+        data, status = await self.update_object(
+            "orders", order_id, {}, "/finish_order"
+        )
         return status
 
     @staticmethod

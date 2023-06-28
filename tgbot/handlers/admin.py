@@ -7,7 +7,10 @@ from aiogram.utils.exceptions import ChatNotFound
 from aiogram.utils.markdown import hbold, hitalic
 
 from loader import dp
-from tgbot.keyboards.inline.callback_data import admin_place_callback, order_callback
+from tgbot.keyboards.inline.callback_data import (
+    admin_place_callback,
+    order_callback,
+)
 from tgbot.keyboards.inline.places_keyboard import admin_places_markup
 from tgbot.keyboards.inline.restaurants_keyboard import restaurants_markup
 from tgbot.keyboards.reply.location import location_markup
@@ -77,7 +80,8 @@ async def answer_credentials(message: Message, state: FSMContext) -> Message:
     await User.next()
     try:
         await state.update_data(
-            username=message.forward_from.username, telegram_id=message.forward_from.id
+            username=message.forward_from.username,
+            telegram_id=message.forward_from.id,
         )
     except AttributeError:
         return await message.reply(
@@ -125,9 +129,13 @@ async def add_admin(message: Message, command: Command.CommandObj) -> Message:
         api: UserAPI = message.bot.get("users_api")
         status = await api.delete_user(text)
         if status == 204:
-            return await message.reply(f"Користувача {hbold(text)} успішно видалено")
+            return await message.reply(
+                f"Користувача {hbold(text)} успішно видалено"
+            )
         elif status == 404:
-            return await message.reply(f"Користувача {hbold(text)} не знайдено")
+            return await message.reply(
+                f"Користувача {hbold(text)} не знайдено"
+            )
         return await message.reply(
             "Виникла проблема. Зверніться до головного адміністратора"
         )
@@ -139,7 +147,8 @@ async def add_restaurant(message: Message, state: FSMContext) -> Message:
     await state.set_state("cafe_coords")
     markup = location_markup()
     return await message.reply(
-        "Надішліть локацію через кнопку або просто як вкладення", reply_markup=markup
+        "Надішліть локацію через кнопку або просто як вкладення",
+        reply_markup=markup,
     )
 
 
@@ -149,7 +158,8 @@ async def add_restaurant(message: Message, state: FSMContext) -> Message:
 async def add_cafe_coords(message: Message, state: FSMContext) -> Message:
     await state.set_state("cafe_name")
     await state.update_data(
-        longitude=message.location.longitude, latitude=message.location.latitude
+        longitude=message.location.longitude,
+        latitude=message.location.latitude,
     )
     return await message.reply("Напишіть назву ресторану")
 
@@ -176,27 +186,34 @@ async def edit_places(message: Message, state: FSMContext) -> Message:
     markup = await reply_restaurants_markup(message)
     await state.set_state("admin_restaurant_name")
     return await message.answer(
-        "Оберіть ресторан, у якому хочете редагувати місце", reply_markup=markup
+        "Оберіть ресторан, у якому хочете редагувати місце",
+        reply_markup=markup,
     )
 
 
 @dp.message_handler(state="admin_restaurant_name", is_admin=True)
-async def edit_places_in_restaurant(message: Message, state: FSMContext) -> Message:
+async def edit_places_in_restaurant(
+    message: Message, state: FSMContext
+) -> Message:
     restaurant_name = message.text
     keyboard = await admin_places_markup(message, restaurant_name)
     await state.finish()
     return await message.answer(
-        "Будь ласка, редагуйте місця за допомогою кнопок", reply_markup=keyboard
+        "Будь ласка, редагуйте місця за допомогою кнопок",
+        reply_markup=keyboard,
     )
 
 
-@dp.callback_query_handler(admin_place_callback.filter(method="update"), is_admin=True)
+@dp.callback_query_handler(
+    admin_place_callback.filter(method="update"), is_admin=True
+)
 async def update_places_in_restaurant(
     call: CallbackQuery, callback_data: dict
 ) -> Message:
     api: Place = call.bot.get("places_api")
     _, status = await api.update_place(
-        callback_data["place_id"], {"free": callback_data["value"], "customer": ""}
+        callback_data["place_id"],
+        {"free": callback_data["value"], "customer": ""},
     )
     if status == 200:
         return await call.message.edit_text("Місце успішно оновлено")
@@ -205,7 +222,9 @@ async def update_places_in_restaurant(
     )
 
 
-@dp.callback_query_handler(admin_place_callback.filter(method="remove"), is_admin=True)
+@dp.callback_query_handler(
+    admin_place_callback.filter(method="remove"), is_admin=True
+)
 async def delete_places_in_restaurant(
     call: CallbackQuery, callback_data: dict
 ) -> Message:
@@ -241,7 +260,9 @@ async def enter_text(message: Message, state: FSMContext):
     return await message.answer("Повідомлення надіслано!")
 
 
-@dp.callback_query_handler(order_callback.filter(action="finished"), is_admin=True)
+@dp.callback_query_handler(
+    order_callback.filter(action="finished"), is_admin=True
+)
 async def finish_order(callback_query: CallbackQuery, callback_data: dict):
     return await finish_order_action(
         callback_query,
@@ -252,7 +273,9 @@ async def finish_order(callback_query: CallbackQuery, callback_data: dict):
 
 
 @dp.callback_query_handler(order_callback.filter(action="paid"), is_admin=True)
-async def change_order_payment(callback_query: CallbackQuery, callback_data: dict):
+async def change_order_payment(
+    callback_query: CallbackQuery, callback_data: dict
+):
     return await staff_action(
         callback_query,
         callback_data,
@@ -262,11 +285,17 @@ async def change_order_payment(callback_query: CallbackQuery, callback_data: dic
     )
 
 
-@dp.callback_query_handler(order_callback.filter(action="delete"), is_admin=True)
+@dp.callback_query_handler(
+    order_callback.filter(action="delete"), is_admin=True
+)
 async def delete_order(callback_query: CallbackQuery, callback_data: dict):
     api: Order = callback_query.bot.get("orders_api")
     status = await api.delete_order(callback_data["id"])
     if status == 204:
         await callback_query.message.delete()
-        return await callback_query.message.answer("Замовлення успішно видалено!")
-    return await callback_query.message.answer("Помилка при видалення замовлення!")
+        return await callback_query.message.answer(
+            "Замовлення успішно видалено!"
+        )
+    return await callback_query.message.answer(
+        "Помилка при видалення замовлення!"
+    )

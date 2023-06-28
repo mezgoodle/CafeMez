@@ -55,9 +55,13 @@ async def staff_action(
     if status == 200:
         keyboard = orders_keyboard(new_order)
         if additional_text:
-            await bot.send_message(new_order["user"]["telegram_id"], additional_text)
+            await bot.send_message(
+                new_order["user"]["telegram_id"], additional_text
+            )
         await callback_query.message.answer(success_text)
-        return await callback_query.message.edit_reply_markup(reply_markup=keyboard)
+        return await callback_query.message.edit_reply_markup(
+            reply_markup=keyboard
+        )
     return await callback_query.message.answer(fail_text)
 
 

@@ -1,61 +1,61 @@
-from rest_framework import response, status
-from rest_framework.decorators import api_view, action
-from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.viewsets import ModelViewSet
 from django.http import Http404
 from loguru import logger
+from rest_framework import response, status
+from rest_framework.decorators import action, api_view
+from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.viewsets import ModelViewSet
 
 from .models import (
-    Place,
-    Restaurant,
-    User,
-    Referral,
-    Item,
     Category,
-    SubCategory,
-    OrderItem,
+    Item,
     Order,
+    OrderItem,
+    Place,
+    Referral,
+    Restaurant,
+    SubCategory,
+    User,
 )
+from .permissions import IsAdminOrReadOnly
 from .serializers import (
-    PlaceSerializer,
-    RestaurantSerializer,
-    UserSerializer,
-    ReferralSerializer,
-    ItemSerializer,
     CategorySerializer,
-    SubCategorySerializer,
-    OrderSerializer,
+    ItemSerializer,
     OrderItemSerializer,
+    OrderSerializer,
+    PlaceSerializer,
+    ReferralSerializer,
+    RestaurantSerializer,
+    SubCategorySerializer,
+    UserSerializer,
 )
 from .utils import set_permissions
-from .permissions import IsAdminOrReadOnly
 
 
 class BaseViewSet(ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
 
     def list(self, request, *args, **kwargs):
-        # logger.info(f'Get list of objects; {request=}; {args=}; {kwargs=}')
+        logger.info(f"Get list of objects; {request=}; {args=}; {kwargs=}")
         return super().list(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
-        # logger.info(f'Create object; {request=}; {args=}; {kwargs=}')
+        logger.info(f"Create object; {request=}; {args=}; {kwargs=}")
         return super().create(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
-        # logger.info(f'Get object; {request=}; {args=}; {kwargs=}')
+        logger.info(f"Get object; {request=}; {args=}; {kwargs=}")
         return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
-        # logger.info(f'Update object; {request=}; {args=}; {kwargs=}')
+        logger.info(f"Update object; {request=}; {args=}; {kwargs=}")
         return super().update(request, *args, **kwargs)
 
     def partial_update(self, request, *args, **kwargs):
-        # logger.info(f'Update object partial; {request=}; {args=}; {kwargs=}')
+        logger.info(f"Update object partial; {request=}; {args=}; {kwargs=}")
         return super().partial_update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
-        # logger.info(f'Delete object; {request=}; {args=}; {kwargs=}')
+        logger.info(f"Delete object; {request=}; {args=}; {kwargs=}")
         return super().destroy(request, *args, **kwargs)
 
 
@@ -84,8 +84,12 @@ class SubCategoryViewSet(BaseViewSet):
             )
             subcategory.save()
             serializer = self.serializer_class(subcategory)
-            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
-        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(
+                serializer.data, status=status.HTTP_201_CREATED
+            )
+        return response.Response(
+            serializer.errors, status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 class OrderViewSet(BaseViewSet):
@@ -101,18 +105,26 @@ class OrderViewSet(BaseViewSet):
                     name=request.data["shipping_address_name"]
                 ),
                 payment_method=request.data["payment_method"],
-                shipping_address_longitude=request.data["shipping_address_longitude"]
+                shipping_address_longitude=request.data[
+                    "shipping_address_longitude"
+                ]
                 if "shipping_address_longitude" in request.data
                 else None,
-                shipping_address_latitude=request.data["shipping_address_latitude"]
+                shipping_address_latitude=request.data[
+                    "shipping_address_latitude"
+                ]
                 if "shipping_address_latitude" in request.data
                 else None,
                 shipping_price=request.data["shipping_price"],
             )
             order.save()
             serializer = self.serializer_class(order)
-            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
-        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(
+                serializer.data, status=status.HTTP_201_CREATED
+            )
+        return response.Response(
+            serializer.errors, status=status.HTTP_400_BAD_REQUEST
+        )
 
     @action(detail=True, methods=["patch"])
     def finish_order(self, request, pk=None):
@@ -137,8 +149,12 @@ class OrderItemViewSet(BaseViewSet):
             )
             order_item.save()
             serializer = self.serializer_class(order_item)
-            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
-        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(
+                serializer.data, status=status.HTTP_201_CREATED
+            )
+        return response.Response(
+            serializer.errors, status=status.HTTP_400_BAD_REQUEST
+        )
 
     @action(detail=False, methods=["get"])
     def finished_orders(self, request):
@@ -161,12 +177,18 @@ class ItemViewSet(BaseViewSet):
                 price=request.data["price"],
                 description=request.data["description"],
                 photo=request.data["photo"],
-                subcategory=SubCategory.objects.get(code=request.data["subcategory"]),
+                subcategory=SubCategory.objects.get(
+                    code=request.data["subcategory"]
+                ),
             )
             item.save()
             serializer = self.serializer_class(item)
-            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
-        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(
+                serializer.data, status=status.HTTP_201_CREATED
+            )
+        return response.Response(
+            serializer.errors, status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 # TODO: rewrite functional views into ModelViewSet's actions as possible
@@ -184,7 +206,9 @@ def get_orders(request, username):
     user = User.objects.get(username=username)
     orders = None
     if user.is_chef:
-        orders = user.connected_restaurant.order_set.all().filter(is_ready=False)
+        orders = user.connected_restaurant.order_set.all().filter(
+            is_ready=False
+        )
     elif user.is_courier:
         orders = user.connected_restaurant.order_set.all().filter(
             is_delivered=False, shipping_address_latitude__isnull=False
@@ -247,8 +271,12 @@ class UserViewSet(BaseViewSet):
             user.set_password(request.data["password"])
             set_permissions(user)
             user.save()
-            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
-        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(
+                serializer.data, status=status.HTTP_201_CREATED
+            )
+        return response.Response(
+            serializer.errors, status=status.HTTP_400_BAD_REQUEST
+        )
 
     @action(detail=True, methods=["get"])
     def get_order(self, request, username=None):
@@ -291,8 +319,12 @@ class UserViewSet(BaseViewSet):
 
     @action(detail=False, url_path="get_staff/(?P<restaurant>[^/.]+)")
     def get_staff(self, request, restaurant):
-        staff = User.objects.filter(is_staff=True, connected_restaurant=restaurant)
-        chefs = User.objects.filter(is_chef=True, connected_restaurant=restaurant)
+        staff = User.objects.filter(
+            is_staff=True, connected_restaurant=restaurant
+        )
+        chefs = User.objects.filter(
+            is_chef=True, connected_restaurant=restaurant
+        )
         staff_serializer = self.get_serializer(staff, many=True)
         chefs_serializer = self.get_serializer(chefs, many=True)
         return response.Response(

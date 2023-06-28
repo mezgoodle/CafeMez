@@ -1,10 +1,12 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
 
 from . import views
 
-router = DefaultRouter(trailing_slash=False)  # trailing slash is False for production
+router = DefaultRouter(
+    trailing_slash=False
+)  # trailing slash is False for production
 router.register(r"places", views.PlaceViewSet)
 router.register(r"categories", views.CategoryViewSet)
 router.register(r"items", views.ItemViewSet)
@@ -22,7 +24,11 @@ urlpatterns = [
         views.places_by_restaurant,
         name="places_by_restaurant",
     ),
-    path("items/by/<str:subcategory_code>", views.get_items, name="items_specific"),
+    path(
+        "items/by/<str:subcategory_code>",
+        views.get_items,
+        name="items_specific",
+    ),
     path(
         "subcategories/by/<str:category_code>",
         views.subcategories_by_category,
