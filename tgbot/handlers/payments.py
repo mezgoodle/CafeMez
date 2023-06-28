@@ -19,7 +19,8 @@ async def pre_checkout(query: PreCheckoutQuery):
         )
         if status != 201:
             return await bot.send_message(
-                query.from_user.id, "Виникла помилка. Зверніться до служби підтримки"
+                query.from_user.id,
+                "Виникла помилка. Зверніться до служби підтримки",
             )
     payment_handlers = {
         "place": handle_place_payment,

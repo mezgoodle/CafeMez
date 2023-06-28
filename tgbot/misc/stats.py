@@ -66,7 +66,9 @@ async def plot_restaurant_count(df: pd.DataFrame, message: Message) -> Message:
     img = io.BytesIO()
     fig.savefig(img)
     img.seek(0)
-    return await message.answer_photo(img, "Кількість замовлень у кожному ресторані")
+    return await message.answer_photo(
+        img, "Кількість замовлень у кожному ресторані"
+    )
 
 
 async def plot_items_price(df: pd.DataFrame, message: Message) -> Message:
@@ -74,7 +76,9 @@ async def plot_items_price(df: pd.DataFrame, message: Message) -> Message:
     for tick in axs.get_yticklabels():
         tick.set_rotation(90)
     fig.align_ylabels()
-    sns.barplot(x="quantity", y="restaurant", hue="name", data=df, palette="Greens")
+    sns.barplot(
+        x="quantity", y="restaurant", hue="name", data=df, palette="Greens"
+    )
     img = io.BytesIO()
     fig.savefig(img)
     img.seek(0)

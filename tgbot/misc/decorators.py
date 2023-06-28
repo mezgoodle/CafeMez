@@ -1,9 +1,9 @@
-from aiohttp import ClientConnectorError
+from functools import wraps
+
 from aiogram import Bot
 from aiogram.types import User
+from aiohttp import ClientConnectorError
 from loguru import logger
-
-from functools import wraps
 
 
 def api_decorator(method):
@@ -16,8 +16,14 @@ def api_decorator(method):
         try:
             return await method(*args, **kwargs)
         except ClientConnectorError:
-            logger.error(f'Error in function "{method_name}": Connection error')
-            await bot.send_message(user_id, 'Помилка при з\'єднанні з сервером. Перевірте лог-файли.')
+            logger.error(
+                f'Error in function "{method_name}": Connection error'
+            )
+            await bot.send_message(
+                user_id,
+                "Помилка при з'єднанні з сервером. Перевірте лог-файли.",
+            )
         except Exception as e:
-            logger.error(f'Error in function {method_name}. Error: {e}')
+            logger.error(f"Error in function {method_name}. Error: {e}")
+
     return wrapper

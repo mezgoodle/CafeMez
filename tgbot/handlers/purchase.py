@@ -53,7 +53,9 @@ async def change_item_amount(message: Message, state: FSMContext):
     await message.answer("Ви успішно змінили кількість товару!")
     api: Item = message.bot.get("items_api")
     keyboard = await cart_keyboard(api, cart)
-    return await message.answer("Ваша оновлена корзина:", reply_markup=keyboard)
+    return await message.answer(
+        "Ваша оновлена корзина:", reply_markup=keyboard
+    )
 
 
 @dp.callback_query_handler(cart_callback.filter(action="show"))
@@ -120,10 +122,14 @@ async def shipping_address_as_text(message: Message, state: FSMContext):
         await state.update_data(shipping_address_name=name)
         await state.set_state("payment_method")
         keyboard = payments_markup()
-        return await message.answer("Виберіть спосіб оплати", reply_markup=keyboard)
+        return await message.answer(
+            "Виберіть спосіб оплати", reply_markup=keyboard
+        )
 
 
-@dp.message_handler(state="shipping_address", content_types=ContentType.LOCATION)
+@dp.message_handler(
+    state="shipping_address", content_types=ContentType.LOCATION
+)
 async def shipping_address_as_location(message: Message, state: FSMContext):
     restaurant_location = message.location
     api: Order = message.bot.get("orders_api")
@@ -142,11 +148,14 @@ async def shipping_address_as_location(message: Message, state: FSMContext):
     )
     await state.set_state("payment_method")
     keyboard = payments_markup()
-    return await message.answer("Виберіть спосіб оплати", reply_markup=keyboard)
+    return await message.answer(
+        "Виберіть спосіб оплати", reply_markup=keyboard
+    )
 
 
 @dp.message_handler(
-    Text(equals=["Картка", "Готівка"], ignore_case=True), state="payment_method"
+    Text(equals=["Картка", "Готівка"], ignore_case=True),
+    state="payment_method",
 )
 async def answer_payment_method(message: Message, state: FSMContext):
     payment_dict = {"Картка": "CD", "Готівка": "CH"}
@@ -156,7 +165,9 @@ async def answer_payment_method(message: Message, state: FSMContext):
     bot: Bot = message.bot
     await state.finish()
     api: Order = bot.get("orders_api")
-    order_id, status = await api.create_order(user=message.from_user.username, **data)
+    order_id, status = await api.create_order(
+        user=message.from_user.username, **data
+    )
     if status == 201:
         storage: Storage = bot.get("storage")
         cart = storage.get_cart(message.from_user.id)
@@ -168,7 +179,9 @@ async def answer_payment_method(message: Message, state: FSMContext):
                 order = await api.get_order(str(order_id))
                 if price := order["shipping_price"]:
                     prices.append(
-                        LabeledPrice(label="Вартість доставки", amount=int(price) * 100)
+                        LabeledPrice(
+                            label="Вартість доставки", amount=int(price) * 100
+                        )
                     )
                 user = await users_api.get_user(message.from_user.username)
                 need_email = False
@@ -183,7 +196,8 @@ async def answer_payment_method(message: Message, state: FSMContext):
                             LabeledPrice(
                                 label="Знижка",
                                 amount=int(
-                                    -order["total_price_without_discount"] * discount
+                                    -order["total_price_without_discount"]
+                                    * discount
                                 ),
                             )
                         )

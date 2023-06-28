@@ -21,7 +21,9 @@ from .serializers import *
 
 class RestaurantTestCase(APITestCase):
     def setUp(self) -> None:
-        self.user = User.objects.create(email="mezgoodle@gmail.com", password="123456")
+        self.user = User.objects.create(
+            email="mezgoodle@gmail.com", password="123456"
+        )
         self.token = Token.objects.create(user=self.user)
         # self.api_authentication()
 
