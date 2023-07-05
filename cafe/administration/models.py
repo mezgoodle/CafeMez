@@ -19,7 +19,9 @@ class TimeStampedModel(models.Model):
 
 class Restaurant(TimeStampedModel):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100, verbose_name="Назва ресторану", unique=True)
+    name = models.CharField(
+        max_length=100, verbose_name="Назва ресторану", unique=True
+    )
     longitude = models.FloatField(verbose_name="Довгота")
     latitude = models.FloatField(verbose_name="Широта")
 
@@ -34,7 +36,9 @@ class Restaurant(TimeStampedModel):
 class User(TimeStampedModel, AbstractUser):
     id = models.AutoField(primary_key=True)
     username = models.CharField(
-        max_length=100, verbose_name="Ім'я користувача в телеграмі", unique=True
+        max_length=100,
+        verbose_name="Ім'я користувача в телеграмі",
+        unique=True,
     )
     email = models.EmailField(
         max_length=100, verbose_name="Електронна пошта", unique=True
@@ -122,7 +126,9 @@ class Referral(TimeStampedModel):
 class Category(TimeStampedModel):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, verbose_name="Назва категорії")
-    code = models.CharField(max_length=20, verbose_name="Код категорії", unique=True)
+    code = models.CharField(
+        max_length=20, verbose_name="Код категорії", unique=True
+    )
 
     class Meta:
         verbose_name = "Категорія"
@@ -133,15 +139,22 @@ class Category(TimeStampedModel):
 
     def count_items(self):
         subcategories = self.subcategory_set.all()
-        return sum([subcategory.item_set.count() for subcategory in subcategories])
+        return sum(
+            [subcategory.item_set.count() for subcategory in subcategories]
+        )
 
 
 class SubCategory(TimeStampedModel):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, verbose_name="Назва підкатегорії")
-    code = models.CharField(max_length=20, verbose_name="Код підкатегорії", unique=True)
+    code = models.CharField(
+        max_length=20, verbose_name="Код підкатегорії", unique=True
+    )
     category = models.ForeignKey(
-        Category, to_field="code", on_delete=models.CASCADE, verbose_name="Категорія"
+        Category,
+        to_field="code",
+        on_delete=models.CASCADE,
+        verbose_name="Категорія",
     )
 
     class Meta:
@@ -158,9 +171,15 @@ class SubCategory(TimeStampedModel):
 class Item(TimeStampedModel):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, verbose_name="Назва", unique=True)
-    price = models.DecimalField(max_digits=8, decimal_places=2, verbose_name="Ціна")
-    description = models.TextField(verbose_name="Опис", null=True, max_length=200)
-    photo = models.CharField(max_length=250, verbose_name="Фото file_id")
+    price = models.DecimalField(
+        max_digits=8, decimal_places=2, verbose_name="Ціна"
+    )
+    description = models.TextField(
+        verbose_name="Опис", null=True, max_length=200
+    )
+    photo = models.ImageField(
+        upload_to="images/", verbose_name="Фото", null=True, blank=True
+    )
     subcategory = models.ForeignKey(
         SubCategory,
         to_field="code",
@@ -200,7 +219,11 @@ class Order(TimeStampedModel):
         null=True, blank=True, max_digits=10, decimal_places=7
     )
     shipping_address_name = models.ForeignKey(
-        Restaurant, to_field="name", on_delete=models.CASCADE, null=True, blank=True
+        Restaurant,
+        to_field="name",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     connected_courier = models.OneToOneField(
         User,
@@ -234,7 +257,10 @@ class Order(TimeStampedModel):
     @property
     def tax_price(self):
         return sum(
-            [item.item.price * item.quantity for item in self.orderitem_set.all()]
+            [
+                item.item.price * item.quantity
+                for item in self.orderitem_set.all()
+            ]
         )
 
     class Meta:
@@ -251,7 +277,9 @@ class Order(TimeStampedModel):
 
 class OrderItem(TimeStampedModel):
     id = models.AutoField(primary_key=True)
-    item = models.ForeignKey(Item, to_field="name", null=True, on_delete=models.CASCADE)
+    item = models.ForeignKey(
+        Item, to_field="name", null=True, on_delete=models.CASCADE
+    )
     order = models.ForeignKey(Order, null=True, on_delete=models.CASCADE)
     quantity = models.IntegerField(null=True, blank=True, default=1)
 
