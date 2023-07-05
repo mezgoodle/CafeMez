@@ -63,6 +63,8 @@ async def show_item(callback_query: CallbackQuery, callback_data: dict):
     item_id = callback_data["item_id"]
     api: Item = callback_query.bot.get("items_api")
     item = await api.get_item(item_id)
+    # print(item["photo"])
+    # Raise an error if django launched locally
     return await callback_query.message.answer_photo(
         item["photo"], f'{item["name"]} - {item["price"]} грн'
     )
